@@ -1,0 +1,53 @@
+<!-- Add this to the departments section in company-register.html -->
+
+<div class="form-group departments-section">
+    <label class="form-label">Departments</label>
+    <div id="departmentsList">
+        <div class="department-input-row">
+            <input type="text" class="form-input department-name" placeholder="e.g., Engineering, Sales, HR" style="flex: 1;">
+            <span class="department-icon-preview">📁</span>
+            <button type="button" class="btn btn-outline remove-dept" style="display: none;">✕</button>
+        </div>
+    </div>
+    <button type="button" id="addDepartmentBtn" class="btn btn-outline btn-sm mt-1">+ Add Department</button>
+    <div class="form-hint">Departments will automatically get relevant icons based on their names</div>
+    <div class="form-error" id="departmentsError"></div>
+</div>
+
+<!-- Add this JavaScript for icon preview -->
+<script>
+    // Update icon preview when department name changes
+    function updateDepartmentIconPreview(input) {
+        const row = input.closest('.department-input-row');
+        const previewSpan = row.querySelector('.department-icon-preview');
+        const departmentName = input.value.trim();
+        
+        if (departmentName) {
+            // Use the smart icon function
+            const icon = getDepartmentIcon(departmentName);
+            previewSpan.textContent = icon;
+        } else {
+            previewSpan.textContent = '📁';
+        }
+    }
+    
+    // Call this when adding a new department row
+    function addDepartmentRow() {
+        const row = document.createElement('div');
+        row.className = 'department-input-row';
+        row.innerHTML = `
+            <input type="text" class="form-input department-name" placeholder="e.g., Engineering, Sales, HR" style="flex: 1;">
+            <span class="department-icon-preview">📁</span>
+            <button type="button" class="btn btn-outline remove-dept">✕</button>
+        `;
+        
+        const input = row.querySelector('.department-name');
+        input.addEventListener('input', () => updateDepartmentIconPreview(input));
+        
+        row.querySelector('.remove-dept').addEventListener('click', () => {
+            row.remove();
+        });
+        
+        departmentsList.appendChild(row);
+    }
+</script>

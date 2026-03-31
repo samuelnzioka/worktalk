@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Company Discussions - WorkTalk</title>
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-api.onrender.com;">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🗣️</span>
+                    <span class="logo-text">Work<span>Talk</span></span>
+                </a>
+                <nav class="nav">
+                    <a href="/companies.html" class="nav-link">Companies</a>
+                    <a href="/public-timeline.html" class="nav-link">Public Timeline</a>
+                </nav>
+                <div class="user-menu" id="userMenu">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+        </header>
+
+        <main class="main-container">
+            <div id="companyView">
+                <div class="loading-spinner"></div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">Work<span>Talk</span></div>
+                    <p>Workplace transparency platform for Kenya</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="/companies.html">Companies</a>
+                    <a href="/public-timeline.html">Public Timeline</a>
+                    <a href="/company-register.html">Register Company</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Community Guidelines</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 WorkTalk. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { isAuthenticated, getCurrentUser } from '/js/auth.js';
+        import { getCompanyBySlug, getCompanyDepartments, getDepartmentPosts, createCompanyPost, likePost, createComment } from '/js/company-detail.js';
+        import { showToast, formatRelativeTime, formatNumber, escapeHtml, getDepartmentIcon, debounce } from '/js/utils.js';
+
+        let currentUser = null;
+        let currentCompany = null;
+        let departments = [];
+        let currentDepartment = null;
+        let userDepartment = null;
+        let canPost = false;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const companySlug = urlParams.get('company');
+
+        if (!companySlug) {
+            window.location.href = '/companies.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadCompany();
+        });
+
+        async function checkAuth() {
+            if (isAuthenticated()) {
+                try {
+                    currentUser = await getCurrentUser();
+                    if (currentUser && currentUser.employeeProfile) {
+                        userDepartment = currentUser.employeeProfile.department;
+                    }
+                    updateUserMenu();
+                } catch (error) {
+                    console.error('Failed to get user:', error);
+                }
+            }
+            updateUserMenu();
+        }
+
+        function updateUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (currentUser) {
+                const activeProfile = currentUser.activeProfile || currentUser.profiles?.[0];
+                const displayName = activeProfile?.username || currentUser.email?.split('@')[0];
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <button class="user-avatar" id="userMenuBtn">
+                            <span class="avatar-icon">👤</span>
+                            <span class="user-name">${escapeHtml(displayName)}</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <div class="dropdown-section">
+                                <div class="dropdown-header">Profiles</div>
+                                <div id="profileSwitcher"></div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="/dashboard.html" class="dropdown-item">Dashboard</a>
+                            <button id="logoutBtn" class="dropdown-item logout-item">Sign Out</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                userMenu.innerHTML = `
+                    <a href="/login.html" class="btn btn-outline">Log In</a>
+                    <a href="/register.html" class="btn btn-primary">Sign Up</a>
+                `;
+            }
+        }
+
+        async function loadCompany() {
+            try {
+                currentCompany = await getCompanyBySlug(companySlug);
+                if (!currentCompany) {
+                    window.location.href = '/companies.html';
+                    return;
+                }
+                
+                departments = await getCompanyDepartments(currentCompany.id);
+                
+                canPost = currentUser && currentUser.employeeProfile && 
+                          currentUser.employeeProfile.company?.id === currentCompany.id;
+                
+                if (canPost && userDepartment && departments.some(d => d.id === userDepartment.id)) {
+                    currentDepartment = userDepartment;
+                } else if (departments.length > 0) {
+                    currentDepartment = departments[0];
+                }
+                
+                renderCompany();
+                
+                if (currentDepartment) {
+                    await loadPosts();
+                } else if (departments.length === 0) {
+                    renderNoDepartments();
+                }
+            } catch (error) {
+                console.error('Failed to load company:', error);
+                showToast('Failed to load company', 'error');
+                document.getElementById('companyView').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏢</div>
+                        <div class="empty-state-title">Company not found</div>
+                        <div class="empty-state-message">The company you're looking for doesn't exist</div>
+                        <a href="/companies.html" class="btn btn-primary mt-2">Back to Companies</a>
+                    </div>
+                `;
+            }
+        }
+
+        function renderCompany() {
+            const container = document.getElementById('companyView');
+            const isUserCompany = canPost;
+            
+            container.innerHTML = `
+                <div class="selected-company-view">
+                    <div class="company-header ${isUserCompany ? 'my-company-header' : ''}">
+                        <div class="company-header-top">
+                            <h2>
+                                <span>${currentCompany.icon || '🏢'}</span>
+                                <span>${escapeHtml(currentCompany.name)} • Department Discussions</span>
+                            </h2>
+                            <button class="back-btn" id="backToCompaniesBtn">← Back to all companies</button>
+                        </div>
+                        <div class="company-meta">
+                            <span>🏭 ${escapeHtml(currentCompany.industry)}</span>
+                            <span>👥 ${formatNumber(currentCompany.employeeCount || 0)} employees</span>
+                            <span>📊 ${currentCompany.departmentCount || 0} departments</span>
+                            <span>${isUserCompany ? '✍️ You can post in your department' : '🔒 Read-only for you'}</span>
+                        </div>
+                    </div>
+                    
+                    <div id="companyBanner">
+                        ${isUserCompany ? `
+                            <div class="employee-banner">
+                                <span>✍️</span>
+                                <span>You're an employee of ${escapeHtml(currentCompany.name)}! You can post anonymously and comment in your department space.</span>
+                                ${userDepartment ? `<span class="badge department">Your department: ${escapeHtml(userDepartment.name)}</span>` : ''}
+                            </div>
+                        ` : `
+                            <div class="readonly-banner">
+                                <span>👁️</span>
+                                <span>You're viewing as a public member. Only employees of ${escapeHtml(currentCompany.name)} can post or comment here. Want to share your thoughts? Go to the Public Timeline tab.</span>
+                            </div>
+                        `}
+                    </div>
+                    
+                    <div id="departmentNav" class="department-nav"></div>
+                    <div id="postsContainer" class="posts-container"></div>
+                </div>
+            `;
+            
+            document.getElementById('backToCompaniesBtn').addEventListener('click', () => {
+                window.location.href = '/companies.html';
+            });
+            
+            if (departments.length > 0) {
+                renderDepartmentNav();
+            }
+        }
+
+        function renderDepartmentNav() {
+            const navContainer = document.getElementById('departmentNav');
+            
+            if (!departments || departments.length === 0) {
+                navContainer.innerHTML = '';
+                return;
+            }
+            
+            const departmentTabs = departments.map(dept => `
+                <button class="dept-tab ${currentDepartment?.id === dept.id ? 'active' : ''} 
+                           ${canPost && userDepartment?.id === dept.id ? 'my-dept' : ''}" 
+                        data-department-id="${dept.id}">
+                    <span>${getDepartmentIcon(dept.name)}</span>
+                    <span>${escapeHtml(dept.name)}</span>
+                    ${canPost && userDepartment?.id === dept.id ? '<span class="dept-badge">Your Dept</span>' : ''}
+                </button>
+            `).join('');
+            
+            navContainer.innerHTML = `<div class="department-tabs">${departmentTabs}</div>`;
+            
+            document.querySelectorAll('.dept-tab').forEach(tab => {
+                tab.addEventListener('click', async () => {
+                    const deptId = tab.dataset.departmentId;
+                    currentDepartment = departments.find(d => d.id === deptId);
+                    renderDepartmentNav();
+                    await loadPosts();
+                });
+            });
+        }
+
+        function renderNoDepartments() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📁</div>
+                    <div class="empty-state-title">No departments yet</div>
+                    <div class="empty-state-message">This company hasn't created any departments yet.</div>
+                    ${canPost ? '<p class="text-muted mt-2">Company admins can add departments from the company dashboard.</p>' : ''}
+                </div>
+            `;
+        }
+
+        async function loadPosts() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const result = await getDepartmentPosts(currentCompany.id, currentDepartment.id);
+                renderPosts(result.posts);
+            } catch (error) {
+                console.error('Failed to load posts:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-title">No discussions yet</div>
+                        <div class="empty-state-message">Be the first to start a conversation in ${escapeHtml(currentDepartment?.name)} department!</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPosts(posts) {
+            const container = document.getElementById('postsContainer');
+            const canInteract = canPost && userDepartment?.id === currentDepartment?.id;
+            
+            // Add post box if user can post
+            if (canInteract) {
+                container.innerHTML = `
+                    <div class="post-box">
+                        <textarea class="post-input" id="newPostInput" rows="3" 
+                                  placeholder="What's on your mind about ${escapeHtml(currentDepartment?.name)} department? (Only ${escapeHtml(currentDepartment?.name)} coworkers will see this)"></textarea>
+                        <div class="post-actions">
+                            <label class="anonymous-toggle">
+                                <input type="checkbox" id="anonymousPostCheckbox" checked> Post anonymously
+                            </label>
+                            <button class="post-submit" id="submitPostBtn">Post to ${escapeHtml(currentDepartment?.name)}</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('submitPostBtn').addEventListener('click', handleCreatePost);
+            }
+            
+            // Render posts
+            if (!posts || posts.length === 0) {
+                if (!canInteract) {
+                    container.innerHTML += `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div class="empty-state-title">No discussions yet</div>
+                            <div class="empty-state-message">Check back later for employee discussions.</div>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            const postsHtml = posts.map(post => `
+                <div class="post-card" data-post-id="${post.id}">
+                    <div class="post-header">
+                        <div class="post-avatar ${post.isAnonymous ? 'anonymous' : 'employee'}">
+                            ${post.isAnonymous ? '🔒' : (post.username === 'You' ? '👤' : '👤')}
+                        </div>
+                        <div class="post-info">
+                            <div class="post-author">
+                                ${escapeHtml(post.username)}
+                                ${post.isAnonymous ? '<span class="post-badge employee">Anonymous</span>' : ''}
+                            </div>
+                            <div class="post-meta">
+                                <span class="post-badge ${canPost ? 'company' : 'employee'}">
+                                    ${canPost ? currentCompany.name : 'Verified Employee'}
+                                </span>
+                                <span>• ${formatRelativeTime(post.createdAt)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    <div class="post-stats">
+                        ${canInteract ? 
+                            `<button class="stat-btn like-btn" data-post-id="${post.id}">👍 ${formatNumber(post.likeCount)}</button>
+                             <button class="stat-btn comment-btn">💬 ${formatNumber(post.commentCount)}</button>` :
+                            `<span class="stat-view">👍 ${formatNumber(post.likeCount)}</span>
+                             <span class="stat-view">💬 ${formatNumber(post.commentCount)}</span>`
+                        }
+                    </div>
+                    <div class="comments-section" id="comments-${post.id}">
+                        ${renderComments(post.comments, canInteract, post.id)}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML += postsHtml;
+            
+            if (canInteract) {
+                document.querySelectorAll('.like-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const postId = btn.dataset.postId;
+                        await handleLike(postId);
+                    });
+                });
+                
+                document.querySelectorAll('.comment-submit').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const postId = btn.dataset.postId;
+                        const input = document.querySelector(`#comment-input-${postId}`);
+                        if (input && input.value.trim()) {
+                            await handleCreateComment(postId, input.value.trim());
+                            input.value = '';
+                        }
+                    });
+                });
+            }
+        }
+
+        function renderComments(comments, canInteract, postId) {
+            if (!comments || comments.length === 0) {
+                if (canInteract) {
+                    return `
+                        <div class="comment-form">
+                            <input type="text" id="comment-input-${postId}" class="comment-input" 
+                                   placeholder="Add a comment...">
+                            <button class="comment-submit" data-post-id="${postId}">Post</button>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="no-comment-notice">
+                        👁️ Only ${currentDepartment?.name} department employees can comment here.
+                    </div>
+                `;
+            }
+            
+            const commentsHtml = comments.map(comment => `
+                <div class="comment">
+                    <div class="comment-avatar">${comment.isAnonymous ? '🔒' : '👤'}</div>
+                    <div class="comment-content">
+                        <div class="comment-author">${escapeHtml(comment.username)}</div>
+                        <div class="comment-text">${escapeHtml(comment.content)}</div>
+                        <div class="comment-time">${formatRelativeTime(comment.createdAt)}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            if (canInteract) {
+                return commentsHtml + `
+                    <div class="comment-form">
+                        <input type="text" id="comment-input-${postId}" class="comment-input" 
+                               placeholder="Add a comment...">
+                        <button class="comment-submit" data-post-id="${postId}">Post</button>
+                    </div>
+                `;
+            }
+            
+            return commentsHtml + `
+                <div class="no-comment-notice">
+                    👁️ Only ${currentDepartment?.name} department employees can comment here.
+                </div>
+            `;
+        }
+
+        async function handleCreatePost() {
+            const content = document.getElementById('newPostInput').value.trim();
+            const isAnonymous = document.getElementById('anonymousPostCheckbox').checked;
+            
+            if (!content) {
+                showToast('Please write something before posting', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitPostBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Posting...';
+            
+            try {
+                await createCompanyPost(currentCompany.id, currentDepartment.id, content, isAnonymous);
+                showToast('Post published successfully', 'success');
+                document.getElementById('newPostInput').value = '';
+                await loadPosts();
+            } catch (error) {
+                console.error('Failed to create post:', error);
+                showToast(error.message || 'Failed to create post', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = `Post to ${currentDepartment?.name}`;
+            }
+        }
+
+        async function handleLike(postId) {
+            try {
+                await likePost(postId);
+                await loadPosts();
+            } catch (error) {
+                console.error('Failed to like post:', error);
+                showToast('Failed to like post', 'error');
+            }
+        }
+
+        async function handleCreateComment(postId, content) {
+            try {
+                await createComment(postId, content, true);
+                showToast('Comment added', 'success');
+                await loadPosts();
+            } catch (error) {
+                console.error('Failed to create comment:', error);
+                showToast(error.message || 'Failed to add comment', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

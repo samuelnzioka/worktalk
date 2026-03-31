@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>WorkTalk - Workplace Transparency Platform</title>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-api.onrender.com;">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/company.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🗣️</span>
+                    <span class="logo-text">Work<span>Talk</span></span>
+                </a>
+                
+                <nav class="nav">
+                    <a href="/companies.html" class="nav-link">Companies</a>
+                    <a href="/public-timeline.html" class="nav-link">Public Timeline</a>
+                </nav>
+                
+                <div class="user-menu" id="userMenu">
+                    <a href="/login.html" class="btn btn-outline">Log In</a>
+                    <a href="/register.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        See What Employees<br>
+                        <span class="gradient-text">Really Say</span>
+                    </h1>
+                    <p class="hero-description">
+                        WorkTalk brings transparency to the workplace. See internal company discussions, 
+                        share your thoughts publicly, and help build better workplaces across Kenya.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/companies.html" class="btn btn-primary btn-large">
+                            Browse Companies →
+                        </a>
+                        <a href="/public-timeline.html" class="btn btn-secondary btn-large">
+                            Public Timeline
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">10+</span>
+                        <span class="stat-label">Companies</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Departments</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">1,000+</span>
+                        <span class="stat-label">Discussions</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features">
+                <div class="container">
+                    <h2 class="section-title">How WorkTalk Works</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🏢</div>
+                            <h3>Company Spaces</h3>
+                            <p>See internal employee discussions by department. Every conversation is visible to the public, but only verified employees can participate.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">🌍</div>
+                            <h3>Public Timeline</h3>
+                            <p>Share your thoughts about any company. Everyone can post and comment. Your voice matters in building better workplaces.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">🔒</div>
+                            <h3>Anonymous Posting</h3>
+                            <p>Speak freely. When you post anonymously, your identity is protected. Only employees can post in company spaces.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">🎨</div>
+                            <h3>Color Usernames</h3>
+                            <p>Employees get professional color-based usernames like "Crimson" or "Navy" — no offensive names, full privacy.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section class="how-it-works">
+                <div class="container">
+                    <h2 class="section-title">For Employees & Companies</h2>
+                    <div class="steps-grid">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <h3>Company Invites You</h3>
+                            <p>Your company sends you an invite code via email. Click the link to join.</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <h3>Get Your Color Name</h3>
+                            <p>You're automatically assigned a unique color username like "Crimson" or "Sapphire".</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <h3>Join Your Department</h3>
+                            <p>Post and comment in your department's private space. Only coworkers see who posted.</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <h3>Public Timeline Access</h3>
+                            <p>You can also create a public profile to share thoughts about any company.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- For Companies Section -->
+            <section class="for-companies">
+                <div class="container">
+                    <div class="companies-cta">
+                        <div class="cta-content">
+                            <h2>Is Your Company on WorkTalk?</h2>
+                            <p>Register your company to create private department spaces for your employees. Control who joins, moderate content, and show transparency.</p>
+                            <a href="/company-register.html" class="btn btn-primary">Register Your Company →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">Work<span>Talk</span></div>
+                    <p>Workplace transparency platform for Kenya</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="/companies.html">Companies</a>
+                    <a href="/public-timeline.html">Public Timeline</a>
+                    <a href="/company-register.html">Register Company</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Community Guidelines</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <a href="mailto:support@worktalk.com">support@worktalk.com</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 WorkTalk. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>

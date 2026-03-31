@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dashboard - WorkTalk</title>
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-api.onrender.com;">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🗣️</span>
+                    <span class="logo-text">Work<span>Talk</span></span>
+                </a>
+                <nav class="nav">
+                    <a href="/companies.html" class="nav-link">Companies</a>
+                    <a href="/public-timeline.html" class="nav-link">Public Timeline</a>
+                </nav>
+                <div class="user-menu" id="userMenu">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-container">
+            <div class="dashboard-sidebar">
+                <div class="profile-card" id="profileCard">
+                    <!-- Profile info will be populated -->
+                </div>
+                <div class="profile-switcher" id="profileSwitcher">
+                    <!-- Profile switcher will be populated -->
+                </div>
+            </div>
+
+            <div class="dashboard-main">
+                <div class="dashboard-header">
+                    <h1>Dashboard</h1>
+                    <div class="dashboard-tabs" id="dashboardTabs">
+                        <button class="tab-btn active" data-tab="activity">My Activity</button>
+                        <button class="tab-btn" data-tab="company">Company Space</button>
+                        <button class="tab-btn" data-tab="public">Public Activity</button>
+                        <button class="tab-btn" data-tab="settings">Settings</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div id="activityTab" class="tab-panel active">
+                        <div class="activity-feed" id="activityFeed">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="companyTab" class="tab-panel">
+                        <div class="company-space-info" id="companySpaceInfo">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="publicTab" class="tab-panel">
+                        <div class="public-feed" id="publicFeed">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="settingsTab" class="tab-panel">
+                        <div class="settings-form" id="settingsForm">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">Work<span>Talk</span></div>
+                    <p>Workplace transparency platform for Kenya</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="/companies.html">Companies</a>
+                    <a href="/public-timeline.html">Public Timeline</a>
+                    <a href="/company-register.html">Register Company</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Community Guidelines</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 WorkTalk. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { isAuthenticated, getCurrentUser, logout } from '/js/auth.js';
+        import { getUserActivity, getUserCompanyPosts, getUserPublicPosts, updateUserProfile, changePassword } from '/js/dashboard.js';
+        import { showToast, formatRelativeTime, formatNumber, escapeHtml } from '/js/utils.js';
+
+        let currentUser = null;
+        let activeTab = 'activity';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            setupEventListeners();
+        });
+
+        async function checkAuth() {
+            if (!isAuthenticated()) {
+                window.location.href = '/login.html?redirect=/dashboard.html';
+                return;
+            }
+            
+            try {
+                currentUser = await getCurrentUser();
+                if (!currentUser) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                renderDashboard();
+                loadTab(activeTab);
+            } catch (error) {
+                console.error('Failed to get user:', error);
+                showToast('Session expired. Please log in again.', 'error');
+                logout();
+                window.location.href = '/login.html';
+            }
+        }
+
+        function renderDashboard() {
+            renderProfileCard();
+            renderProfileSwitcher();
+            renderDashboardHeader();
+        }
+
+        function renderProfileCard() {
+            const activeProfile = currentUser.activeProfile || currentUser.profiles?.[0];
+            const container = document.getElementById('profileCard');
+            
+            container.innerHTML = `
+                <div class="profile-avatar">
+                    <span class="avatar-large">${activeProfile?.type === 'employee' ? '🏢' : '🌍'}</span>
+                </div>
+                <div class="profile-info">
+                    <h3>${escapeHtml(activeProfile?.username || currentUser.email?.split('@')[0])}</h3>
+                    <p class="profile-email">${escapeHtml(currentUser.email)}</p>
+                    <p class="profile-type">
+                        ${activeProfile?.type === 'employee' ? 
+                            `<span class="badge company">Employee at ${escapeHtml(activeProfile.companyName)}</span>` : 
+                            `<span class="badge public">Public User</span>`}
+                    </p>
+                    ${activeProfile?.type === 'employee' ? 
+                        `<p class="profile-department">Department: ${escapeHtml(activeProfile.departmentName)}</p>` : ''}
+                </div>
+            `;
+        }
+
+        function renderProfileSwitcher() {
+            const container = document.getElementById('profileSwitcher');
+            
+            if (!currentUser.profiles || currentUser.profiles.length <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="switcher-header">Switch Profile</div>
+                ${currentUser.profiles.map(profile => `
+                    <button class="switcher-item ${currentUser.activeProfileId === profile._id ? 'active' : ''}" 
+                            data-profile-id="${profile._id}">
+                        <span class="switcher-icon">${profile.type === 'employee' ? '🏢' : '🌍'}</span>
+                        <span class="switcher-name">${escapeHtml(profile.username)}</span>
+                        ${profile.type === 'employee' ? 
+                            `<span class="switcher-badge">${escapeHtml(profile.companyName)}</span>` : ''}
+                    </button>
+                `).join('')}
+            `;
+            
+            document.querySelectorAll('.switcher-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                    const profileId = item.dataset.profileId;
+                    await switchProfile(profileId);
+                });
+            });
+        }
+
+        async function switchProfile(profileId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/profiles/switch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify({ profileId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    renderDashboard();
+                    loadTab(activeTab);
+                    showToast('Profile switched successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Failed to switch profile:', error);
+                showToast('Failed to switch profile', 'error');
+            }
+        }
+
+        function renderDashboardHeader() {
+            const activeProfile = currentUser.activeProfile || currentUser.profiles?.[0];
+            const title = document.querySelector('.dashboard-header h1');
+            if (title) {
+                title.textContent = `Welcome, ${escapeHtml(activeProfile?.username || 'User')}`;
+            }
+        }
+
+        function setupEventListeners() {
+            const tabs = document.querySelectorAll('.dashboard-tabs .tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    activeTab = tabId;
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    document.querySelectorAll('.tab-panel').forEach(panel => {
+                        panel.classList.remove('active');
+                    });
+                    document.getElementById(`${tabId}Tab`).classList.add('active');
+                    
+                    loadTab(tabId);
+                });
+            });
+        }
+
+        async function loadTab(tabId) {
+            switch(tabId) {
+                case 'activity':
+                    await loadActivity();
+                    break;
+                case 'company':
+                    await loadCompanySpace();
+                    break;
+                case 'public':
+                    await loadPublicActivity();
+                    break;
+                case 'settings':
+                    await loadSettings();
+                    break;
+            }
+        }
+
+        async function loadActivity() {
+            const container = document.getElementById('activityFeed');
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const activities = await getUserActivity();
+                
+                if (!activities || activities.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📝</div>
+                            <div class="empty-state-title">No activity yet</div>
+                            <div class="empty-state-message">Your posts and comments will appear here</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon">${getActivityIcon(activity.type)}</div>
+                        <div class="activity-content">
+                            <div class="activity-text">${escapeHtml(activity.text)}</div>
+                            <div class="activity-meta">
+                                <span>${formatRelativeTime(activity.createdAt)}</span>
+                                ${activity.postLink ? `<a href="${activity.postLink}">View post →</a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load activity:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <div class="empty-state-title">Failed to load activity</div>
+                        <div class="empty-state-message">Please try again later</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadCompanySpace() {
+            const container = document.getElementById('companySpaceInfo');
+            const activeProfile = currentUser.activeProfile || currentUser.profiles?.[0];
+            
+            if (activeProfile?.type !== 'employee') {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏢</div>
+                        <div class="empty-state-title">No Company Access</div>
+                        <div class="empty-state-message">You are not an employee of any company. Switch to an employee profile or accept an invite.</div>
+                        <a href="/invite-accept.html" class="btn btn-primary mt-2">Accept Invite</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const posts = await getUserCompanyPosts();
+                
+                const html = `
+                    <div class="company-info-card">
+                        <h3>${escapeHtml(activeProfile.companyName)}</h3>
+                        <p>Department: ${escapeHtml(activeProfile.departmentName)}</p>
+                        <a href="/company-detail.html?company=${activeProfile.companySlug}" class="btn btn-primary">Go to Company Space →</a>
+                    </div>
+                    <div class="my-posts">
+                        <h4>Your Recent Posts</h4>
+                        ${posts && posts.length > 0 ? 
+                            posts.map(post => `
+                                <div class="post-preview">
+                                    <div class="post-content">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</div>
+                                    <div class="post-meta">${formatRelativeTime(post.createdAt)} • ${formatNumber(post.likeCount)} likes • ${formatNumber(post.commentCount)} comments</div>
+                                </div>
+                            `).join('') :
+                            '<p class="text-muted">No posts yet. Start a discussion in your department!</p>'
+                        }
+                    </div>
+                `;
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Failed to load company space:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <div class="empty-state-title">Failed to load company data</div>
+                        <div class="empty-state-message">Please try again later</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadPublicActivity() {
+            const container = document.getElementById('publicFeed');
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const posts = await getUserPublicPosts();
+                
+                if (!posts || posts.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌍</div>
+                            <div class="empty-state-title">No public posts yet</div>
+                            <div class="empty-state-message">Share your thoughts in the Public Timeline!</div>
+                            <a href="/public-timeline.html" class="btn btn-primary mt-2">Go to Public Timeline →</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = posts.map(post => `
+                    <div class="post-preview">
+                        <div class="post-content">${escapeHtml(post.content.substring(0, 200))}${post.content.length > 200 ? '...' : ''}</div>
+                        <div class="post-meta">
+                            ${formatRelativeTime(post.createdAt)} • 
+                            ${formatNumber(post.likeCount)} likes • 
+                            ${formatNumber(post.commentCount)} comments
+                            <a href="/public-timeline.html">View →</a>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load public activity:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <div class="empty-state-title">Failed to load public posts</div>
+                        <div class="empty-state-message">Please try again later</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadSettings() {
+            const container = document.getElementById('settingsForm');
+            const activeProfile = currentUser.activeProfile || currentUser.profiles?.[0];
+            
+            container.innerHTML = `
+                <div class="settings-section">
+                    <h3>Profile Settings</h3>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Public Username</label>
+                            <input type="text" id="username" class="form-input" value="${escapeHtml(activeProfile?.username || '')}">
+                            <div class="form-hint">Letters, numbers, underscores, hyphens only</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" class="form-input" value="${escapeHtml(currentUser.email)}" disabled>
+                            <div class="form-hint">Email cannot be changed</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Change Password</h3>
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <input type="password" id="currentPassword" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" id="newPassword" class="form-input" required>
+                            <div class="form-hint">At least 8 characters with letters and numbers</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" class="form-input" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+                </div>
+                
+                <div class="settings-section danger-zone">
+                    <h3>Danger Zone</h3>
+                    <button id="deleteAccountBtn" class="btn btn-danger">Delete Account</button>
+                    <p class="form-hint">This action cannot be undone. All your posts will be anonymized.</p>
+                </div>
+            `;
+            
+            document.getElementById('profileForm').addEventListener('submit', handleUpdateProfile);
+            document.getElementById('passwordForm').addEventListener('submit', handleChangePassword);
+            document.getElementById('deleteAccountBtn').addEventListener('click', handleDeleteAccount);
+        }
+
+        async function handleUpdateProfile(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            
+            try {
+                await updateUserProfile({ username });
+                showToast('Profile updated successfully', 'success');
+                currentUser = await getCurrentUser();
+                renderDashboard();
+            } catch (error) {
+                console.error('Failed to update profile:', error);
+                showToast(error.message || 'Failed to update profile', 'error');
+            }
+        }
+
+        async function handleChangePassword(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                showToast('New passwords do not match', 'error');
+                return;
+            }
+            
+            try {
+                await changePassword(currentPassword, newPassword);
+                showToast('Password changed successfully', 'success');
+                document.getElementById('passwordForm').reset();
+            } catch (error) {
+                console.error('Failed to change password:', error);
+                showToast(error.message || 'Failed to change password', 'error');
+            }
+        }
+
+        async function handleDeleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone. All your posts will be anonymized.')) {
+                try {
+                    await deleteAccount();
+                    showToast('Account deleted successfully', 'success');
+                    logout();
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Failed to delete account:', error);
+                    showToast(error.message || 'Failed to delete account', 'error');
+                }
+            }
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                'post_company': '🏢',
+                'post_public': '🌍',
+                'comment_company': '💬',
+                'comment_public': '💬',
+                'like': '👍'
+            };
+            return icons[type] || '📝';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Public Timeline - WorkTalk</title>
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-api.onrender.com;">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🗣️</span>
+                    <span class="logo-text">Work<span>Talk</span></span>
+                </a>
+                <nav class="nav">
+                    <a href="/companies.html" class="nav-link">Companies</a>
+                    <a href="/public-timeline.html" class="nav-link active">Public Timeline</a>
+                </nav>
+                <div class="user-menu" id="userMenu">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+        </header>
+
+        <main class="main-container">
+            <div class="timeline-header">
+                <h1>Public Timeline</h1>
+                <p>Share your thoughts about any company. Everyone can post and comment here.</p>
+            </div>
+
+            <div id="timelineContent">
+                <!-- Will be populated by JS -->
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">Work<span>Talk</span></div>
+                    <p>Workplace transparency platform for Kenya</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="/companies.html">Companies</a>
+                    <a href="/public-timeline.html">Public Timeline</a>
+                    <a href="/company-register.html">Register Company</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Community Guidelines</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 WorkTalk. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { isAuthenticated, getCurrentUser } from '/js/auth.js';
+        import { getPublicTimeline, createPublicPost, likePublicPost } from '/js/public-timeline.js';
+        import { showToast, formatRelativeTime, formatNumber, escapeHtml, debounce } from '/js/utils.js';
+
+        let currentUser = null;
+        let currentPage = 1;
+        let isLoading = false;
+        let hasMore = true;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadTimeline();
+            setupEventListeners();
+            setupInfiniteScroll();
+        });
+
+        async function checkAuth() {
+            if (isAuthenticated()) {
+                try {
+                    currentUser = await getCurrentUser();
+                    updateUserMenu();
+                } catch (error) {
+                    console.error('Failed to get user:', error);
+                }
+            }
+            updateUserMenu();
+        }
+
+        function updateUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (currentUser) {
+                const activeProfile = currentUser.activeProfile || currentUser.profiles?.[0];
+                const displayName = activeProfile?.username || currentUser.email?.split('@')[0];
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <button class="user-avatar" id="userMenuBtn">
+                            <span class="avatar-icon">👤</span>
+                            <span class="user-name">${escapeHtml(displayName)}</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <div class="dropdown-section">
+                                <div class="dropdown-header">Profiles</div>
+                                <div id="profileSwitcher"></div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="/dashboard.html" class="dropdown-item">Dashboard</a>
+                            <button id="logoutBtn" class="dropdown-item logout-item">Sign Out</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                userMenu.innerHTML = `
+                    <a href="/login.html" class="btn btn-outline">Log In</a>
+                    <a href="/register.html" class="btn btn-primary">Sign Up</a>
+                `;
+            }
+        }
+
+        async function loadTimeline(append = false) {
+            if (isLoading) return;
+            isLoading = true;
+            
+            const container = document.getElementById('timelineContent');
+            
+            if (!append) {
+                container.innerHTML = '<div class="loading-spinner"></div>';
+                currentPage = 1;
+                hasMore = true;
+            }
+            
+            try {
+                const result = await getPublicTimeline(currentPage);
+                
+                if (!append) {
+                    renderTimeline(result.posts, result.pagination);
+                } else {
+                    appendPosts(result.posts);
+                }
+                
+                hasMore = result.pagination.hasNextPage;
+            } catch (error) {
+                console.error('Failed to load timeline:', error);
+                if (!append) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌍</div>
+                            <div class="empty-state-title">Failed to load timeline</div>
+                            <div class="empty-state-message">Please try again later</div>
+                        </div>
+                    `;
+                }
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function renderTimeline(posts, pagination) {
+            const container = document.getElementById('timelineContent');
+            
+            // Add post box for authenticated users
+            let html = '';
+            if (currentUser) {
+                html = `
+                    <div class="post-box">
+                        <textarea class="post-input" id="newPostInput" rows="3" 
+                                  placeholder="Share your thoughts about any company..."></textarea>
+                        <div class="post-actions">
+                            <label class="anonymous-toggle">
+                                <input type="checkbox" id="anonymousPostCheckbox"> Post anonymously
+                            </label>
+                            <button class="post-submit" id="submitPostBtn">Post to Public Timeline</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="readonly-banner">
+                        <span>👁️</span>
+                        <span><a href="/login.html">Log in</a> or <a href="/register.html">sign up</a> to post in the Public Timeline!</span>
+                    </div>
+                `;
+            }
+            
+            if (!posts || posts.length === 0) {
+                html += `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🌍</div>
+                        <div class="empty-state-title">No posts yet</div>
+                        <div class="empty-state-message">Be the first to share your thoughts about a company!</div>
+                    </div>
+                `;
+                container.innerHTML = html;
+                return;
+            }
+            
+            html += posts.map(post => `
+                <div class="post-card" data-post-id="${post.id}">
+                    <div class="post-header">
+                        <div class="post-avatar ${post.isAnonymous ? 'anonymous' : 'employee'}">
+                            ${post.isAnonymous ? '🔒' : '👤'}
+                        </div>
+                        <div class="post-info">
+                            <div class="post-author">
+                                ${escapeHtml(post.username)}
+                                ${post.isAnonymous ? '<span class="post-badge">Anonymous</span>' : ''}
+                            </div>
+                            <div class="post-meta">
+                                <span class="post-badge">Public User</span>
+                                <span>• ${formatRelativeTime(post.createdAt)}</span>
+                                ${post.companyMention ? `<span>• 📍 ${escapeHtml(post.companyMention)}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    <div class="post-stats">
+                        ${currentUser ? 
+                            `<button class="stat-btn like-btn" data-post-id="${post.id}">👍 ${formatNumber(post.likeCount)}</button>
+                             <button class="stat-btn comment-btn">💬 ${formatNumber(post.commentCount)}</button>` :
+                            `<span class="stat-view">👍 ${formatNumber(post.likeCount)}</span>
+                             <span class="stat-view">💬 ${formatNumber(post.commentCount)}</span>`
+                        }
+                    </div>
+                    <div class="comments-section" id="comments-${post.id}">
+                        ${renderComments(post.comments, post.id)}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+            
+            // Add event handlers
+            if (currentUser) {
+                document.getElementById('submitPostBtn')?.addEventListener('click', handleCreatePost);
+                
+                document.querySelectorAll('.like-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const postId = btn.dataset.postId;
+                        await handleLike(postId);
+                    });
+                });
+                
+                document.querySelectorAll('.comment-submit').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const postId = btn.dataset.postId;
+                        const input = document.querySelector(`#comment-input-${postId}`);
+                        if (input && input.value.trim()) {
+                            await handleCreateComment(postId, input.value.trim());
+                            input.value = '';
+                        }
+                    });
+                });
+            }
+            
+            // Add pagination if needed
+            if (pagination && pagination.hasNextPage) {
+                const loadMoreBtn = document.createElement('button');
+                loadMoreBtn.className = 'btn btn-outline load-more-btn';
+                loadMoreBtn.textContent = 'Load More';
+                loadMoreBtn.addEventListener('click', () => {
+                    currentPage++;
+                    loadTimeline(true);
+                });
+                container.appendChild(loadMoreBtn);
+            }
+        }
+
+        function appendPosts(newPosts) {
+            const container = document.getElementById('timelineContent');
+            
+            // Remove load more button if exists
+            const loadMoreBtn = container.querySelector('.load-more-btn');
+            if (loadMoreBtn) loadMoreBtn.remove();
+            
+            const postsHtml = newPosts.map(post => `
+                <div class="post-card" data-post-id="${post.id}">
+                    <div class="post-header">
+                        <div class="post-avatar ${post.isAnonymous ? 'anonymous' : 'employee'}">
+                            ${post.isAnonymous ? '🔒' : '👤'}
+                        </div>
+                        <div class="post-info">
+                            <div class="post-author">
+                                ${escapeHtml(post.username)}
+                                ${post.isAnonymous ? '<span class="post-badge">Anonymous</span>' : ''}
+                            </div>
+                            <div class="post-meta">
+                                <span class="post-badge">Public User</span>
+                                <span>• ${formatRelativeTime(post.createdAt)}</span>
+                                ${post.companyMention ? `<span>• 📍 ${escapeHtml(post.companyMention)}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    <div class="post-stats">
+                        ${currentUser ? 
+                            `<button class="stat-btn like-btn" data-post-id="${post.id}">👍 ${formatNumber(post.likeCount)}</button>
+                             <button class="stat-btn comment-btn">💬 ${formatNumber(post.commentCount)}</button>` :
+                            `<span class="stat-view">👍 ${formatNumber(post.likeCount)}</span>
+                             <span class="stat-view">💬 ${formatNumber(post.commentCount)}</span>`
+                        }
+                    </div>
+                    <div class="comments-section" id="comments-${post.id}">
+                        ${renderComments(post.comments, post.id)}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.insertAdjacentHTML('beforeend', postsHtml);
+            
+            // Re-attach event handlers for new posts
+            if (currentUser) {
+                document.querySelectorAll('.like-btn').forEach(btn => {
+                    btn.removeEventListener('click', handleLike);
+                    btn.addEventListener('click', async () => {
+                        const postId = btn.dataset.postId;
+                        await handleLike(postId);
+                    });
+                });
+                
+                document.querySelectorAll('.comment-submit').forEach(btn => {
+                    btn.removeEventListener('click', handleCreateComment);
+                    btn.addEventListener('click', async () => {
+                        const postId = btn.dataset.postId;
+                        const input = document.querySelector(`#comment-input-${postId}`);
+                        if (input && input.value.trim()) {
+                            await handleCreateComment(postId, input.value.trim());
+                            input.value = '';
+                        }
+                    });
+                });
+            }
+        }
+
+        function renderComments(comments, postId) {
+            if (!comments || comments.length === 0) {
+                if (currentUser) {
+                    return `
+                        <div class="comment-form">
+                            <input type="text" id="comment-input-${postId}" class="comment-input" 
+                                   placeholder="Add a comment...">
+                            <button class="comment-submit" data-post-id="${postId}">Post</button>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="no-comment-notice">
+                        👁️ <a href="/login.html">Log in</a> to comment
+                    </div>
+                `;
+            }
+            
+            const commentsHtml = comments.map(comment => `
+                <div class="comment">
+                    <div class="comment-avatar">${comment.isAnonymous ? '🔒' : '👤'}</div>
+                    <div class="comment-content">
+                        <div class="comment-author">${escapeHtml(comment.username)}</div>
+                        <div class="comment-text">${escapeHtml(comment.content)}</div>
+                        <div class="comment-time">${formatRelativeTime(comment.createdAt)}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            if (currentUser) {
+                return commentsHtml + `
+                    <div class="comment-form">
+                        <input type="text" id="comment-input-${postId}" class="comment-input" 
+                               placeholder="Add a comment...">
+                        <button class="comment-submit" data-post-id="${postId}">Post</button>
+                    </div>
+                `;
+            }
+            
+            return commentsHtml + `
+                <div class="no-comment-notice">
+                    👁️ <a href="/login.html">Log in</a> to comment
+                </div>
+            `;
+        }
+
+        async function handleCreatePost() {
+            const content = document.getElementById('newPostInput').value.trim();
+            const isAnonymous = document.getElementById('anonymousPostCheckbox').checked;
+            
+            if (!content) {
+                showToast('Please write something before posting', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitPostBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Posting...';
+            
+            try {
+                await createPublicPost(content, isAnonymous);
+                showToast('Post published successfully', 'success');
+                document.getElementById('newPostInput').value = '';
+                await loadTimeline();
+            } catch (error) {
+                console.error('Failed to create post:', error);
+                showToast(error.message || 'Failed to create post', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Post to Public Timeline';
+            }
+        }
+
+        async function handleLike(postId) {
+            try {
+                await likePublicPost(postId);
+                await loadTimeline();
+            } catch (error) {
+                console.error('Failed to like post:', error);
+                showToast('Failed to like post', 'error');
+            }
+        }
+
+        async function handleCreateComment(postId, content) {
+            try {
+                await createComment(postId, content);
+                showToast('Comment added', 'success');
+                await loadTimeline();
+            } catch (error) {
+                console.error('Failed to create comment:', error);
+                showToast(error.message || 'Failed to add comment', 'error');
+            }
+        }
+
+        function setupEventListeners() {
+            // Any additional event listeners
+        }
+
+        function setupInfiniteScroll() {
+            window.addEventListener('scroll', debounce(() => {
+                if (isLoading || !hasMore) return;
+                
+                const scrollPosition = window.innerHeight + window.scrollY;
+                const threshold = document.body.offsetHeight - 500;
+                
+                if (scrollPosition >= threshold) {
+                    currentPage++;
+                    loadTimeline(true);
+                }
+            }, 300));
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>

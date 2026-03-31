@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Company Dashboard - WorkTalk</title>
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-api.onrender.com;">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🗣️</span>
+                    <span class="logo-text">Work<span>Talk</span></span>
+                </a>
+                <nav class="nav">
+                    <a href="/companies.html" class="nav-link">Companies</a>
+                    <a href="/public-timeline.html" class="nav-link">Public Timeline</a>
+                </nav>
+                <div class="user-menu" id="userMenu">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-container">
+            <div class="dashboard-sidebar">
+                <div class="company-card-dashboard" id="companyCard">
+                    <!-- Company info will be populated -->
+                </div>
+                <div class="dashboard-nav">
+                    <button class="nav-btn active" data-section="overview">Overview</button>
+                    <button class="nav-btn" data-section="employees">Employees</button>
+                    <button class="nav-btn" data-section="invites">Invites</button>
+                    <button class="nav-btn" data-section="departments">Departments</button>
+                    <button class="nav-btn" data-section="moderation">Moderation</button>
+                    <button class="nav-btn" data-section="settings">Settings</button>
+                </div>
+            </div>
+
+            <div class="dashboard-main">
+                <div id="overviewSection" class="dashboard-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="employeeCount">0</div>
+                            <div class="stat-label">Employees</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="departmentCount">0</div>
+                            <div class="stat-label">Departments</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="postCount">0</div>
+                            <div class="stat-label">Total Posts</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="flaggedCount">0</div>
+                            <div class="stat-label">Flagged Content</div>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div id="recentActivity" class="activity-list">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="employeesSection" class="dashboard-section">
+                    <div class="section-header">
+                        <h3>Employees</h3>
+                        <button id="inviteEmployeesBtn" class="btn btn-primary">+ Invite Employees</button>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" id="employeeSearch" class="search-input" placeholder="Search employees...">
+                    </div>
+                    <div id="employeesList" class="employees-table">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <div id="invitesSection" class="dashboard-section">
+                    <div class="section-header">
+                        <h3>Invite Codes</h3>
+                        <button id="generateInviteBtn" class="btn btn-primary">+ Generate Invite</button>
+                    </div>
+                    <div id="invitesList" class="invites-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <div id="departmentsSection" class="dashboard-section">
+                    <div class="section-header">
+                        <h3>Departments</h3>
+                        <button id="addDepartmentBtn" class="btn btn-primary">+ Add Department</button>
+                    </div>
+                    <div id="departmentsList" class="departments-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <div id="moderationSection" class="dashboard-section">
+                    <h3>Flagged Content</h3>
+                    <div id="flaggedPosts" class="flagged-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <div id="settingsSection" class="dashboard-section">
+                    <h3>Company Settings</h3>
+                    <form id="companySettingsForm" class="settings-form">
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="allowAnonymous"> Allow anonymous posts
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="requireVerification"> Require email verification for employees
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="autoModerate"> Auto-moderate flagged content
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">Work<span>Talk</span></div>
+                    <p>Workplace transparency platform for Kenya</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="/companies.html">Companies</a>
+                    <a href="/public-timeline.html">Public Timeline</a>
+                    <a href="/company-register.html">Register Company</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Community Guidelines</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 WorkTalk. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { isAuthenticated, getCurrentUser } from '/js/auth.js';
+        import { 
+            getCompanyStats, getEmployees, getInvites, getDepartments, getFlaggedContent,
+            generateInvite, revokeInvite, removeEmployee, addDepartment, updateDepartment,
+            updateCompanySettings, resolveFlagged
+        } from '/js/company-dashboard.js';
+        import { showToast, formatRelativeTime, escapeHtml } from '/js/utils.js';
+
+        let currentUser = null;
+        let currentCompany = null;
+        let activeSection = 'overview';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadCompanyData();
+            setupEventListeners();
+            loadSection('overview');
+        });
+
+        async function checkAuth() {
+            if (!isAuthenticated()) {
+                window.location.href = '/login.html?redirect=/company-dashboard.html';
+                return;
+            }
+            
+            try {
+                currentUser = await getCurrentUser();
+                if (!currentUser || currentUser.role !== 'company_admin') {
+                    showToast('You do not have access to this page', 'error');
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+                updateUserMenu();
+            } catch (error) {
+                console.error('Failed to get user:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        function updateUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (currentUser) {
+                const activeProfile = currentUser.activeProfile || currentUser.profiles?.[0];
+                const displayName = activeProfile?.username || currentUser.email?.split('@')[0];
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <button class="user-avatar" id="userMenuBtn">
+                            <span class="avatar-icon">👤</span>
+                            <span class="user-name">${escapeHtml(displayName)}</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <div class="dropdown-section">
+                                <div class="dropdown-header">Profiles</div>
+                                <div id="profileSwitcher"></div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="/dashboard.html" class="dropdown-item">Dashboard</a>
+                            <button id="logoutBtn" class="dropdown-item logout-item">Sign Out</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                userMenu.innerHTML = `
+                    <a href="/login.html" class="btn btn-outline">Log In</a>
+                    <a href="/register.html" class="btn btn-primary">Sign Up</a>
+                `;
+            }
+        }
+
+        async function loadCompanyData() {
+            try {
+                const stats = await getCompanyStats();
+                currentCompany = stats.company;
+                updateStats(stats);
+                
+                document.getElementById('companyCard').innerHTML = `
+                    <div class="company-icon-large">${currentCompany.icon || '🏢'}</div>
+                    <h3>${escapeHtml(currentCompany.name)}</h3>
+                    <p class="company-industry">${escapeHtml(currentCompany.industry)}</p>
+                    <div class="company-verification ${currentCompany.isVerified ? 'verified' : 'pending'}">
+                        ${currentCompany.isVerified ? '✓ Verified Company' : '⏳ Pending Verification'}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load company data:', error);
+                showToast('Failed to load company data', 'error');
+            }
+        }
+
+        function updateStats(stats) {
+            document.getElementById('employeeCount').textContent = stats.employeeCount;
+            document.getElementById('departmentCount').textContent = stats.departmentCount;
+            document.getElementById('postCount').textContent = stats.postCount;
+            document.getElementById('flaggedCount').textContent = stats.flaggedCount;
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('.dashboard-nav .nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const section = btn.dataset.section;
+                    loadSection(section);
+                });
+            });
+            
+            // Invite generation
+            document.getElementById('generateInviteBtn')?.addEventListener('click', handleGenerateInvite);
+            document.getElementById('inviteEmployeesBtn')?.addEventListener('click', () => loadSection('invites'));
+            document.getElementById('addDepartmentBtn')?.addEventListener('click', handleAddDepartment);
+            document.getElementById('companySettingsForm')?.addEventListener('submit', handleSaveSettings);
+            
+            // Employee search
+            document.getElementById('employeeSearch')?.addEventListener('input', debounce(loadEmployees, 300));
+        }
+
+        async function loadSection(section) {
+            activeSection = section;
+            
+            // Update active nav
+            document.querySelectorAll('.dashboard-nav .nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.section === section);
+            });
+            
+            // Show/hide sections
+            document.querySelectorAll('.dashboard-section').forEach(sec => {
+                sec.classList.toggle('active', sec.id === `${section}Section`);
+            });
+            
+            // Load section data
+            switch(section) {
+                case 'overview':
+                    await loadRecentActivity();
+                    break;
+                case 'employees':
+                    await loadEmployees();
+                    break;
+                case 'invites':
+                    await loadInvites();
+                    break;
+                case 'departments':
+                    await loadDepartments();
+                    break;
+                case 'moderation':
+                    await loadFlaggedContent();
+                    break;
+                case 'settings':
+                    await loadSettings();
+                    break;
+            }
+        }
+
+        async function loadRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            try {
+                const activities = await getRecentActivity();
+                if (!activities || activities.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No recent activity</p>';
+                    return;
+                }
+                
+                container.innerHTML = activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon">${getActivityIcon(activity.type)}</div>
+                        <div class="activity-content">
+                            <div class="activity-text">${escapeHtml(activity.text)}</div>
+                            <div class="activity-meta">${formatRelativeTime(activity.createdAt)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load activity:', error);
+                container.innerHTML = '<p class="text-muted">Failed to load activity</p>';
+            }
+        }
+
+        async function loadEmployees() {
+            const container = document.getElementById('employeesList');
+            const search = document.getElementById('employeeSearch')?.value || '';
+            
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const employees = await getEmployees(search);
+                if (!employees || employees.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No employees found</p>';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Name</th><th>Email</th><th>Department</th><th>Joined</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            ${employees.map(emp => `
+                                <tr>
+                                    <td>${escapeHtml(emp.name)}</td>
+                                    <td>${escapeHtml(emp.email)}</td>
+                                    <td>${escapeHtml(emp.department)}</td>
+                                    <td>${formatRelativeTime(emp.joinedAt)}</td>
+                                    <td><span class="status-badge ${emp.isActive ? 'active' : 'inactive'}">${emp.isActive ? 'Active' : 'Inactive'}</span></td>
+                                    <td><button class="btn-icon remove-employee" data-id="${emp.id}">✕</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                
+                document.querySelectorAll('.remove-employee').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (confirm('Remove this employee? They will lose access to company space.')) {
+                            await handleRemoveEmployee(btn.dataset.id);
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Failed to load employees:', error);
+                container.innerHTML = '<p class="text-muted">Failed to load employees</p>';
+            }
+        }
+
+        async function loadInvites() {
+            const container = document.getElementById('invitesList');
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const invites = await getInvites();
+                if (!invites || invites.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No active invites. Click "Generate Invite" to create one.</p>';
+                    return;
+                }
+                
+                container.innerHTML = invites.map(invite => `
+                    <div class="invite-card">
+                        <div class="invite-code">${escapeHtml(invite.code)}</div>
+                        <div class="invite-details">
+                            <span>Department: ${escapeHtml(invite.departmentName)}</span>
+                            <span>Expires: ${formatRelativeTime(invite.expiresAt)}</span>
+                            <span>Status: ${invite.used ? 'Used' : 'Available'}</span>
+                        </div>
+                        ${!invite.used ? `<button class="btn btn-outline btn-sm revoke-invite" data-id="${invite.id}">Revoke</button>` : ''}
+                    </div>
+                `).join('');
+                
+                document.querySelectorAll('.revoke-invite').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (confirm('Revoke this invite code?')) {
+                            await handleRevokeInvite(btn.dataset.id);
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Failed to load invites:', error);
+                container.innerHTML = '<p class="text-muted">Failed to load invites</p>';
+            }
+        }
+
+        async function loadDepartments() {
+            const container = document.getElementById('departmentsList');
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const departments = await getDepartments();
+                if (!departments || departments.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No departments. Click "Add Department" to create one.</p>';
+                    return;
+                }
+                
+                container.innerHTML = departments.map(dept => `
+                    <div class="department-card">
+                        <div class="department-info">
+                            <span class="department-icon">${getDepartmentIcon(dept.name)}</span>
+                            <div>
+                                <h4>${escapeHtml(dept.name)}</h4>
+                                <p class="text-muted">${dept.employeeCount} employees • ${dept.postCount} posts</p>
+                            </div>
+                        </div>
+                        <div class="department-actions">
+                            <button class="btn-icon edit-department" data-id="${dept.id}" data-name="${escapeHtml(dept.name)}">✎</button>
+                            ${dept.employeeCount === 0 ? `<button class="btn-icon delete-department" data-id="${dept.id}">🗑</button>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.querySelectorAll('.edit-department').forEach(btn => {
+                    btn.addEventListener('click', () => handleEditDepartment(btn.dataset.id, btn.dataset.name));
+                });
+                
+                document.querySelectorAll('.delete-department').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (confirm('Delete this department? All posts will be moved to General.')) {
+                            await handleDeleteDepartment(btn.dataset.id);
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Failed to load departments:', error);
+                container.innerHTML = '<p class="text-muted">Failed to load departments</p>';
+            }
+        }
+
+        async function loadFlaggedContent() {
+            const container = document.getElementById('flaggedPosts');
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const flagged = await getFlaggedContent();
+                if (!flagged || flagged.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No flagged content</p>';
+                    return;
+                }
+                
+                container.innerHTML = flagged.map(item => `
+                    <div class="flagged-card">
+                        <div class="flagged-header">
+                            <span class="flagged-user">${escapeHtml(item.username)}</span>
+                            <span class="flagged-reason">Flagged: ${escapeHtml(item.flagReason)}</span>
+                        </div>
+                        <div class="flagged-content">${escapeHtml(item.content)}</div>
+                        <div class="flagged-actions">
+                            <button class="btn btn-sm btn-primary resolve-flag" data-id="${item.id}" data-action="keep">Keep Post</button>
+                            <button class="btn btn-sm btn-danger resolve-flag" data-id="${item.id}" data-action="remove">Remove Post</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.querySelectorAll('.resolve-flag').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        await handleResolveFlag(btn.dataset.id, btn.dataset.action);
+                    });
+                });
+            } catch (error) {
+                console.error('Failed to load flagged content:', error);
+                container.innerHTML = '<p class="text-muted">Failed to load flagged content</p>';
+            }
+        }
+
+        async function loadSettings() {
+            const form = document.getElementById('companySettingsForm');
+            if (currentCompany?.settings) {
+                document.getElementById('allowAnonymous').checked = currentCompany.settings.allowAnonymousPosts;
+                document.getElementById('requireVerification').checked = currentCompany.settings.requireVerification;
+                document.getElementById('autoModerate').checked = currentCompany.settings.moderationEnabled;
+            }
+        }
+
+        async function handleGenerateInvite() {
+            const department = prompt('Enter department for this invite:');
+            if (!department) return;
+            
+            try {
+                const result = await generateInvite(department);
+                if (result.success) {
+                    showToast('Invite code generated!', 'success');
+                    await loadInvites();
+                } else {
+                    showToast(result.message || 'Failed to generate invite', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to generate invite:', error);
+                showToast('Failed to generate invite', 'error');
+            }
+        }
+
+        async function handleRevokeInvite(inviteId) {
+            try {
+                const result = await revokeInvite(inviteId);
+                if (result.success) {
+                    showToast('Invite revoked', 'success');
+                    await loadInvites();
+                } else {
+                    showToast(result.message || 'Failed to revoke invite', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to revoke invite:', error);
+                showToast('Failed to revoke invite', 'error');
+            }
+        }
+
+        async function handleRemoveEmployee(userId) {
+            try {
+                const result = await removeEmployee(userId);
+                if (result.success) {
+                    showToast('Employee removed', 'success');
+                    await loadEmployees();
+                } else {
+                    showToast(result.message || 'Failed to remove employee', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to remove employee:', error);
+                showToast('Failed to remove employee', 'error');
+            }
+        }
+
+        async function handleAddDepartment() {
+            const name = prompt('Enter department name:');
+            if (!name) return;
+            
+            try {
+                const result = await addDepartment(name);
+                if (result.success) {
+                    showToast('Department added', 'success');
+                    await loadDepartments();
+                } else {
+                    showToast(result.message || 'Failed to add department', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to add department:', error);
+                showToast('Failed to add department', 'error');
+            }
+        }
+
+        async function handleEditDepartment(deptId, currentName) {
+            const newName = prompt('Edit department name:', currentName);
+            if (!newName || newName === currentName) return;
+            
+            try {
+                const result = await updateDepartment(deptId, { name: newName });
+                if (result.success) {
+                    showToast('Department updated', 'success');
+                    await loadDepartments();
+                } else {
+                    showToast(result.message || 'Failed to update department', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to update department:', error);
+                showToast('Failed to update department', 'error');
+            }
+        }
+
+        async function handleDeleteDepartment(deptId) {
+            try {
+                const result = await deleteDepartment(deptId);
+                if (result.success) {
+                    showToast('Department deleted', 'success');
+                    await loadDepartments();
+                } else {
+                    showToast(result.message || 'Failed to delete department', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to delete department:', error);
+                showToast('Failed to delete department', 'error');
+            }
+        }
+
+        async function handleResolveFlag(flagId, action) {
+            try {
+                const result = await resolveFlagged(flagId, action);
+                if (result.success) {
+                    showToast(`Post ${action === 'keep' ? 'kept' : 'removed'}`, 'success');
+                    await loadFlaggedContent();
+                    await loadRecentActivity();
+                } else {
+                    showToast(result.message || 'Failed to resolve flag', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to resolve flag:', error);
+                showToast('Failed to resolve flag', 'error');
+            }
+        }
+
+        async function handleSaveSettings(e) {
+            e.preventDefault();
+            
+            const settings = {
+                allowAnonymousPosts: document.getElementById('allowAnonymous').checked,
+                requireVerification: document.getElementById('requireVerification').checked,
+                moderationEnabled: document.getElementById('autoModerate').checked
+            };
+            
+            try {
+                const result = await updateCompanySettings(settings);
+                if (result.success) {
+                    showToast('Settings saved', 'success');
+                } else {
+                    showToast(result.message || 'Failed to save settings', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to save settings:', error);
+                showToast('Failed to save settings', 'error');
+            }
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                'employee_joined': '👤',
+                'post_created': '📝',
+                'post_flagged': '🚩',
+                'invite_created': '✉️'
+            };
+            return icons[type] || '📋';
+        }
+
+        function getDepartmentIcon(name) {
+            const icons = {
+                'Cabin Crew': '✈️', 'Flight Operations': '🛫', 'Engineering': '🔧',
+                'IT': '💻', 'Sales': '📊', 'Marketing': '📢', 'Finance': '💰',
+                'HR': '👥', 'Operations': '⚙️', 'Customer Service': '🎧'
+            };
+            return icons[name] || '📁';
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Accept Invite - WorkTalk</title>
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-api.onrender.com;">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🗣️</span>
+                    <span class="logo-text">Work<span>Talk</span></span>
+                </a>
+                <nav class="nav">
+                    <a href="/companies.html" class="nav-link">Companies</a>
+                    <a href="/public-timeline.html" class="nav-link">Public Timeline</a>
+                </nav>
+                <div class="user-menu" id="userMenu">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+        </header>
+
+        <main class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1>Accept Employee Invite</h1>
+                    <p>Join your company's private space on WorkTalk</p>
+                </div>
+
+                <div id="inviteInfo" class="invite-info" style="display: none;">
+                    <div class="company-banner-small">
+                        <span id="companyIcon">🏢</span>
+                        <div>
+                            <h3 id="companyName"></h3>
+                            <p id="departmentName"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="inviteAcceptForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="inviteCode" class="form-label">Invite Code</label>
+                        <input type="text" id="inviteCode" name="inviteCode" class="form-input" 
+                               placeholder="Enter the invite code from your email" required>
+                        <div class="form-error" id="inviteCodeError"></div>
+                    </div>
+
+                    <div id="registrationForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" id="name" name="name" class="form-input" 
+                                   placeholder="Your full name" required>
+                            <div class="form-error" id="nameError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Work Email</label>
+                            <input type="email" id="email" name="email" class="form-input" 
+                                   placeholder="you@company.com" required>
+                            <div class="form-error" id="emailError"></div>
+                            <div class="form-hint">Use your company email address for verification</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" id="password" name="password" class="form-input" 
+                                   placeholder="••••••••" required>
+                            <div class="form-error" id="passwordError"></div>
+                            <div class="form-hint">At least 8 characters with letters and numbers</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" 
+                                   placeholder="••••••••" required>
+                            <div class="form-error" id="confirmError"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="acceptBtn">
+                        Verify Invite
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="/login.html">Log in</a></p>
+                    <p class="employee-note">Don't have an invite? <a href="/register.html">Sign up as public user</a></p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">Work<span>Talk</span></div>
+                    <p>Workplace transparency platform for Kenya</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="/companies.html">Companies</a>
+                    <a href="/public-timeline.html">Public Timeline</a>
+                    <a href="/company-register.html">Register Company</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Community Guidelines</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 WorkTalk. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { verifyInvite, acceptInvite, registerEmployee } from '/js/invite.js';
+        import { showToast, validatePassword, sanitizeInput } from '/js/utils.js';
+
+        let verifiedInvite = null;
+        let isVerifying = false;
+
+        const inviteCodeInput = document.getElementById('inviteCode');
+        const verificationForm = document.getElementById('registrationForm');
+        const inviteInfo = document.getElementById('inviteInfo');
+        const acceptBtn = document.getElementById('acceptBtn');
+        const form = document.getElementById('inviteAcceptForm');
+
+        // Auto-verify invite code as user types
+        const debouncedVerify = debounce(async () => {
+            const code = inviteCodeInput.value.trim();
+            if (code.length >= 6) {
+                await verifyInviteCode(code);
+            } else {
+                resetToVerificationState();
+            }
+        }, 500);
+
+        inviteCodeInput.addEventListener('input', debouncedVerify);
+
+        async function verifyInviteCode(code) {
+            if (isVerifying) return;
+            isVerifying = true;
+            
+            try {
+                const result = await verifyInvite(code);
+                
+                if (result.success && result.invite) {
+                    verifiedInvite = result.invite;
+                    showInviteInfo(verifiedInvite);
+                    showRegistrationForm();
+                    acceptBtn.textContent = 'Create Employee Account';
+                } else {
+                    resetToVerificationState();
+                    document.getElementById('inviteCodeError').textContent = result.message || 'Invalid invite code';
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                resetToVerificationState();
+                document.getElementById('inviteCodeError').textContent = 'Failed to verify invite code';
+            } finally {
+                isVerifying = false;
+            }
+        }
+
+        function showInviteInfo(invite) {
+            inviteInfo.style.display = 'block';
+            document.getElementById('companyIcon').textContent = invite.companyIcon || '🏢';
+            document.getElementById('companyName').textContent = invite.companyName;
+            document.getElementById('departmentName').textContent = `Department: ${invite.departmentName}`;
+            
+            // Auto-fill email domain hint
+            if (invite.emailDomain) {
+                const emailHint = document.querySelector('#email + .form-hint');
+                if (emailHint) {
+                    emailHint.textContent = `Use your @${invite.emailDomain} email address`;
+                }
+            }
+        }
+
+        function showRegistrationForm() {
+            verificationForm.style.display = 'block';
+            document.getElementById('inviteCodeError').textContent = '';
+        }
+
+        function resetToVerificationState() {
+            verifiedInvite = null;
+            inviteInfo.style.display = 'none';
+            verificationForm.style.display = 'none';
+            acceptBtn.textContent = 'Verify Invite';
+            document.getElementById('inviteCodeError').textContent = '';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = inviteCodeInput.value.trim();
+            
+            // Clear previous errors
+            const errorFields = ['inviteCode', 'name', 'email', 'password', 'confirm'];
+            errorFields.forEach(field => {
+                const el = document.getElementById(`${field}Error`);
+                if (el) el.textContent = '';
+            });
+            
+            // If not verified yet, verify first
+            if (!verifiedInvite) {
+                await verifyInviteCode(code);
+                return;
+            }
+            
+            // Get registration data
+            const name = sanitizeInput(document.getElementById('name').value.trim());
+            const email = sanitizeInput(document.getElementById('email').value.trim());
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            let hasError = false;
+            
+            if (!name || name.length < 2) {
+                document.getElementById('nameError').textContent = 'Name must be at least 2 characters';
+                hasError = true;
+            }
+            
+            if (!email) {
+                document.getElementById('emailError').textContent = 'Email is required';
+                hasError = true;
+            } else if (verifiedInvite.emailDomain && !email.endsWith(`@${verifiedInvite.emailDomain}`)) {
+                document.getElementById('emailError').textContent = `Please use your company email (@${verifiedInvite.emailDomain})`;
+                hasError = true;
+            }
+            
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.isValid) {
+                document.getElementById('passwordError').textContent = passwordValidation.message;
+                hasError = true;
+            }
+            
+            if (password !== confirmPassword) {
+                document.getElementById('confirmError').textContent = 'Passwords do not match';
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            // Show loading state
+            acceptBtn.disabled = true;
+            acceptBtn.textContent = 'Creating Account...';
+            
+            try {
+                const result = await registerEmployee({
+                    inviteCode: code,
+                    name,
+                    email,
+                    password
+                });
+                
+                if (result.success) {
+                    showToast('Account created successfully! You can now log in.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 2000);
+                } else {
+                    showToast(result.message || 'Registration failed', 'error');
+                    if (result.field) {
+                        document.getElementById(`${result.field}Error`).textContent = result.message;
+                    }
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showToast('An error occurred. Please try again.', 'error');
+            } finally {
+                acceptBtn.disabled = false;
+                acceptBtn.textContent = 'Create Employee Account';
+            }
+        });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>
