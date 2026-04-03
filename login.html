@@ -143,74 +143,7 @@
         }
 
         .logo-text {
-            color: white;
-        }
-
-        .logo-text span {
-            color: #ffd700;
-        }
-
-        .nav {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-link {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: #ffd700;
-        }
-
-        .user-menu {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
             color: #333;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-
-        .btn-outline:hover {
-            background: white;
-            color: #667eea;
-        }
-
-        /* Main Content */
-        .auth-container {
-            min-height: calc(100vh - 80px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            position: relative;
         }
 
         .auth-content {
@@ -222,113 +155,183 @@
             align-items: center;
         }
 
-        /* Left Side - Job Sector Content */
-        .job-sector-content {
+        /* Times Square Eyes Animation */
+        .eyes-showcase {
             color: white;
-            animation: slideInLeft 1s ease-out;
+            text-align: center;
+            position: relative;
         }
 
-        @keyframes slideInLeft {
-            from {
+        .eyes-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+            perspective: 1000px;
+        }
+
+        .eye {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            animation: eyeBlink 4s infinite;
+        }
+
+        @keyframes eyeBlink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .eye:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .eye:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        .eye:nth-child(4) {
+            animation-delay: 0.5s;
+        }
+
+        .eye:nth-child(5) {
+            animation-delay: 1.5s;
+        }
+
+        .eye:nth-child(6) {
+            animation-delay: 2.5s;
+        }
+
+        .pupil {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #1a1a1a 30%, #333 70%);
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .pupil::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        .eye.happy .pupil {
+            background: radial-gradient(circle, #333 30%, #1a1a1a 70%);
+            animation: pupilDilate 0.5s ease;
+        }
+
+        .eye.happy::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 30px;
+            background: transparent;
+            border: 3px solid #ffd700;
+            border-bottom: none;
+            border-radius: 60px 60px 0 0;
+            animation: smileAppear 0.5s ease;
+        }
+
+        @keyframes pupilDilate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes smileAppear {
+            0% { 
+                transform: translateX(-50%) translateY(10px);
                 opacity: 0;
-                transform: translateX(-50px);
             }
-            to {
+            100% { 
+                transform: translateX(-50%) translateY(0);
                 opacity: 1;
-                transform: translateX(0);
             }
         }
 
-        .job-sector-content h1 {
+        .eyes-message h1 {
             font-size: 3rem;
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: 1rem;
-            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .job-sector-content .highlight {
+        .highlight {
             color: #ffd700;
+            font-weight: 800;
         }
 
-        .job-sector-content p {
+        .eyes-message p {
             font-size: 1.2rem;
-            margin-bottom: 2rem;
             opacity: 0.9;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
 
-        .job-stats {
+        .platform-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 1rem;
+            margin-top: 2rem;
         }
 
         .stat-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .stat-number {
             font-size: 2rem;
-            font-weight: bold;
+            font-weight: 700;
             color: #ffd700;
             margin-bottom: 0.5rem;
         }
 
         .stat-label {
             font-size: 0.9rem;
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
-        .job-categories {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .job-tag {
-            background: rgba(255, 215, 0, 0.2);
-            color: #ffd700;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .job-tag:hover {
-            background: rgba(255, 215, 0, 0.3);
-            transform: scale(1.05);
-        }
-
-        /* Right Side - Login Form */
+        /* Auth Card */
         .auth-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
             padding: 3rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            animation: slideInRight 1s ease-out;
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 450px;
+            width: 100%;
         }
 
         .auth-header {
@@ -441,49 +444,6 @@
             opacity: 0.8;
         }
 
-        /* Footer */
-        .footer {
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-            padding: 2rem 0;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .footer-section h4 {
-            margin-bottom: 1rem;
-            color: #ffd700;
-        }
-
-        .footer-section a {
-            display: block;
-            color: white;
-            text-decoration: none;
-            margin-bottom: 0.5rem;
-            opacity: 0.8;
-            transition: opacity 0.3s ease;
-        }
-
-        .footer-section a:hover {
-            opacity: 1;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            opacity: 0.8;
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
             .auth-content {
@@ -491,25 +451,31 @@
                 gap: 2rem;
             }
 
-            .job-sector-content {
+            .eyes-showcase {
                 text-align: center;
             }
 
-            .job-sector-content h1 {
+            .eyes-showcase h1 {
                 font-size: 2rem;
             }
 
-            .job-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .header-content {
-                flex-direction: column;
+            .eyes-container {
+                grid-template-columns: repeat(2, 1fr);
                 gap: 1rem;
             }
 
-            .nav {
-                display: none;
+            .eye {
+                width: 80px;
+                height: 80px;
+            }
+
+            .pupil {
+                width: 35px;
+                height: 35px;
+            }
+
+            .platform-stats {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -530,7 +496,7 @@
             <div class="header-content">
                 <a href="/" class="logo">
                     <span class="logo-icon">🗣️</span>
-                    <span class="logo-text">Work<span>Talk</span></span>
+                    <span class="logo-text">Ajira<span>Talk</span></span>
                 </a>
                 <nav class="nav">
                     <a href="/companies.html" class="nav-link">Companies</a>
@@ -545,40 +511,33 @@
 
         <main class="auth-container">
             <div class="auth-content">
-                <!-- Left Side - Job Sector Content -->
-                <div class="job-sector-content">
-                    <h1>Unlock Your <span class="highlight">Career Potential</span></h1>
-                    <p>Connect with professionals in your industry and discover opportunities that match your ambitions.</p>
-                    
-                    <div class="job-stats">
-                        <div class="stat-card">
-                            <div class="stat-number">500+</div>
-                            <div class="stat-label">Companies</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">50K+</div>
-                            <div class="stat-label">Professionals</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">1000+</div>
-                            <div class="stat-label">Job Openings</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">25+</div>
-                            <div class="stat-label">Industries</div>
-                        </div>
+                <!-- Left Side - Times Square Eyes Animation -->
+                <div class="eyes-showcase">
+                    <div class="eyes-container" id="eyesContainer">
+                        <!-- Eyes will be dynamically created -->
                     </div>
-
-                    <h3 style="margin-bottom: 1rem;">Popular Job Sectors</h3>
-                    <div class="job-categories">
-                        <span class="job-tag">Technology</span>
-                        <span class="job-tag">Healthcare</span>
-                        <span class="job-tag">Finance</span>
-                        <span class="job-tag">Education</span>
-                        <span class="job-tag">Engineering</span>
-                        <span class="job-tag">Marketing</span>
-                        <span class="job-tag">Sales</span>
-                        <span class="job-tag">Design</span>
+                    <div class="eyes-message">
+                        <h1>The <span class="highlight">World</span> is Watching</h1>
+                        <p>Every conversation matters. Every voice deserves to be heard.</p>
+                    </div>
+                    
+                    <div class="platform-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">∞</div>
+                            <div class="stat-label">Conversations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Transparency</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">Anonymous</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Global</div>
+                            <div class="stat-label">Reach</div>
+                        </div>
                     </div>
                 </div>
 
@@ -627,7 +586,7 @@
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-section">
-                    <div class="logo">Work<span>Talk</span></div>
+                    <div class="logo">Ajira<span>Talk</span></div>
                     <p>Workplace transparency platform for everyone</p>
                 </div>
                 <div class="footer-section">
@@ -642,6 +601,10 @@
                     <a href="#">Terms of Service</a>
                     <a href="#">Community Guidelines</a>
                 </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <a href="mailto:support@ajiratalk.com">support@ajiratalk.com</a>
+                </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 AjiraTalk. All rights reserved.</p>
@@ -652,6 +615,55 @@
     <script type="module">
         import { login } from '/js/auth.js';
         import { sanitizeInput, showToast } from '/js/utils.js';
+
+        // Create Times Square Eyes
+        function createEyes() {
+            const container = document.getElementById('eyesContainer');
+            const eyeCount = 6;
+            
+            for (let i = 0; i < eyeCount; i++) {
+                const eye = document.createElement('div');
+                eye.className = 'eye';
+                eye.innerHTML = '<div class="pupil"></div>';
+                container.appendChild(eye);
+            }
+        }
+
+        // Make eyes follow mouse
+        function setupEyeTracking() {
+            const eyes = document.querySelectorAll('.eye');
+            
+            document.addEventListener('mousemove', (e) => {
+                eyes.forEach(eye => {
+                    const pupil = eye.querySelector('.pupil');
+                    const rect = eye.getBoundingClientRect();
+                    const eyeCenterX = rect.left + rect.width / 2;
+                    const eyeCenterY = rect.top + rect.height / 2;
+                    
+                    const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+                    const distance = Math.min(15, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) / 10);
+                    
+                    const pupilX = Math.cos(angle) * distance;
+                    const pupilY = Math.sin(angle) * distance;
+                    
+                    pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+                });
+            });
+        }
+
+        // Make eyes happy when login is clicked
+        function makeEyesHappy() {
+            const eyes = document.querySelectorAll('.eye');
+            eyes.forEach((eye, index) => {
+                setTimeout(() => {
+                    eye.classList.add('happy');
+                }, index * 100);
+            });
+        }
+
+        // Initialize
+        createEyes();
+        setupEyeTracking();
 
         const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('email');
@@ -673,6 +685,9 @@
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Make eyes happy!
+            makeEyesHappy();
             
             // Clear previous errors
             document.getElementById('emailError').textContent = '';
@@ -726,7 +741,7 @@
         });
 
         // Add typing animation to the heading
-        const heading = document.querySelector('.job-sector-content h1');
+        const heading = document.querySelector('.eyes-message h1');
         const text = heading.innerHTML;
         heading.innerHTML = '';
         let i = 0;
