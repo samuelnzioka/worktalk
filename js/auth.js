@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Authentication Service
+ * AjiraTalk - Authentication Service
  * Handles user authentication, token management, and user state
  */
 

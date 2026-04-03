@@ -1,9 +1,9 @@
 /**
- * WorkTalk - API Service
+ * AjiraTalk - API Service
  * Handles all API calls with authentication, error handling, and security
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://worktalk-api.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ajiratalk-api.onrender.com/api';
 
 // Helper function for API calls
 export async function apiCall(endpoint, options = {}) {

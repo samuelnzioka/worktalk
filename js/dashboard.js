@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Dashboard Service
+ * AjiraTalk - Dashboard Service
  * Handles user dashboard operations
  */
 

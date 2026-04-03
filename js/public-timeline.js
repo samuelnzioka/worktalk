@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Public Timeline Service
+ * AjiraTalk - Public Timeline Service
  * Handles public timeline operations
  */
 

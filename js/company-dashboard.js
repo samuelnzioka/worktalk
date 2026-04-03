@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Company Dashboard Service
+ * AjiraTalk - Company Dashboard Service
  * Handles company admin operations
  */
 

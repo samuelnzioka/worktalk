@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Companies Service
+ * AjiraTalk - Companies Service
  * Handles company-related operations
  */
 

@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Company Detail Service
+ * AjiraTalk - Company Detail Service
  * Handles company-specific operations including posts and comments
  */
 

@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Invite Service
+ * AjiraTalk - Invite Service
  * Handles invite verification and employee registration
  */
 

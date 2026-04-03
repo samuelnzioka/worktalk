@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Main Application Entry Point
+ * AjiraTalk - Main Application Entry Point
  * Initializes global components and handles authentication state
  */
 

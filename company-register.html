@@ -1,53 +1,852 @@
-<!-- Add this to the departments section in company-register.html -->
-
-<div class="form-group departments-section">
-    <label class="form-label">Departments</label>
-    <div id="departmentsList">
-        <div class="department-input-row">
-            <input type="text" class="form-input department-name" placeholder="e.g., Engineering, Sales, HR" style="flex: 1;">
-            <span class="department-icon-preview">📁</span>
-            <button type="button" class="btn btn-outline remove-dept" style="display: none;">✕</button>
-        </div>
-    </div>
-    <button type="button" id="addDepartmentBtn" class="btn btn-outline btn-sm mt-1">+ Add Department</button>
-    <div class="form-hint">Departments will automatically get relevant icons based on their names</div>
-    <div class="form-error" id="departmentsError"></div>
-</div>
-
-<!-- Add this JavaScript for icon preview -->
-<script>
-    // Update icon preview when department name changes
-    function updateDepartmentIconPreview(input) {
-        const row = input.closest('.department-input-row');
-        const previewSpan = row.querySelector('.department-icon-preview');
-        const departmentName = input.value.trim();
-        
-        if (departmentName) {
-            // Use the smart icon function
-            const icon = getDepartmentIcon(departmentName);
-            previewSpan.textContent = icon;
-        } else {
-            previewSpan.textContent = '📁';
-        }
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Register Company - AjiraTalk</title>
     
-    // Call this when adding a new department row
-    function addDepartmentRow() {
-        const row = document.createElement('div');
-        row.className = 'department-input-row';
-        row.innerHTML = `
-            <input type="text" class="form-input department-name" placeholder="e.g., Engineering, Sales, HR" style="flex: 1;">
-            <span class="department-icon-preview">📁</span>
-            <button type="button" class="btn btn-outline remove-dept">✕</button>
-        `;
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://ajiratalk-api.onrender.com;">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    
+    <style>
+        /* Company Registration Form Styles */
+        .company-register-form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
         
-        const input = row.querySelector('.department-name');
-        input.addEventListener('input', () => updateDepartmentIconPreview(input));
+        .form-section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
         
-        row.querySelector('.remove-dept').addEventListener('click', () => {
-            row.remove();
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .verification-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .verification-row .form-input {
+            flex: 1;
+        }
+        
+        .verification-row .btn {
+            white-space: nowrap;
+        }
+        
+        /* File Upload Styles */
+        .file-upload {
+            position: relative;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .file-upload:hover {
+            border-color: #4299e1;
+            background: rgba(66, 153, 225, 0.05);
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .upload-icon {
+            font-size: 2rem;
+            opacity: 0.6;
+        }
+        
+        .upload-text {
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .upload-hint {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+        
+        .file-preview {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(66, 153, 225, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(66, 153, 225, 0.2);
+            display: none;
+        }
+        
+        .file-preview.show {
+            display: block;
+        }
+        
+        .file-preview-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #2b6cb0;
+        }
+        
+        /* CAPTCHA Styles */
+        .captcha-container {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.5);
+            text-align: center;
+        }
+        
+        .captcha-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 0.875rem;
+        }
+        
+        .captcha-icon {
+            font-size: 1.25rem;
+        }
+        
+        /* Enhanced Button Styles */
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .btn-text {
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn-loader {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn:disabled .btn-text {
+            opacity: 0;
+        }
+        
+        .btn:disabled .btn-loader {
+            opacity: 1;
+        }
+        
+        /* Enhanced Form Input Styles */
+        .company-register-form .form-input {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .company-register-form .form-input:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .company-register-form .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .company-register-form .form-hint {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+        
+        .company-register-form .form-error {
+            font-size: 0.875rem;
+            color: #e53e3e;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+        
+        /* Department Icon Preview */
+        .department-icon-preview {
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            background: rgba(66, 153, 225, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(66, 153, 225, 0.2);
+        }
+        
+        .department-input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .department-input-row .remove-dept {
+            padding: 0.5rem;
+            min-width: auto;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .verification-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .verification-row .btn {
+                margin-top: 0.5rem;
+            }
+            
+            .form-section {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .company-register-form {
+                max-width: 100%;
+            }
+        }
+        
+        /* Loading States */
+        .company-register-form.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .company-register-form.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2rem;
+            height: 2rem;
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid #4299e1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        /* Success/Error States */
+        .form-section.success {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.05);
+        }
+        
+        .form-section.error {
+            border-color: #e53e3e;
+            background: rgba(229, 62, 62, 0.05);
+        }
+        
+        /* Enhanced Checkbox */
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            margin-top: 0.125rem;
+            min-width: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🗣️</span>
+                    <span class="logo-text">Ajira<span>Talk</span></span>
+                </a>
+                <nav class="nav">
+                    <a href="/companies.html" class="nav-link">Companies</a>
+                    <a href="/public-timeline.html" class="nav-link">Public Timeline</a>
+                </nav>
+                <div class="user-menu" id="userMenu">
+                    <a href="/login.html" class="btn btn-outline">Log In</a>
+                    <a href="/register.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1>Register Your Company</h1>
+                    <p>Create a company space on AjiraTalk for your employees</p>
+                </div>
+
+                <form id="companyRegisterForm" class="auth-form company-register-form">
+                    <!-- Basic Company Information -->
+                    <div class="form-section">
+                        <h3 class="section-title">🏢 Basic Company Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="companyName" class="form-label">Company Name *</label>
+                            <input type="text" id="companyName" name="companyName" class="form-input" 
+                                   placeholder="Your registered company name" required>
+                            <div class="form-error" id="companyNameError"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="totalDepartments" class="form-label">Total Departments *</label>
+                                <input type="number" id="totalDepartments" name="totalDepartments" class="form-input" 
+                                       placeholder="e.g., 5" min="1" required>
+                                <div class="form-error" id="totalDepartmentsError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="totalEmployees" class="form-label">Total Employees *</label>
+                                <input type="number" id="totalEmployees" name="totalEmployees" class="form-input" 
+                                       placeholder="e.g., 50" min="1" required>
+                                <div class="form-error" id="totalEmployeesError"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group departments-section">
+                            <label class="form-label">Names of Departments *</label>
+                            <div id="departmentsList">
+                                <div class="department-input-row">
+                                    <input type="text" class="form-input department-name" placeholder="e.g., Engineering, Sales, HR" style="flex: 1;">
+                                    <span class="department-icon-preview">📁</span>
+                                    <button type="button" class="btn btn-outline remove-dept" style="display: none;">✕</button>
+                                </div>
+                            </div>
+                            <button type="button" id="addDepartmentBtn" class="btn btn-outline btn-sm mt-1">+ Add Department</button>
+                            <div class="form-hint">Add all your company departments</div>
+                            <div class="form-error" id="departmentsError"></div>
+                        </div>
+                    </div>
+
+                    <!-- Business Identifiers -->
+                    <div class="form-section">
+                        <h3 class="section-title">🔐 Business Identifiers</h3>
+                        
+                        <div class="form-group">
+                            <label for="taxId" class="form-label">Tax ID / VAT Number *</label>
+                            <input type="text" id="taxId" name="taxId" class="form-input" 
+                                   placeholder="Your country-specific tax ID" required>
+                            <div class="form-error" id="taxIdError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registrationNumber" class="form-label">Business Registration Number *</label>
+                            <input type="text" id="registrationNumber" name="registrationNumber" class="form-input" 
+                                   placeholder="e.g., EIN, Company House number" required>
+                            <div class="form-error" id="registrationNumberError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="country" class="form-label">Country of Incorporation *</label>
+                            <select id="country" name="country" class="form-input" required>
+                                <option value="">Select country</option>
+                                <option value="US">United States</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                                <option value="AU">Australia</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="JP">Japan</option>
+                                <option value="SG">Singapore</option>
+                                <option value="IN">India</option>
+                                <option value="BR">Brazil</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="ZA">South Africa</option>
+                                <option value="KE">Kenya</option>
+                                <option value="UG">Uganda</option>
+                                <option value="TZ">Tanzania</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="form-error" id="countryError"></div>
+                        </div>
+                    </div>
+
+                    <!-- Contact & Verification -->
+                    <div class="form-section">
+                        <h3 class="section-title">📞 Contact & Verification</h3>
+                        
+                        <div class="form-group">
+                            <label for="companyEmail" class="form-label">Official Company Email *</label>
+                            <input type="email" id="companyEmail" name="companyEmail" class="form-input" 
+                                   placeholder="contact@yourcompany.com" required>
+                            <div class="form-hint">Must be your company domain (no Gmail/Yahoo)</div>
+                            <div class="form-error" id="companyEmailError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="companyPhone" class="form-label">Official Phone Number *</label>
+                            <input type="tel" id="companyPhone" name="companyPhone" class="form-input" 
+                                   placeholder="+1 123 456 7890" required>
+                            <div class="form-hint">Include country code</div>
+                            <div class="form-error" id="companyPhoneError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="companyWebsite" class="form-label">Company Website *</label>
+                            <input type="url" id="companyWebsite" name="companyWebsite" class="form-input" 
+                                   placeholder="https://yourcompany.com" required>
+                            <div class="form-error" id="companyWebsiteError"></div>
+                        </div>
+                    </div>
+
+                    <!-- Registrar Information -->
+                    <div class="form-section">
+                        <h3 class="section-title">👤 Your Information</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="adminName" class="form-label">Your Full Name *</label>
+                                <input type="text" id="adminName" name="adminName" class="form-input" 
+                                       placeholder="John Doe" required>
+                                <div class="form-error" id="adminNameError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="jobTitle" class="form-label">Your Job Title *</label>
+                                <select id="jobTitle" name="jobTitle" class="form-input" required>
+                                    <option value="">Select your role</option>
+                                    <option value="CEO">CEO</option>
+                                    <option value="CTO">CTO</option>
+                                    <option value="CFO">CFO</option>
+                                    <option value="HR Manager">HR Manager</option>
+                                    <option value="IT Admin">IT Admin</option>
+                                    <option value="Operations Manager">Operations Manager</option>
+                                    <option value="Founder">Founder</option>
+                                    <option value="Co-Founder">Co-Founder</option>
+                                    <option value="Director">Director</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div class="form-error" id="jobTitleError"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="adminEmail" class="form-label">Your Work Email *</label>
+                                <input type="email" id="adminEmail" name="adminEmail" class="form-input" 
+                                       placeholder="john.doe@yourcompany.com" required>
+                                <div class="form-hint">Must match company domain</div>
+                                <div class="form-error" id="adminEmailError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="adminPhone" class="form-label">Your Direct Phone</label>
+                                <input type="tel" id="adminPhone" name="adminPhone" class="form-input" 
+                                       placeholder="+1 123 456 7890">
+                                <div class="form-hint">Optional but useful for verification</div>
+                                <div class="form-error" id="adminPhoneError"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Proof -->
+                    <div class="form-section">
+                        <h3 class="section-title">📄 Business Proof Documents</h3>
+                        
+                        <div class="form-group">
+                            <label for="businessLicense" class="form-label">Business License / Certificate of Incorporation *</label>
+                            <div class="file-upload">
+                                <input type="file" id="businessLicense" name="businessLicense" 
+                                       accept=".pdf,.jpg,.jpeg,.png" required>
+                                <label for="businessLicense" class="file-upload-label">
+                                    <span class="upload-icon">📁</span>
+                                    <span class="upload-text">Choose file or drag here</span>
+                                    <span class="upload-hint">PDF, JPG, PNG (Max 10MB)</span>
+                                </label>
+                                <div class="file-preview" id="businessLicensePreview"></div>
+                            </div>
+                            <div class="form-error" id="businessLicenseError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="utilityBill" class="form-label">Utility Bill or Bank Statement *</label>
+                            <div class="file-upload">
+                                <input type="file" id="utilityBill" name="utilityBill" 
+                                       accept=".pdf,.jpg,.jpeg,.png" required>
+                                <label for="utilityBill" class="file-upload-label">
+                                    <span class="upload-icon">📄</span>
+                                    <span class="upload-text">Choose file or drag here</span>
+                                    <span class="upload-hint">Must show company name & address</span>
+                                </label>
+                                <div class="file-preview" id="utilityBillPreview"></div>
+                            </div>
+                            <div class="form-error" id="utilityBillError"></div>
+                        </div>
+                    </div>
+
+                    <!-- Address Information -->
+                    <div class="form-section">
+                        <h3 class="section-title">📍 Business Address</h3>
+                        
+                        <div class="form-group">
+                            <label for="streetAddress" class="form-label">Street Address *</label>
+                            <input type="text" id="streetAddress" name="streetAddress" class="form-input" 
+                                   placeholder="123 Business Street, Building name" required>
+                            <div class="form-hint">Physical address preferred (not PO box)</div>
+                            <div class="form-error" id="streetAddressError"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city" class="form-label">City *</label>
+                                <input type="text" id="city" name="city" class="form-input" 
+                                       placeholder="New York" required>
+                                <div class="form-error" id="cityError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="postalCode" class="form-label">Postal Code *</label>
+                                <input type="text" id="postalCode" name="postalCode" class="form-input" 
+                                       placeholder="10001" required>
+                                <div class="form-error" id="postalCodeError"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Industry & Scale -->
+                    <div class="form-section">
+                        <h3 class="section-title">📊 Industry & Scale</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="industry" class="form-label">Industry Sector *</label>
+                                <select id="industry" name="industry" class="form-input" required>
+                                    <option value="">Select industry</option>
+                                    <option value="technology">Technology</option>
+                                    <option value="manufacturing">Manufacturing</option>
+                                    <option value="retail">Retail</option>
+                                    <option value="finance">Finance & Banking</option>
+                                    <option value="healthcare">Healthcare</option>
+                                    <option value="education">Education</option>
+                                    <option value="consulting">Consulting</option>
+                                    <option value="agriculture">Agriculture</option>
+                                    <option value="construction">Construction</option>
+                                    <option value="transportation">Transportation</option>
+                                    <option value="hospitality">Hospitality</option>
+                                    <option value="media">Media & Entertainment</option>
+                                    <option value="real-estate">Real Estate</option>
+                                    <option value="energy">Energy</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="form-error" id="industryError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="yearFounded" class="form-label">Year Founded *</label>
+                                <input type="number" id="yearFounded" name="yearFounded" class="form-input" 
+                                       placeholder="2020" min="1900" max="2026" required>
+                                <div class="form-error" id="yearFoundedError"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="revenueRange" class="form-label">Annual Revenue Range</label>
+                            <select id="revenueRange" name="revenueRange" class="form-input">
+                                <option value="">Select revenue range (optional)</option>
+                                <option value="under-100k">Under $100,000</option>
+                                <option value="100k-500k">$100,000 - $500,000</option>
+                                <option value="500k-1m">$500,000 - $1,000,000</option>
+                                <option value="1m-5m">$1,000,000 - $5,000,000</option>
+                                <option value="5m-10m">$5,000,000 - $10,000,000</option>
+                                <option value="10m-50m">$10,000,000 - $50,000,000</option>
+                                <option value="over-50m">Over $50,000,000</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                            <div class="form-error" id="revenueRangeError"></div>
+                        </div>
+                    </div>
+
+                    <!-- Verification -->
+                    <div class="form-section">
+                        <h3 class="section-title">🛡️ Verification</h3>
+                        
+                        <div class="form-group">
+                            <label for="emailVerificationCode" class="form-label">Email Verification Code *</label>
+                            <div class="verification-row">
+                                <input type="text" id="emailVerificationCode" name="emailVerificationCode" 
+                                       class="form-input" placeholder="Enter 6-digit code" required>
+                                <button type="button" id="sendEmailCodeBtn" class="btn btn-outline">
+                                    Send Code
+                                </button>
+                            </div>
+                            <div class="form-hint">We'll send a code to your company email domain</div>
+                            <div class="form-error" id="emailVerificationCodeError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="captcha" class="form-label">Verification *</label>
+                            <div class="captcha-container">
+                                <div class="captcha-placeholder">
+                                    <span class="captcha-icon">🤖</span>
+                                    <span class="captcha-text">CAPTCHA verification</span>
+                                </div>
+                                <input type="hidden" id="captcha" name="captcha" required>
+                            </div>
+                            <div class="form-error" id="captchaError"></div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agreeTerms" required>
+                                I agree to the <a href="#">Terms of Service</a>, <a href="#">Community Guidelines</a>, and <a href="#">Privacy Policy</a>. I confirm that all provided information is accurate and I have authority to register this company.
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full btn-large" id="registerBtn">
+                        <span class="btn-text">Submit Registration</span>
+                        <span class="btn-loader" style="display: none;">Processing...</span>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p>Already have a company? <a href="/login.html">Log in</a></p>
+                    <p>Looking for employee access? <a href="/invite-accept.html">Accept an invite</a></p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">Ajira<span>Talk</span></div>
+                    <p>Workplace transparency platform for everyone</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="/companies.html">Companies</a>
+                    <a href="/public-timeline.html">Public Timeline</a>
+                    <a href="/company-register.html">Register Company</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Community Guidelines</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <a href="mailto:support@ajiratalk.com">support@ajiratalk.com</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 AjiraTalk. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { registerCompany } from '/js/auth.js';
+        import { sanitizeInput, validatePassword, getDepartmentIcon, showToast } from '/js/utils.js';
+
+        const companyRegisterForm = document.getElementById('companyRegisterForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const departmentsList = document.getElementById('departmentsList');
+        const addDepartmentBtn = document.getElementById('addDepartmentBtn');
+
+        // Department management
+        function updateDepartmentIconPreview(input) {
+            const row = input.closest('.department-input-row');
+            const previewSpan = row.querySelector('.department-icon-preview');
+            const departmentName = input.value.trim();
+            
+            if (departmentName) {
+                const icon = getDepartmentIcon(departmentName);
+                previewSpan.textContent = icon;
+            } else {
+                previewSpan.textContent = '📁';
+            }
+        }
+        
+        function addDepartmentRow() {
+            const row = document.createElement('div');
+            row.className = 'department-input-row';
+            row.innerHTML = `
+                <input type="text" class="form-input department-name" placeholder="e.g., Engineering, Sales, HR" style="flex: 1;">
+                <span class="department-icon-preview">📁</span>
+                <button type="button" class="btn btn-outline remove-dept">✕</button>
+            `;
+            
+            const input = row.querySelector('.department-name');
+            input.addEventListener('input', () => updateDepartmentIconPreview(input));
+            
+            row.querySelector('.remove-dept').addEventListener('click', () => {
+                row.remove();
+                updateRemoveButtons();
+            });
+            
+            departmentsList.appendChild(row);
+            updateRemoveButtons();
+        }
+
+        function updateRemoveButtons() {
+            const rows = departmentsList.querySelectorAll('.department-input-row');
+            rows.forEach((row, index) => {
+                const removeBtn = row.querySelector('.remove-dept');
+                removeBtn.style.display = rows.length > 1 ? 'block' : 'none';
+            });
+        }
+
+        addDepartmentBtn.addEventListener('click', addDepartmentRow);
+
+        // Initialize first department input
+        const firstDeptInput = departmentsList.querySelector('.department-name');
+        firstDeptInput.addEventListener('input', () => updateDepartmentIconPreview(firstDeptInput));
+
+        // Form submission
+        companyRegisterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.form-error').forEach(error => error.textContent = '');
+            
+            // Get form data
+            const formData = {
+                companyName: sanitizeInput(document.getElementById('companyName').value.trim()),
+                companyEmail: sanitizeInput(document.getElementById('companyEmail').value.trim()),
+                industry: document.getElementById('industry').value,
+                companySize: document.getElementById('companySize').value,
+                description: sanitizeInput(document.getElementById('description').value.trim()),
+                adminName: sanitizeInput(document.getElementById('adminName').value.trim()),
+                adminEmail: sanitizeInput(document.getElementById('adminEmail').value.trim()),
+                adminPassword: document.getElementById('adminPassword').value,
+                departments: Array.from(departmentsList.querySelectorAll('.department-name'))
+                    .map(input => sanitizeInput(input.value.trim()))
+                    .filter(name => name.length > 0)
+            };
+            
+            // Validate
+            let hasError = false;
+            
+            if (!formData.companyName) {
+                document.getElementById('companyNameError').textContent = 'Company name is required';
+                hasError = true;
+            }
+            
+            if (!formData.companyEmail) {
+                document.getElementById('companyEmailError').textContent = 'Company email is required';
+                hasError = true;
+            }
+            
+            if (!formData.industry) {
+                document.getElementById('industryError').textContent = 'Please select an industry';
+                hasError = true;
+            }
+            
+            if (!formData.companySize) {
+                document.getElementById('companySizeError').textContent = 'Please select company size';
+                hasError = true;
+            }
+            
+            if (formData.departments.length === 0) {
+                document.getElementById('departmentsError').textContent = 'At least one department is required';
+                hasError = true;
+            }
+            
+            if (!formData.adminName) {
+                document.getElementById('adminNameError').textContent = 'Your name is required';
+                hasError = true;
+            }
+            
+            if (!formData.adminEmail) {
+                document.getElementById('adminEmailError').textContent = 'Your email is required';
+                hasError = true;
+            }
+            
+            if (!formData.adminPassword) {
+                document.getElementById('adminPasswordError').textContent = 'Password is required';
+                hasError = true;
+            } else if (!validatePassword(formData.adminPassword)) {
+                document.getElementById('adminPasswordError').textContent = 'Password must be at least 8 characters';
+                hasError = true;
+            }
+            
+            if (!document.getElementById('agreeTerms').checked) {
+                showToast('Please agree to the terms and conditions', 'error');
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            // Show loading state
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Registering...';
+            
+            try {
+                const result = await registerCompany(formData);
+                
+                if (result.success) {
+                    showToast('Company registered successfully! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = result.redirectTo || '/company-dashboard.html';
+                    }, 2000);
+                } else {
+                    showToast(result.message || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showToast('An error occurred. Please try again.', 'error');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register Company';
+            }
         });
-        
-        departmentsList.appendChild(row);
-    }
-</script>
+    </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Profile Switcher Component
+ * AjiraTalk - Profile Switcher Component
  * Handles profile switching UI and logic
  */
 

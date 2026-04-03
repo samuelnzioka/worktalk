@@ -1,5 +1,5 @@
 /**
- * WorkTalk - Utility Functions
+ * AjiraTalk - Utility Functions
  * Helper functions for sanitization, validation, and common operations
  */
 
@@ -92,7 +92,7 @@ export function getDepartmentIcon(departmentName) {
         return '🏭';
     }
     
-    // Aviation specific (for Kenya Airways, etc.)
+    // Aviation specific
     if (name.includes('cabin') || name.includes('crew') || name.includes('flight')) {
         return '✈️';
     }
