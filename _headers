@@ -1,0 +1,9 @@
+# Cloudflare Pages headers file
+# Ensure proper MIME types for JSON files
+/js/animations/*
+  Content-Type: application/json
+  Access-Control-Allow-Origin: *
+  
+/json/*
+  Content-Type: application/json
+  Access-Control-Allow-Origin: *

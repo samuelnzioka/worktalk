@@ -97,9 +97,9 @@
                 });
         }
         
-        // Test both animations
-        testAnimation('/json/Sample%20Animation.json', 'loginLottie', 'loginStatus');
-        testAnimation('/json/Sign%20up.json', 'signupLottie', 'signupStatus');
+        // Test both animations with Cloudflare-compatible paths
+        testAnimation('./js/animations/login-animation.json', 'loginLottie', 'loginStatus');
+        testAnimation('./js/animations/signup-animation.json', 'signupLottie', 'signupStatus');
     </script>
 </body>
 </html>

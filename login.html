@@ -525,39 +525,17 @@
         function initLoginAnimation() {
             const container = document.getElementById('loginLottie');
             
-            // Load the Sample Animation JSON with proper error handling
-            fetch('/json/Sample%20Animation.json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(animationData => {
-                    console.log('Login animation data loaded successfully');
-                    loginAnimation = lottie.loadAnimation({
-                        container: container,
-                        renderer: 'svg',
-                        loop: true,
-                        autoplay: true,
-                        animationData: animationData,
-                        rendererSettings: {
-                            progressiveLoad: true,
-                            hideOnTransparent: true,
-                            preserveAspectRatio: 'xMidYMid meet'
-                        }
-                    });
-                    
-                    // Set container size based on animation dimensions
-                    if (animationData.w && animationData.h) {
-                        const scale = Math.min(300 / animationData.w, 300 / animationData.h);
-                        container.style.width = (animationData.w * scale) + 'px';
-                        container.style.height = (animationData.h * scale) + 'px';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading login animation:', error);
-                    // Show a better fallback with CSS animation
+            // Try multiple approaches for Cloudflare compatibility
+            const animationUrls = [
+                './js/animations/login-animation.json',
+                '/js/animations/login-animation.json',
+                'js/animations/login-animation.json'
+            ];
+            
+            function tryLoadAnimation(urlIndex = 0) {
+                if (urlIndex >= animationUrls.length) {
+                    // All URLs failed, show fallback
+                    console.error('All animation URLs failed, showing fallback');
                     container.innerHTML = `
                         <div style="
                             font-size: 80px; 
@@ -573,7 +551,49 @@
                             }
                         </style>
                     `;
-                });
+                    return;
+                }
+                
+                const url = animationUrls[urlIndex];
+                console.log(`Trying to load animation from: ${url}`);
+                
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(animationData => {
+                        console.log('Login animation data loaded successfully');
+                        loginAnimation = lottie.loadAnimation({
+                            container: container,
+                            renderer: 'svg',
+                            loop: true,
+                            autoplay: true,
+                            animationData: animationData,
+                            rendererSettings: {
+                                progressiveLoad: true,
+                                hideOnTransparent: true,
+                                preserveAspectRatio: 'xMidYMid meet'
+                            }
+                        });
+                        
+                        // Set container size based on animation dimensions
+                        if (animationData.w && animationData.h) {
+                            const scale = Math.min(300 / animationData.w, 300 / animationData.h);
+                            container.style.width = (animationData.w * scale) + 'px';
+                            container.style.height = (animationData.h * scale) + 'px';
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Failed to load from ${url}:`, error);
+                        // Try next URL
+                        tryLoadAnimation(urlIndex + 1);
+                    });
+            }
+            
+            tryLoadAnimation();
         }
 
         // Form elements
