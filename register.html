@@ -545,10 +545,16 @@
         function initSignupAnimation() {
             const container = document.getElementById('signupLottie');
             
-            // Load the Sign up Animation JSON
-            fetch('/json/Sign up.json')
-                .then(response => response.json())
+            // Load the Sign up Animation JSON with proper error handling
+            fetch('/json/Sign%20up.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(animationData => {
+                    console.log('Signup animation data loaded successfully');
                     signupAnimation = lottie.loadAnimation({
                         container: container,
                         renderer: 'svg',
@@ -557,14 +563,37 @@
                         animationData: animationData,
                         rendererSettings: {
                             progressiveLoad: true,
-                            hideOnTransparent: true
+                            hideOnTransparent: true,
+                            preserveAspectRatio: 'xMidYMid meet'
                         }
                     });
+                    
+                    // Set container size based on animation dimensions
+                    if (animationData.w && animationData.h) {
+                        const scale = Math.min(300 / animationData.w, 300 / animationData.h);
+                        container.style.width = (animationData.w * scale) + 'px';
+                        container.style.height = (animationData.h * scale) + 'px';
+                    }
                 })
                 .catch(error => {
                     console.error('Error loading signup animation:', error);
-                    // Fallback: Show a simple animated icon if Lottie fails
-                    container.innerHTML = '<div style="font-size: 120px; animation: bounce 2s infinite;">👋</div>';
+                    // Show a better fallback with CSS animation
+                    container.innerHTML = `
+                        <div style="
+                            font-size: 80px; 
+                            animation: wave 2s infinite;
+                            text-align: center;
+                            line-height: 300px;
+                            color: white;
+                        ">👋</div>
+                        <style>
+                            @keyframes wave {
+                                0%, 100% { transform: rotate(0deg); }
+                                25% { transform: rotate(20deg); }
+                                75% { transform: rotate(-20deg); }
+                            }
+                        </style>
+                    `;
                 });
         }
 

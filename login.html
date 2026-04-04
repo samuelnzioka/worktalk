@@ -525,10 +525,16 @@
         function initLoginAnimation() {
             const container = document.getElementById('loginLottie');
             
-            // Load the Sample Animation JSON
-            fetch('/json/Sample Animation.json')
-                .then(response => response.json())
+            // Load the Sample Animation JSON with proper error handling
+            fetch('/json/Sample%20Animation.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(animationData => {
+                    console.log('Login animation data loaded successfully');
                     loginAnimation = lottie.loadAnimation({
                         container: container,
                         renderer: 'svg',
@@ -537,14 +543,36 @@
                         animationData: animationData,
                         rendererSettings: {
                             progressiveLoad: true,
-                            hideOnTransparent: true
+                            hideOnTransparent: true,
+                            preserveAspectRatio: 'xMidYMid meet'
                         }
                     });
+                    
+                    // Set container size based on animation dimensions
+                    if (animationData.w && animationData.h) {
+                        const scale = Math.min(300 / animationData.w, 300 / animationData.h);
+                        container.style.width = (animationData.w * scale) + 'px';
+                        container.style.height = (animationData.h * scale) + 'px';
+                    }
                 })
                 .catch(error => {
                     console.error('Error loading login animation:', error);
-                    // Fallback: Show a simple animated icon if Lottie fails
-                    container.innerHTML = '<div style="font-size: 120px; animation: bounce 2s infinite;">🔐</div>';
+                    // Show a better fallback with CSS animation
+                    container.innerHTML = `
+                        <div style="
+                            font-size: 80px; 
+                            animation: pulse 2s infinite;
+                            text-align: center;
+                            line-height: 300px;
+                            color: white;
+                        ">🔐</div>
+                        <style>
+                            @keyframes pulse {
+                                0%, 100% { transform: scale(1); opacity: 1; }
+                                50% { transform: scale(1.1); opacity: 0.8; }
+                            }
+                        </style>
+                    `;
                 });
         }
 
