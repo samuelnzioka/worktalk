@@ -6,11 +6,14 @@
     <title>Sign Up - AjiraTalk</title>
     
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-backend2.onrender.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-backend2.onrender.com;">
     
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/responsive.css">
+    
+    <!-- Lottie Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     
     <style>
         * {
@@ -20,1241 +23,693 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Animated Background */
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+        /* Split Layout Container */
+        .register-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Left Visual Panel */
+        .visual-panel {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            position: relative;
             overflow: hidden;
         }
 
-        .floating-shapes {
+        .visual-panel::before {
+            content: '';
             position: absolute;
-            width: 100%;
-            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
         }
 
-        .shape {
-            position: absolute;
-            opacity: 0.1;
-            animation: float 20s infinite ease-in-out;
-        }
-
-        .shape:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
-            animation-duration: 15s;
-        }
-
-        .shape:nth-child(2) {
-            width: 120px;
-            height: 120px;
-            background: white;
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            top: 60%;
-            right: 10%;
-            animation-delay: 2s;
-            animation-duration: 18s;
-        }
-
-        .shape:nth-child(3) {
-            width: 100px;
-            height: 100px;
-            background: white;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            bottom: 20%;
-            left: 30%;
-            animation-delay: 4s;
-            animation-duration: 20s;
-        }
-
-        .shape:nth-child(4) {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 10px;
-            top: 40%;
-            right: 30%;
-            animation-delay: 6s;
-            animation-duration: 16s;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            25% {
-                transform: translateY(-20px) rotate(90deg);
-            }
-            50% {
-                transform: translateY(10px) rotate(180deg);
-            }
-            75% {
-                transform: translateY(-15px) rotate(270deg);
-            }
-        }
-
-        /* Header */
-        .header {
-            position: relative;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem 0;
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .logo-icon {
-            font-size: 2rem;
-            margin-right: 0.5rem;
-        }
-
-        .logo-text {
-            color: white;
-        }
-
-        .auth-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            max-width: 1200px;
-            width: 100%;
-            align-items: center;
-        }
-
-        /* Times Square Eyes Animation */
-        .eyes-showcase {
-            color: white;
+        .brand-content {
             text-align: center;
-            position: relative;
+            color: white;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
         }
 
-        .eyes-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin-bottom: 3rem;
-            perspective: 1000px;
+        .brand-logo {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .eye {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(145deg, #ffffff, #f0f0f0);
-            border-radius: 50%;
-            position: relative;
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                inset 0 -5px 10px rgba(0, 0, 0, 0.1);
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .brand-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Lottie Animation Container */
+        .lottie-container {
+            width: 300px;
+            height: 300px;
+            margin: 2rem auto;
+            z-index: 1;
+        }
+
+        /* Right Register Panel */
+        .register-panel {
+            background: #ffffff;
             display: flex;
-            align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            animation: eyeBlink 4s infinite;
-        }
-
-        @keyframes eyeBlink {
-            0%, 90%, 100% { transform: scaleY(1); }
-            95% { transform: scaleY(0.1); }
-        }
-
-        .eye:nth-child(2) {
-            animation-delay: 1s;
-        }
-
-        .eye:nth-child(3) {
-            animation-delay: 2s;
-        }
-
-        .eye:nth-child(4) {
-            animation-delay: 0.5s;
-        }
-
-        .eye:nth-child(5) {
-            animation-delay: 1.5s;
-        }
-
-        .eye:nth-child(6) {
-            animation-delay: 2.5s;
-        }
-
-        .pupil {
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle, #1a1a1a 30%, #333 70%);
-            border-radius: 50%;
+            align-items: center;
+            padding: 2rem;
             position: relative;
-            transition: all 0.2s ease;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        .pupil::after {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 15px;
-            height: 15px;
+        /* Register Card Animation */
+        .register-card {
             background: white;
-            border-radius: 50%;
-            opacity: 0.8;
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform: translateX(100px);
+            opacity: 0;
         }
 
-        .eye.happy .pupil {
-            background: radial-gradient(circle, #333 30%, #1a1a1a 70%);
-            animation: pupilDilate 0.5s ease;
-        }
-
-        .eye.happy::before {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 30px;
-            background: transparent;
-            border: 3px solid #ffd700;
-            border-bottom: none;
-            border-radius: 60px 60px 0 0;
-            animation: smileAppear 0.5s ease;
-        }
-
-        @keyframes pupilDilate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes smileAppear {
-            0% { 
-                transform: translateX(-50%) translateY(10px);
-                opacity: 0;
-            }
-            100% { 
-                transform: translateX(-50%) translateY(0);
+        @keyframes slideInRight {
+            to {
+                transform: translateX(0);
                 opacity: 1;
             }
         }
 
-        .eyes-message h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .highlight {
-            color: #ffd700;
-            font-weight: 800;
+        /* Register Header */
+        .register-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
         }
 
-        .eyes-message p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .platform-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .stat-number {
+        .register-header h1 {
             font-size: 2rem;
             font-weight: 700;
-            color: #ffd700;
+            color: #1a1a1a;
             margin-bottom: 0.5rem;
         }
 
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        /* Cartoon Characters Animation */
-        .cartoon-showcase {
-            color: white;
-            text-align: center;
-            position: relative;
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cartoons-container {
-            display: flex;
-            gap: 3rem;
-            align-items: flex-end;
-            height: 300px;
-            position: relative;
-        }
-
-        .cartoon-character {
-            position: relative;
-            width: 100px;
-            height: 180px;
-            transition: all 0.3s ease;
-        }
-
-        .cartoon-body {
-            width: 70px;
-            height: 90px;
-            border-radius: 35px 35px 25px 25px;
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .cartoon-body.red {
-            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
-            animation: breatheRed 3s ease-in-out infinite;
-        }
-
-        .cartoon-body.green {
-            background: linear-gradient(145deg, #51cf66, #40c057);
-            animation: breatheGreen 3s ease-in-out infinite;
-        }
-
-        .cartoon-body.blue {
-            background: linear-gradient(145deg, #339af0, #228be6);
-            animation: breatheBlue 3s ease-in-out infinite;
-        }
-
-        @keyframes breatheRed {
-            0%, 100% { transform: translateX(-50%) scaleY(1); }
-            50% { transform: translateX(-50%) scaleY(1.03); }
-        }
-
-        @keyframes breatheGreen {
-            0%, 100% { transform: translateX(-50%) scaleY(1); }
-            50% { transform: translateX(-50%) scaleY(1.03); }
-        }
-
-        @keyframes breatheBlue {
-            0%, 100% { transform: translateX(-50%) scaleY(1); }
-            50% { transform: translateX(-50%) scaleY(1.03); }
-        }
-
-        .cartoon-head {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            position: absolute;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(145deg, #ffeaa7, #fdcb6e);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-        }
-
-        .cartoon-eyes {
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 12px;
-        }
-
-        .cartoon-eye {
-            width: 10px;
-            height: 10px;
-            background: #2d3436;
-            border-radius: 50%;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        .cartoon-eye::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 3px;
-            height: 3px;
-            background: white;
-            border-radius: 50%;
-        }
-
-        .cartoon-mouth {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 16px;
-            height: 8px;
-            border: 2px solid #2d3436;
-            border-top: none;
-            border-radius: 0 0 16px 16px;
-            transition: all 0.3s ease;
-        }
-
-        .cartoon-arms {
-            position: absolute;
-            top: 85px;
-            width: 100%;
-        }
-
-        .cartoon-arm {
-            position: absolute;
-            width: 6px;
-            height: 35px;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
-
-        .cartoon-arm.left {
-            left: -2px;
-            transform-origin: top center;
-            animation: waveLeft 2s ease-in-out infinite;
-        }
-
-        .cartoon-arm.right {
-            right: -2px;
-            transform-origin: top center;
-            animation: waveRight 2s ease-in-out infinite;
-        }
-
-        .cartoon-arm.red {
-            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
-        }
-
-        .cartoon-arm.green {
-            background: linear-gradient(145deg, #51cf66, #40c057);
-        }
-
-        .cartoon-arm.blue {
-            background: linear-gradient(145deg, #339af0, #228be6);
-        }
-
-        @keyframes waveLeft {
-            0%, 100% { transform: rotate(-10deg); }
-            50% { transform: rotate(10deg); }
-        }
-
-        @keyframes waveRight {
-            0%, 100% { transform: rotate(10deg); }
-            50% { transform: rotate(-10deg); }
-        }
-
-        .cartoon-character.watching .cartoon-head {
-            transform: translateX(-50%) rotate(0deg);
-        }
-
-        .cartoon-character.excited .cartoon-mouth {
-            height: 15px;
-            border-radius: 20px 20px 0 0;
-            border: 2px solid #2d3436;
-            border-bottom: none;
-        }
-
-        .cartoon-character.excited .cartoon-eye {
-            height: 8px;
-        }
-
-        .cartoon-character.sad .cartoon-mouth {
-            width: 15px;
-            height: 15px;
-            border: 2px solid #2d3436;
-            border-top: none;
-            border-radius: 0 0 10px 10px;
-            transform: translateX(-50%) translateY(2px);
-        }
-
-        .cartoon-character.sad .cartoon-eye {
-            height: 6px;
-            width: 10px;
-            transform: translateY(2px);
-        }
-
-        .cartoon-character.sad .cartoon-head {
-            transform: translateX(-50%) rotate(-10deg);
-        }
-
-        .cartoon-character.shy .cartoon-head {
-            transform: translateX(-50%) rotate(-45deg);
-        }
-
-        .cartoon-character.shy .cartoon-eye {
-            height: 4px;
-            width: 8px;
-        }
-
-        .cartoon-character.shy .cartoon-mouth {
-            width: 10px;
-            height: 5px;
-        }
-
-        .cartoon-character.curious .cartoon-head {
-            transform: translateX(-50%) rotate(5deg);
-        }
-
-        .cartoon-character.curious .cartoon-eye {
-            height: 14px;
-            width: 14px;
-        }
-
-        .cartoon-character.curious .cartoon-mouth {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            border: 2px solid #2d3436;
-        }
-
-        .cartoon-character.sleeping .cartoon-eye {
-            height: 2px;
-            width: 12px;
-        }
-
-        .cartoon-character.sleeping .cartoon-mouth {
-            width: 15px;
-            height: 8px;
-            border-radius: 10px;
-        }
-
-        .cartoon-character.sleeping .cartoon-body {
-            animation: breatheRed 4s ease-in-out infinite;
-        }
-
-        .cartoon-character.sleeping .cartoon-body.green {
-            animation: breatheGreen 4s ease-in-out infinite;
-        }
-
-        .cartoon-character.sleeping .cartoon-body.blue {
-            animation: breatheBlue 4s ease-in-out infinite;
-        }
-
-        .cartoon-character.typing .cartoon-arm.left {
-            animation: typingLeft 0.5s ease-in-out infinite;
-        }
-
-        .cartoon-character.typing .cartoon-arm.right {
-            animation: typingRight 0.5s ease-in-out infinite;
-        }
-
-        @keyframes typingLeft {
-            0%, 100% { transform: rotate(-20deg) translateY(5px); }
-            50% { transform: rotate(-30deg) translateY(0px); }
-        }
-
-        @keyframes typingRight {
-            0%, 100% { transform: rotate(20deg) translateY(5px); }
-            50% { transform: rotate(30deg) translateY(0px); }
-        }
-
-        /* Auth Card */
-        .auth-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 450px;
-            width: 100%;
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-header h1 {
-            color: #333;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-header p {
-            color: #666;
+        .register-header p {
+            color: #6b7280;
             font-size: 1rem;
         }
 
+        /* Form Styles */
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
         .form-group {
-            margin-bottom: 1.5rem;
+            position: relative;
         }
 
         .form-label {
             display: block;
-            color: #333;
+            font-size: 0.875rem;
             font-weight: 600;
+            color: #374151;
             margin-bottom: 0.5rem;
         }
 
         .form-input {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
             font-size: 1rem;
-            transition: all 0.3s ease;
-            background: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
 
-        .form-error {
-            color: #e74c3c;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
+        .form-input::placeholder {
+            color: #9ca3af;
         }
 
         .password-input-container {
             position: relative;
-            display: flex;
-            align-items: center;
         }
 
         .show-password-btn {
             position: absolute;
-            right: 10px;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.2rem;
-            padding: 5px;
-            border-radius: 5px;
-            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            color: #6b7280;
         }
 
         .show-password-btn:hover {
-            background: rgba(102, 126, 234, 0.1);
+            background: #f3f4f6;
+            color: #374151;
         }
 
-        .show-password-btn:active {
-            transform: scale(0.95);
+        .form-error {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
         }
 
+        .form-error.show {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-google {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-google:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Form Options */
         .form-options {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin: 1rem 0;
         }
 
         .checkbox-label {
             display: flex;
             align-items: center;
-            color: #666;
-            font-size: 0.9rem;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
             cursor: pointer;
         }
 
-        .checkbox-label input {
-            margin-right: 0.5rem;
+        .checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
-        .forgot-link {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
+        /* Divider */
+        .form-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            gap: 1rem;
         }
 
-        .forgot-link:hover {
-            color: #764ba2;
+        .form-divider::before,
+        .form-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
         }
 
-        .btn-full {
-            width: 100%;
-            padding: 1rem;
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
+        .form-divider span {
+            color: #6b7280;
+            font-size: 0.875rem;
         }
 
-        .auth-footer {
+        /* Footer */
+        .register-footer {
             text-align: center;
-            color: #666;
-            font-size: 0.9rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
         }
 
-        .auth-footer p {
-            margin-bottom: 0.5rem;
+        .register-footer p {
+            color: #6b7280;
+            font-size: 0.875rem;
         }
 
-        .auth-footer a {
+        .register-footer a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
+            transition: color 0.2s ease;
         }
 
-        .auth-footer a:hover {
+        .register-footer a:hover {
             color: #764ba2;
-        }
-
-        .employee-note {
-            opacity: 0.8;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .auth-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .eyes-showcase {
-                text-align: center;
-            }
-
-            .eyes-showcase h1 {
-                font-size: 2rem;
-            }
-
-            .eyes-container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-
-            .eye {
-                width: 80px;
-                height: 80px;
-            }
-
-            .pupil {
-                width: 35px;
-                height: 35px;
-            }
-
-            .platform-stats {
+            .register-container {
                 grid-template-columns: 1fr;
             }
+
+            .visual-panel {
+                display: none;
+            }
+
+            .register-panel {
+                padding: 1rem;
+            }
+
+            .register-card {
+                padding: 2rem;
+                animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                transform: translateY(50px);
+            }
+
+            @keyframes slideInUp {
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Animated Background -->
-        <div class="animated-bg">
-            <div class="floating-shapes">
-                <div class="shape"></div>
-                <div class="shape"></div>
-                <div class="shape"></div>
-                <div class="shape"></div>
+    <div class="register-container">
+        <!-- Left Visual Panel -->
+        <div class="visual-panel">
+            <div class="brand-content">
+                <div class="brand-logo">🗣️</div>
+                <h1 class="brand-title">AjiraTalk</h1>
+                <p class="brand-subtitle">
+                    Join our community of transparent workplaces. Share your authentic experiences and help others make informed career decisions.
+                </p>
+                <!-- Lottie Animation Container -->
+                <div id="signupLottie" class="lottie-container"></div>
             </div>
         </div>
 
-        <header class="header">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <span class="logo-icon">🗣️</span>
-                    <span class="logo-text">Ajira<span>Talk</span></span>
-                </a>
-                <nav class="nav">
-                    <a href="/companies.html" class="nav-link">Companies</a>
-                    <a href="/public-timeline.html" class="nav-link">Public Timeline</a>
-                </nav>
-                <div class="user-menu" id="userMenu">
-                    <a href="/login.html" class="btn btn-outline">Log In</a>
-                    <a href="/register.html" class="btn btn-primary">Sign Up</a>
-                </div>
-            </div>
-        </header>
-
-        <main class="auth-container">
-            <div class="auth-content">
-                <!-- Left Side - Cartoon Characters Animation -->
-                <div class="cartoon-showcase">
-                    <div class="cartoons-container" id="cartoonsContainer">
-                        <!-- Red Cartoon Character -->
-                        <div class="cartoon-character" id="redCartoon">
-                            <div class="cartoon-head">
-                                <div class="cartoon-eyes">
-                                    <div class="cartoon-eye"></div>
-                                    <div class="cartoon-eye"></div>
-                                </div>
-                                <div class="cartoon-mouth"></div>
-                            </div>
-                            <div class="cartoon-body red"></div>
-                            <div class="cartoon-arms">
-                                <div class="cartoon-arm left red"></div>
-                                <div class="cartoon-arm right red"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Green Cartoon Character -->
-                        <div class="cartoon-character" id="greenCartoon">
-                            <div class="cartoon-head">
-                                <div class="cartoon-eyes">
-                                    <div class="cartoon-eye"></div>
-                                    <div class="cartoon-eye"></div>
-                                </div>
-                                <div class="cartoon-mouth"></div>
-                            </div>
-                            <div class="cartoon-body green"></div>
-                            <div class="cartoon-arms">
-                                <div class="cartoon-arm left green"></div>
-                                <div class="cartoon-arm right green"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Blue Cartoon Character -->
-                        <div class="cartoon-character" id="blueCartoon">
-                            <div class="cartoon-head">
-                                <div class="cartoon-eyes">
-                                    <div class="cartoon-eye"></div>
-                                    <div class="cartoon-eye"></div>
-                                </div>
-                                <div class="cartoon-mouth"></div>
-                            </div>
-                            <div class="cartoon-body blue"></div>
-                            <div class="cartoon-arms">
-                                <div class="cartoon-arm left blue"></div>
-                                <div class="cartoon-arm right blue"></div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Right Register Panel -->
+        <div class="register-panel">
+            <div class="register-card">
+                <div class="register-header">
+                    <h1>Create account</h1>
+                    <p>Join our workplace transparency community</p>
                 </div>
 
-                <!-- Right Side - Sign Up Form -->
-                <div class="auth-card">
-                    <div class="auth-header">
-                        <h1>Create Account</h1>
-                        <p>Join AjiraTalk to share your thoughts about companies</p>
+                <form id="registerForm" class="register-form">
+                    <div class="form-group">
+                        <label for="fullName" class="form-label">Full name</label>
+                        <input 
+                            type="text" 
+                            id="fullName" 
+                            name="fullName" 
+                            class="form-input" 
+                            placeholder="John Doe"
+                            required 
+                            autocomplete="name"
+                        >
+                        <div class="form-error" id="fullNameError"></div>
                     </div>
 
-                    <form id="registerForm" class="auth-form">
-                        <div class="form-group">
-                            <label for="name" class="form-label">Full Name</label>
-                            <input type="text" id="name" name="name" class="form-input" 
-                                   placeholder="Your name" required autocomplete="name">
-                            <div class="form-error" id="nameError"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" id="email" name="email" class="form-input" 
-                                   placeholder="you@example.com" required autocomplete="email">
-                            <div class="form-error" id="emailError"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="password-input-container">
-                                <input type="password" id="password" name="password" class="form-input" 
-                                       placeholder="••••••••" required autocomplete="new-password">
-                                <button type="button" id="showPasswordBtn" class="show-password-btn">
-                                    <span id="eyeIcon">👁️</span>
-                                </button>
-                            </div>
-                            <div class="form-error" id="passwordError"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="confirmPassword" class="form-label">Confirm Password</label>
-                            <div class="password-input-container">
-                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" 
-                                       placeholder="••••••••" required autocomplete="new-password">
-                                <button type="button" id="showConfirmPasswordBtn" class="show-password-btn">
-                                    <span id="confirmEyeIcon">👁️</span>
-                                </button>
-                            </div>
-                            <div class="form-error" id="confirmPasswordError"></div>
-                        </div>
-
-                        <div class="form-options">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="agreeTerms" required> I agree to the Terms of Service
-                            </label>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-full" id="registerBtn">
-                            Create Account
-                        </button>
-                    </form>
-
-                    <div class="auth-footer">
-                        <p>Already have an account? <a href="/login.html">Log in</a></p>
-                        <p class="employee-note">Employee with an invite? <a href="/invite-accept.html">Accept invite</a></p>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            placeholder="you@example.com"
+                            required 
+                            autocomplete="email"
+                        >
+                        <div class="form-error" id="emailError"></div>
                     </div>
-                </div>
-            </div>
-        </main>
 
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="logo">Ajira<span>Talk</span></div>
-                    <p>Workplace transparency platform for everyone</p>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="password-input-container">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-input" 
+                                placeholder="••••••••"
+                                required 
+                                autocomplete="new-password"
+                            >
+                            <button type="button" id="showPasswordBtn" class="show-password-btn">
+                                <span id="eyeIcon">👁️</span>
+                            </button>
+                        </div>
+                        <div class="form-error" id="passwordError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm password</label>
+                        <div class="password-input-container">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                name="confirmPassword" 
+                                class="form-input" 
+                                placeholder="••••••••"
+                                required 
+                                autocomplete="new-password"
+                            >
+                            <button type="button" id="showConfirmPasswordBtn" class="show-password-btn">
+                                <span id="confirmEyeIcon">👁️</span>
+                            </button>
+                        </div>
+                        <div class="form-error" id="confirmPasswordError"></div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                            I agree to the Terms of Service and Privacy Policy
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="registerBtn">
+                        <span id="btnText">Create Account</span>
+                    </button>
+                </form>
+
+                <div class="form-divider">
+                    <span>OR</span>
                 </div>
-                <div class="footer-section">
-                    <h4>Platform</h4>
-                    <a href="/companies.html">Companies</a>
-                    <a href="/public-timeline.html">Public Timeline</a>
-                    <a href="/company-register.html">Register Company</a>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Community Guidelines</a>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <a href="mailto:support@ajiratalk.com">support@ajiratalk.com</a>
+
+                <button class="btn btn-google btn-full" id="googleRegisterBtn">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M17.64 9.20455C17.64 8.56637 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8196H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z" fill="#4285F4"/>
+                        <path d="M9 18C11.43 18 13.4673 17.1941 14.9564 15.8196L12.0477 13.5614C11.2418 14.1014 10.2109 14.4205 9 14.4205C6.65591 14.4205 4.67182 12.8373 3.96409 10.71H0.957273V13.0418C2.43818 15.9832 5.48182 18 9 18Z" fill="#34A853"/>
+                        <path d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29V4.95818H0.957273C0.347727 6.17318 0 7.54773 0 9C0 10.4523 0.347727 11.8268 0.957273 13.0418L3.96409 10.71Z" fill="#FBBC05"/>
+                        <path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957273 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335"/>
+                    </svg>
+                    Sign up with Google
+                </button>
+
+                <div class="register-footer">
+                    <p>Already have an account? <a href="/login.html">Sign in</a></p>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 AjiraTalk. All rights reserved.</p>
-            </div>
-        </footer>
+        </div>
     </div>
 
     <script type="module">
         import { register } from '/js/auth.js';
         import { sanitizeInput, showToast } from '/js/utils.js';
 
-        // Cartoon character state management
-        let idleTimer;
-        let isPasswordVisible = false;
-        let isConfirmPasswordVisible = false;
-
-        // Setup cartoon character interactions
-        function setupCartoonInteractions() {
-            const cartoons = document.querySelectorAll('.cartoon-character');
-            const nameInput = document.getElementById('name');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirmPassword');
-            const showPasswordBtn = document.getElementById('showPasswordBtn');
-            const showConfirmPasswordBtn = document.getElementById('showConfirmPasswordBtn');
-            const eyeIcon = document.getElementById('eyeIcon');
-            const confirmEyeIcon = document.getElementById('confirmEyeIcon');
+        // Initialize Lottie Animation
+        let signupAnimation;
+        
+        function initSignupAnimation() {
+            const container = document.getElementById('signupLottie');
             
-            // Start with sleeping state
-            makeCartoonsSleeping();
-            
-            // Make cartoons watch mouse movement
-            document.addEventListener('mousemove', (e) => {
-                resetIdleTimer();
-                if (!isPasswordVisible && !isConfirmPasswordVisible) {
-                    cartoons.forEach(cartoon => {
-                        if (!cartoon.classList.contains('sad') && 
-                            !cartoon.classList.contains('excited') &&
-                            !cartoon.classList.contains('shy')) {
-                            cartoon.classList.add('curious');
-                            cartoon.classList.remove('sleeping');
+            // Load the Sign up Animation JSON
+            fetch('/json/Sign up.json')
+                .then(response => response.json())
+                .then(animationData => {
+                    signupAnimation = lottie.loadAnimation({
+                        container: container,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        animationData: animationData,
+                        rendererSettings: {
+                            progressiveLoad: true,
+                            hideOnTransparent: true
                         }
                     });
-                    
-                    cartoons.forEach(cartoon => {
-                        const head = cartoon.querySelector('.cartoon-head');
-                        const eyes = cartoon.querySelectorAll('.cartoon-eye');
-                        const rect = head.getBoundingClientRect();
-                        const headCenterX = rect.left + rect.width / 2;
-                        const headCenterY = rect.top + rect.height / 2;
-                        
-                        const angle = Math.atan2(e.clientY - headCenterY, e.clientX - headCenterX);
-                        const rotation = Math.max(-15, Math.min(15, angle * (180 / Math.PI) / 4));
-                        
-                        head.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
-                        
-                        // Move pupils within eyes
-                        eyes.forEach(eye => {
-                            const eyeRect = eye.getBoundingClientRect();
-                            const eyeCenterX = eyeRect.left + eyeRect.width / 2;
-                            const eyeCenterY = eyeRect.top + eyeRect.height / 2;
-                            
-                            const pupilAngle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterY);
-                            const distance = Math.min(3, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) / 20);
-                            
-                            const pupilX = Math.cos(pupilAngle) * distance;
-                            const pupilY = Math.sin(pupilAngle) * distance;
-                            
-                            eye.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
-                        });
-                    });
-                }
-            });
-            
-            // Show password toggle interactions
-            showPasswordBtn.addEventListener('click', () => {
-                isPasswordVisible = !isPasswordVisible;
-                
-                if (isPasswordVisible) {
-                    // Make cartoons shy when password is shown
-                    cartoons.forEach(cartoon => {
-                        cartoon.classList.remove('curious', 'watching', 'typing', 'excited');
-                        cartoon.classList.add('shy');
-                    });
-                    eyeIcon.textContent = '🙈';
-                    passwordInput.type = 'text';
-                } else {
-                    // Make cartoons curious again when password is hidden
-                    cartoons.forEach(cartoon => {
-                        cartoon.classList.remove('shy');
-                        cartoon.classList.add('curious');
-                    });
-                    eyeIcon.textContent = '👁️';
-                    passwordInput.type = 'password';
-                }
-            });
-
-            showConfirmPasswordBtn.addEventListener('click', () => {
-                isConfirmPasswordVisible = !isConfirmPasswordVisible;
-                
-                if (isConfirmPasswordVisible) {
-                    // Make cartoons shy when confirm password is shown
-                    cartoons.forEach(cartoon => {
-                        cartoon.classList.remove('curious', 'watching', 'typing', 'excited');
-                        cartoon.classList.add('shy');
-                    });
-                    confirmEyeIcon.textContent = '🙈';
-                    confirmPasswordInput.type = 'text';
-                } else {
-                    // Make cartoons curious again when confirm password is hidden
-                    cartoons.forEach(cartoon => {
-                        cartoon.classList.remove('shy');
-                        cartoon.classList.add('curious');
-                    });
-                    confirmEyeIcon.textContent = '👁️';
-                    confirmPasswordInput.type = 'password';
-                }
-            });
-            
-            // React when user starts typing
-            [nameInput, emailInput, passwordInput, confirmPasswordInput].forEach(input => {
-                input.addEventListener('focus', () => {
-                    resetIdleTimer();
-                    if (!isPasswordVisible && !isConfirmPasswordVisible) {
-                        cartoons.forEach(cartoon => {
-                            cartoon.classList.remove('sleeping', 'curious');
-                            cartoon.classList.add('watching');
-                        });
-                    }
+                })
+                .catch(error => {
+                    console.error('Error loading signup animation:', error);
+                    // Fallback: Show a simple animated icon if Lottie fails
+                    container.innerHTML = '<div style="font-size: 120px; animation: bounce 2s infinite;">👋</div>';
                 });
-                
-                input.addEventListener('blur', () => {
-                    if (!isPasswordVisible && !isConfirmPasswordVisible) {
-                        cartoons.forEach(cartoon => {
-                            cartoon.classList.remove('watching');
-                            cartoon.classList.add('curious');
-                        });
-                    }
-                });
-                
-                input.addEventListener('input', () => {
-                    resetIdleTimer();
-                    if (!isPasswordVisible && !isConfirmPasswordVisible) {
-                        cartoons.forEach(cartoon => {
-                            cartoon.classList.remove('curious', 'watching');
-                            cartoon.classList.add('typing');
-                            setTimeout(() => {
-                                cartoon.classList.remove('typing');
-                                cartoon.classList.add('curious');
-                            }, 500);
-                        });
-                    }
-                });
-            });
         }
 
-        // Reset idle timer
-        function resetIdleTimer() {
-            clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => {
-                makeCartoonsSleeping();
-            }, 5000); // Sleep after 5 seconds of inactivity
-        }
-
-        // Make cartoons excited when register is attempted
-        function makeCartoonsExcited() {
-            const cartoons = document.querySelectorAll('.cartoon-character');
-            cartoons.forEach((cartoon, index) => {
-                setTimeout(() => {
-                    cartoon.classList.remove('watching', 'curious', 'typing', 'sad', 'shy', 'sleeping');
-                    cartoon.classList.add('excited');
-                }, index * 200);
-            });
-        }
-
-        // Make cartoons sad when register fails
-        function makeCartoonsSad() {
-            const cartoons = document.querySelectorAll('.cartoon-character');
-            cartoons.forEach((cartoon, index) => {
-                setTimeout(() => {
-                    cartoon.classList.remove('watching', 'curious', 'typing', 'excited', 'shy', 'sleeping');
-                    cartoon.classList.add('sad');
-                }, index * 150);
-            });
-            
-            // Reset to curious after 3 seconds
-            setTimeout(() => {
-                cartoons.forEach(cartoon => {
-                    cartoon.classList.remove('sad');
-                    if (!isPasswordVisible && !isConfirmPasswordVisible) {
-                        cartoon.classList.add('curious');
-                    }
-                });
-            }, 3000);
-        }
-
-        // Make cartoons shy when showing password
-        function makeCartoonsShy() {
-            const cartoons = document.querySelectorAll('.cartoon-character');
-            cartoons.forEach((cartoon, index) => {
-                setTimeout(() => {
-                    cartoon.classList.remove('watching', 'curious', 'typing', 'excited', 'sad', 'sleeping');
-                    cartoon.classList.add('shy');
-                }, index * 100);
-            });
-        }
-
-        // Make cartoons sleeping when idle
-        function makeCartoonsSleeping() {
-            const cartoons = document.querySelectorAll('.cartoon-character');
-            cartoons.forEach(cartoon => {
-                cartoon.classList.remove('watching', 'curious', 'typing', 'excited', 'sad', 'shy');
-                cartoon.classList.add('sleeping');
-            });
-        }
-
-        // Reset cartoons to neutral state
-        function resetCartoons() {
-            const cartoons = document.querySelectorAll('.cartoon-character');
-            cartoons.forEach(cartoon => {
-                cartoon.classList.remove('excited', 'sad', 'shy', 'sleeping');
-                if (!isPasswordVisible && !isConfirmPasswordVisible) {
-                    cartoon.classList.add('curious');
-                }
-            });
-        }
-
-        // Initialize
-        setupCartoonInteractions();
-
+        // Form elements
         const registerForm = document.getElementById('registerForm');
-        const nameInput = document.getElementById('name');
+        const fullNameInput = document.getElementById('fullName');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirmPassword');
-        const agreeTerms = document.getElementById('agreeTerms');
+        const showPasswordBtn = document.getElementById('showPasswordBtn');
+        const showConfirmPasswordBtn = document.getElementById('showConfirmPasswordBtn');
+        const eyeIcon = document.getElementById('eyeIcon');
+        const confirmEyeIcon = document.getElementById('confirmEyeIcon');
         const registerBtn = document.getElementById('registerBtn');
+        const btnText = document.getElementById('btnText');
+        const googleRegisterBtn = document.getElementById('googleRegisterBtn');
 
-        // Add animation to form inputs
-        const inputs = document.querySelectorAll('.form-input');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'scale(1.02)';
-            });
+        // Error elements
+        const fullNameError = document.getElementById('fullNameError');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+        // Password visibility toggles
+        let isPasswordVisible = false;
+        let isConfirmPasswordVisible = false;
+
+        showPasswordBtn.addEventListener('click', () => {
+            isPasswordVisible = !isPasswordVisible;
             
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'scale(1)';
-            });
+            if (isPasswordVisible) {
+                passwordInput.type = 'text';
+                eyeIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.textContent = '👁️';
+            }
         });
 
+        showConfirmPasswordBtn.addEventListener('click', () => {
+            isConfirmPasswordVisible = !isConfirmPasswordVisible;
+            
+            if (isConfirmPasswordVisible) {
+                confirmPasswordInput.type = 'text';
+                confirmEyeIcon.textContent = '🙈';
+            } else {
+                confirmPasswordInput.type = 'password';
+                confirmEyeIcon.textContent = '👁️';
+            }
+        });
+
+        // Clear errors on input
+        fullNameInput.addEventListener('input', () => {
+            fullNameError.classList.remove('show');
+            fullNameError.textContent = '';
+        });
+
+        emailInput.addEventListener('input', () => {
+            emailError.classList.remove('show');
+            emailError.textContent = '';
+        });
+
+        passwordInput.addEventListener('input', () => {
+            passwordError.classList.remove('show');
+            passwordError.textContent = '';
+        });
+
+        confirmPasswordInput.addEventListener('input', () => {
+            confirmPasswordError.classList.remove('show');
+            confirmPasswordError.textContent = '';
+        });
+
+        // Form submission
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Make cartoons excited!
-            makeCartoonsExcited();
-            
             // Clear previous errors
-            document.getElementById('nameError').textContent = '';
-            document.getElementById('emailError').textContent = '';
-            document.getElementById('passwordError').textContent = '';
-            document.getElementById('confirmPasswordError').textContent = '';
+            fullNameError.classList.remove('show');
+            emailError.classList.remove('show');
+            passwordError.classList.remove('show');
+            confirmPasswordError.classList.remove('show');
             
             // Get and sanitize inputs
-            const name = sanitizeInput(nameInput.value.trim());
+            const fullName = sanitizeInput(fullNameInput.value.trim());
             const email = sanitizeInput(emailInput.value.trim());
             const password = passwordInput.value;
             const confirmPassword = confirmPasswordInput.value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
             
-            // Validate
+            // Validation
             let hasError = false;
-            if (!name) {
-                document.getElementById('nameError').textContent = 'Name is required';
+            
+            if (!fullName) {
+                fullNameError.textContent = 'Full name is required';
+                fullNameError.classList.add('show');
                 hasError = true;
-            }
-            if (!email) {
-                document.getElementById('emailError').textContent = 'Email is required';
-                hasError = true;
-            }
-            if (!password) {
-                document.getElementById('passwordError').textContent = 'Password is required';
-                hasError = true;
-            }
-            if (password !== confirmPassword) {
-                document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
-                hasError = true;
-            }
-            if (!agreeTerms.checked) {
-                showToast('You must agree to the Terms of Service', 'error');
+            } else if (fullName.length < 2) {
+                fullNameError.textContent = 'Full name must be at least 2 characters';
+                fullNameError.classList.add('show');
                 hasError = true;
             }
             
-            if (hasError) {
-                makeCartoonsSad();
-                return;
+            if (!email) {
+                emailError.textContent = 'Email is required';
+                emailError.classList.add('show');
+                hasError = true;
+            } else if (!email.includes('@')) {
+                emailError.textContent = 'Please enter a valid email';
+                emailError.classList.add('show');
+                hasError = true;
             }
+            
+            if (!password) {
+                passwordError.textContent = 'Password is required';
+                passwordError.classList.add('show');
+                hasError = true;
+            } else if (password.length < 8) {
+                passwordError.textContent = 'Password must be at least 8 characters';
+                passwordError.classList.add('show');
+                hasError = true;
+            }
+            
+            if (!confirmPassword) {
+                confirmPasswordError.textContent = 'Please confirm your password';
+                confirmPasswordError.classList.add('show');
+                hasError = true;
+            } else if (password !== confirmPassword) {
+                confirmPasswordError.textContent = 'Passwords do not match';
+                confirmPasswordError.classList.add('show');
+                hasError = true;
+            }
+            
+            if (!agreeTerms) {
+                showToast('Please agree to the Terms of Service and Privacy Policy', 'error');
+                hasError = true;
+            }
+            
+            if (hasError) return;
             
             // Show loading state
             registerBtn.disabled = true;
-            registerBtn.textContent = 'Creating account...';
-            registerBtn.style.background = 'linear-gradient(135deg, #95a5a6, #7f8c8d)';
+            btnText.innerHTML = '<span class="loading"></span> Creating account...';
             
             try {
-                const result = await register(name, email, password);
+                const result = await register(fullName, email, password);
                 
                 if (result.success) {
                     showToast('Account created successfully! Redirecting...', 'success');
@@ -1262,23 +717,31 @@
                         window.location.href = result.redirectTo || '/dashboard.html';
                     }, 1000);
                 } else {
-                    showToast(result.message || 'Registration failed', 'error');
-                    
-                    // Make cartoons sad on error
-                    makeCartoonsSad();
+                    if (result.field === 'email') {
+                        emailError.textContent = result.message || 'Registration failed';
+                        emailError.classList.add('show');
+                    } else {
+                        passwordError.textContent = result.message || 'Registration failed';
+                        passwordError.classList.add('show');
+                    }
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                showToast('An error occurred. Please try again.', 'error');
-                
-                // Make cartoons sad on error
-                makeCartoonsSad();
+                passwordError.textContent = 'An error occurred. Please try again.';
+                passwordError.classList.add('show');
             } finally {
                 registerBtn.disabled = false;
-                registerBtn.textContent = 'Create Account';
-                registerBtn.style.background = '';
+                btnText.textContent = 'Create Account';
             }
         });
+
+        // Google registration (placeholder)
+        googleRegisterBtn.addEventListener('click', () => {
+            showToast('Google registration coming soon!', 'info');
+        });
+
+        // Initialize animation when page loads
+        document.addEventListener('DOMContentLoaded', initSignupAnimation);
     </script>
 </body>
 </html>
