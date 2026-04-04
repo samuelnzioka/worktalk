@@ -322,6 +322,209 @@
             opacity: 0.9;
         }
 
+        /* Cartoon Characters Animation */
+        .cartoon-showcase {
+            color: white;
+            text-align: center;
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cartoons-container {
+            display: flex;
+            gap: 3rem;
+            align-items: flex-end;
+            height: 300px;
+            position: relative;
+        }
+
+        .cartoon-character {
+            position: relative;
+            width: 120px;
+            height: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .cartoon-body {
+            width: 80px;
+            height: 100px;
+            border-radius: 40px 40px 20px 20px;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .cartoon-body.red {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+            animation: breatheRed 3s ease-in-out infinite;
+        }
+
+        .cartoon-body.green {
+            background: linear-gradient(145deg, #51cf66, #40c057);
+            animation: breatheGreen 3s ease-in-out infinite;
+        }
+
+        .cartoon-body.blue {
+            background: linear-gradient(145deg, #339af0, #228be6);
+            animation: breatheBlue 3s ease-in-out infinite;
+        }
+
+        @keyframes breatheRed {
+            0%, 100% { transform: translateX(-50%) scaleY(1); }
+            50% { transform: translateX(-50%) scaleY(1.05); }
+        }
+
+        @keyframes breatheGreen {
+            0%, 100% { transform: translateX(-50%) scaleY(1); }
+            50% { transform: translateX(-50%) scaleY(1.05); }
+        }
+
+        @keyframes breatheBlue {
+            0%, 100% { transform: translateX(-50%) scaleY(1); }
+            50% { transform: translateX(-50%) scaleY(1.05); }
+        }
+
+        .cartoon-head {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(145deg, #ffeaa7, #fdcb6e);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .cartoon-eyes {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+
+        .cartoon-eye {
+            width: 12px;
+            height: 12px;
+            background: #2d3436;
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .cartoon-eye::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cartoon-mouth {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 10px;
+            border: 2px solid #2d3436;
+            border-top: none;
+            border-radius: 0 0 20px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .cartoon-arms {
+            position: absolute;
+            top: 120px;
+            width: 100%;
+        }
+
+        .cartoon-arm {
+            position: absolute;
+            width: 8px;
+            height: 40px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .cartoon-arm.left {
+            left: 5px;
+            transform-origin: top center;
+            animation: waveLeft 2s ease-in-out infinite;
+        }
+
+        .cartoon-arm.right {
+            right: 5px;
+            transform-origin: top center;
+            animation: waveRight 2s ease-in-out infinite;
+        }
+
+        .cartoon-arm.red {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+        }
+
+        .cartoon-arm.green {
+            background: linear-gradient(145deg, #51cf66, #40c057);
+        }
+
+        .cartoon-arm.blue {
+            background: linear-gradient(145deg, #339af0, #228be6);
+        }
+
+        @keyframes waveLeft {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        @keyframes waveRight {
+            0%, 100% { transform: rotate(10deg); }
+            50% { transform: rotate(-10deg); }
+        }
+
+        .cartoon-character.watching .cartoon-head {
+            transform: translateX(-50%) rotate(0deg);
+        }
+
+        .cartoon-character.excited .cartoon-mouth {
+            height: 15px;
+            border-radius: 20px 20px 0 0;
+            border: 2px solid #2d3436;
+            border-bottom: none;
+        }
+
+        .cartoon-character.excited .cartoon-eye {
+            height: 8px;
+        }
+
+        .cartoon-character.typing .cartoon-arm.left {
+            animation: typingLeft 0.5s ease-in-out infinite;
+        }
+
+        .cartoon-character.typing .cartoon-arm.right {
+            animation: typingRight 0.5s ease-in-out infinite;
+        }
+
+        @keyframes typingLeft {
+            0%, 100% { transform: rotate(-20deg) translateY(5px); }
+            50% { transform: rotate(-30deg) translateY(0px); }
+        }
+
+        @keyframes typingRight {
+            0%, 100% { transform: rotate(20deg) translateY(5px); }
+            50% { transform: rotate(30deg) translateY(0px); }
+        }
+
         /* Auth Card */
         .auth-card {
             background: rgba(255, 255, 255, 0.95);
@@ -511,32 +714,55 @@
 
         <main class="auth-container">
             <div class="auth-content">
-                <!-- Left Side - Times Square Eyes Animation -->
-                <div class="eyes-showcase">
-                    <div class="eyes-container" id="eyesContainer">
-                        <!-- Eyes will be dynamically created -->
-                    </div>
-                    <div class="eyes-message">
-                        <h1>Join the <span class="highlight">Conversation</span></h1>
-                        <p>Your voice matters. Share your truth and help others make informed decisions.</p>
-                    </div>
-                    
-                    <div class="platform-stats">
-                        <div class="stat-card">
-                            <div class="stat-number">∞</div>
-                            <div class="stat-label">Voices Heard</div>
+                <!-- Left Side - Cartoon Characters Animation -->
+                <div class="cartoon-showcase">
+                    <div class="cartoons-container" id="cartoonsContainer">
+                        <!-- Red Cartoon Character -->
+                        <div class="cartoon-character" id="redCartoon">
+                            <div class="cartoon-head">
+                                <div class="cartoon-eyes">
+                                    <div class="cartoon-eye"></div>
+                                    <div class="cartoon-eye"></div>
+                                </div>
+                                <div class="cartoon-mouth"></div>
+                            </div>
+                            <div class="cartoon-body red"></div>
+                            <div class="cartoon-arms">
+                                <div class="cartoon-arm left red"></div>
+                                <div class="cartoon-arm right red"></div>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number">24/7</div>
-                            <div class="stat-label">Transparency</div>
+                        
+                        <!-- Green Cartoon Character -->
+                        <div class="cartoon-character" id="greenCartoon">
+                            <div class="cartoon-head">
+                                <div class="cartoon-eyes">
+                                    <div class="cartoon-eye"></div>
+                                    <div class="cartoon-eye"></div>
+                                </div>
+                                <div class="cartoon-mouth"></div>
+                            </div>
+                            <div class="cartoon-body green"></div>
+                            <div class="cartoon-arms">
+                                <div class="cartoon-arm left green"></div>
+                                <div class="cartoon-arm right green"></div>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number">100%</div>
-                            <div class="stat-label">Anonymous</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">Global</div>
-                            <div class="stat-label">Community</div>
+                        
+                        <!-- Blue Cartoon Character -->
+                        <div class="cartoon-character" id="blueCartoon">
+                            <div class="cartoon-head">
+                                <div class="cartoon-eyes">
+                                    <div class="cartoon-eye"></div>
+                                    <div class="cartoon-eye"></div>
+                                </div>
+                                <div class="cartoon-mouth"></div>
+                            </div>
+                            <div class="cartoon-body blue"></div>
+                            <div class="cartoon-arms">
+                                <div class="cartoon-arm left blue"></div>
+                                <div class="cartoon-arm right blue"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -629,54 +855,83 @@
         import { register } from '/js/auth.js';
         import { sanitizeInput, showToast } from '/js/utils.js';
 
-        // Create Times Square Eyes
-        function createEyes() {
-            const container = document.getElementById('eyesContainer');
-            const eyeCount = 6;
+        // Setup cartoon character interactions
+        function setupCartoonInteractions() {
+            const cartoons = document.querySelectorAll('.cartoon-character');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
             
-            for (let i = 0; i < eyeCount; i++) {
-                const eye = document.createElement('div');
-                eye.className = 'eye';
-                eye.innerHTML = '<div class="pupil"></div>';
-                container.appendChild(eye);
-            }
-        }
-
-        // Make eyes follow mouse
-        function setupEyeTracking() {
-            const eyes = document.querySelectorAll('.eye');
-            
+            // Make cartoons watch mouse movement
             document.addEventListener('mousemove', (e) => {
-                eyes.forEach(eye => {
-                    const pupil = eye.querySelector('.pupil');
-                    const rect = eye.getBoundingClientRect();
-                    const eyeCenterX = rect.left + rect.width / 2;
-                    const eyeCenterY = rect.top + rect.height / 2;
+                cartoons.forEach(cartoon => {
+                    const head = cartoon.querySelector('.cartoon-head');
+                    const eyes = cartoon.querySelectorAll('.cartoon-eye');
+                    const rect = head.getBoundingClientRect();
+                    const headCenterX = rect.left + rect.width / 2;
+                    const headCenterY = rect.top + rect.height / 2;
                     
-                    const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
-                    const distance = Math.min(15, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) / 10);
+                    const angle = Math.atan2(e.clientY - headCenterY, e.clientX - headCenterX);
+                    const rotation = Math.max(-15, Math.min(15, angle * (180 / Math.PI) / 4));
                     
-                    const pupilX = Math.cos(angle) * distance;
-                    const pupilY = Math.sin(angle) * distance;
+                    head.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
                     
-                    pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+                    // Move pupils within eyes
+                    eyes.forEach(eye => {
+                        const eyeRect = eye.getBoundingClientRect();
+                        const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+                        const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+                        
+                        const pupilAngle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+                        const distance = Math.min(3, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) / 20);
+                        
+                        const pupilX = Math.cos(pupilAngle) * distance;
+                        const pupilY = Math.sin(pupilAngle) * distance;
+                        
+                        eye.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+                    });
+                });
+            });
+            
+            // React when user starts typing
+            [nameInput, emailInput, passwordInput, confirmPasswordInput].forEach(input => {
+                input.addEventListener('focus', () => {
+                    cartoons.forEach(cartoon => {
+                        cartoon.classList.add('watching');
+                    });
+                });
+                
+                input.addEventListener('blur', () => {
+                    cartoons.forEach(cartoon => {
+                        cartoon.classList.remove('watching');
+                    });
+                });
+                
+                input.addEventListener('input', () => {
+                    cartoons.forEach(cartoon => {
+                        cartoon.classList.add('typing');
+                        setTimeout(() => {
+                            cartoon.classList.remove('typing');
+                        }, 500);
+                    });
                 });
             });
         }
 
-        // Make eyes happy when register is clicked
-        function makeEyesHappy() {
-            const eyes = document.querySelectorAll('.eye');
-            eyes.forEach((eye, index) => {
+        // Make cartoons excited when register is attempted
+        function makeCartoonsExcited() {
+            const cartoons = document.querySelectorAll('.cartoon-character');
+            cartoons.forEach((cartoon, index) => {
                 setTimeout(() => {
-                    eye.classList.add('happy');
-                }, index * 100);
+                    cartoon.classList.add('excited');
+                    cartoon.classList.remove('watching');
+                }, index * 200);
             });
         }
 
         // Initialize
-        createEyes();
-        setupEyeTracking();
+        setupCartoonInteractions();
 
         const registerForm = document.getElementById('registerForm');
         const nameInput = document.getElementById('name');
@@ -701,8 +956,8 @@
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Make eyes happy!
-            makeEyesHappy();
+            // Make cartoons excited!
+            makeCartoonsExcited();
             
             // Clear previous errors
             document.getElementById('nameError').textContent = '';
@@ -734,42 +989,55 @@
                 document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
                 hasError = true;
             }
-            
-            // Validate terms
-            if (!termsAgree) {
-                document.getElementById('termsError').textContent = 'You must agree to the Terms of Service';
+            if (!agreeTerms.checked) {
+                showToast('You must agree to the Terms of Service', 'error');
                 hasError = true;
             }
             
-            if (hasError) return;
+            if (hasError) {
+                // Reset cartoons on validation error
+                const cartoons = document.querySelectorAll('.cartoon-character');
+                cartoons.forEach(cartoon => {
+                    cartoon.classList.remove('excited');
+                });
+                return;
+            }
             
             // Show loading state
-            const registerBtn = document.getElementById('registerBtn');
             registerBtn.disabled = true;
             registerBtn.textContent = 'Creating account...';
+            registerBtn.style.background = 'linear-gradient(135deg, #95a5a6, #7f8c8d)';
             
             try {
-                const result = await register(name, email, username, password);
+                const result = await register(name, email, password);
                 
                 if (result.success) {
-                    showToast('Account created! Please check your email to verify your account.', 'success');
+                    showToast('Account created successfully! Redirecting...', 'success');
                     setTimeout(() => {
-                        window.location.href = '/verify-email.html?email=' + encodeURIComponent(email);
-                    }, 2000);
+                        window.location.href = result.redirectTo || '/dashboard.html';
+                    }, 1000);
                 } else {
                     showToast(result.message || 'Registration failed', 'error');
-                    if (result.field === 'email') {
-                        document.getElementById('emailError').textContent = result.message;
-                    } else if (result.field === 'username') {
-                        document.getElementById('usernameError').textContent = result.message;
-                    }
+                    
+                    // Reset cartoons on error
+                    const cartoons = document.querySelectorAll('.cartoon-character');
+                    cartoons.forEach(cartoon => {
+                        cartoon.classList.remove('excited');
+                    });
                 }
             } catch (error) {
                 console.error('Registration error:', error);
                 showToast('An error occurred. Please try again.', 'error');
+                
+                // Reset cartoons on error
+                const cartoons = document.querySelectorAll('.cartoon-character');
+                cartoons.forEach(cartoon => {
+                    cartoon.classList.remove('excited');
+                });
             } finally {
                 registerBtn.disabled = false;
                 registerBtn.textContent = 'Create Account';
+                registerBtn.style.background = '';
             }
         });
     </script>
