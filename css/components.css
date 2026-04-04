@@ -11,6 +11,25 @@
     box-shadow: var(--shadow-md);
 }
 
+/* ==================== Lottie Animation Container ==================== */
+.animation-container {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    margin: 0 auto 20px auto;
+}
+
+.animation-container svg {
+    width: 100%;
+    height: auto;
+}
+
+/* For auth pages */
+.auth-card {
+    position: relative;
+    overflow: hidden;
+}
+
 .card-header {
     padding: var(--spacing-lg);
     border-bottom: 1px solid var(--gray-200);

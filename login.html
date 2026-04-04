@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Log In - AjiraTalk</title>
+    <title>Log In - WorkTalk</title>
     
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-backend2.onrender.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://worktalk-api.onrender.com;">
     
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/components.css">
@@ -14,655 +14,135 @@
     
     <!-- Lottie Animation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Split Layout Container */
-        .login-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        /* Left Visual Panel */
-        .visual-panel {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 3rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .visual-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.3;
-        }
-
-        .brand-content {
-            text-align: center;
-            color: white;
-            z-index: 1;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .brand-logo {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #fff, #f0f0f0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .brand-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .brand-subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            line-height: 1.6;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        /* Lottie Animation Container */
-        .lottie-container {
-            width: 300px;
-            height: 300px;
-            margin: 2rem auto;
-            z-index: 1;
-        }
-
-        /* Right Login Panel */
-        .login-panel {
-            background: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-            position: relative;
-        }
-
-        /* Login Card Animation */
-        .login-card {
-            background: white;
-            border-radius: 24px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 
-                0 20px 25px -5px rgba(0, 0, 0, 0.1),
-                0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            transform: translateX(100px);
-            opacity: 0;
-        }
-
-        @keyframes slideInRight {
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Login Header */
-        .login-header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .login-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 0.5rem;
-        }
-
-        .login-header p {
-            color: #6b7280;
-            font-size: 1rem;
-        }
-
-        /* Form Styles */
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #ffffff;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .form-input::placeholder {
-            color: #9ca3af;
-        }
-
-        .password-input-container {
-            position: relative;
-        }
-
-        .show-password-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            padding: 4px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            color: #6b7280;
-        }
-
-        .show-password-btn:hover {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .form-error {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
-
-        .form-error.show {
-            display: block;
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        /* Button Styles */
-        .btn {
-            padding: 0.875rem 1.5rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-google {
-            background: white;
-            color: #374151;
-            border: 2px solid #e5e7eb;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-google:hover {
-            background: #f9fafb;
-            border-color: #d1d5db;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
-        /* Form Options */
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 1rem 0;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: #374151;
-            cursor: pointer;
-        }
-
-        .checkbox-label input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #d1d5db;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .forgot-link {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .forgot-link:hover {
-            color: #764ba2;
-        }
-
-        /* Divider */
-        .form-divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-            gap: 1rem;
-        }
-
-        .form-divider::before,
-        .form-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e5e7eb;
-        }
-
-        .form-divider span {
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-
-        /* Footer */
-        .login-footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .login-footer p {
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-
-        .login-footer a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s ease;
-        }
-
-        .login-footer a:hover {
-            color: #764ba2;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .login-container {
-                grid-template-columns: 1fr;
-            }
-
-            .visual-panel {
-                display: none;
-            }
-
-            .login-panel {
-                padding: 1rem;
-            }
-
-            .login-card {
-                padding: 2rem;
-                animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-                transform: translateY(50px);
-            }
-
-            @keyframes slideInUp {
-                to {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-            }
-        }
-
-        /* Loading State */
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
 </head>
 <body>
-    <div class="login-container">
-        <!-- Left Visual Panel -->
-        <div class="visual-panel">
-            <div class="brand-content">
-                <div class="brand-logo">🗣️</div>
-                <h1 class="brand-title">AjiraTalk</h1>
-                <p class="brand-subtitle">
-                    Workplace transparency platform where real employees share authentic experiences about their companies.
-                </p>
-                <!-- Lottie Animation Container -->
-                <div id="loginLottie" class="lottie-container"></div>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🗣️</span>
+                    <span class="logo-text">Work<span>Talk</span></span>
+                </a>
+                <nav class="nav">
+                    <a href="/companies.html" class="nav-link">Companies</a>
+                    <a href="/public-timeline.html" class="nav-link">Public Timeline</a>
+                </nav>
+                <div class="user-menu" id="userMenu">
+                    <a href="/login.html" class="btn btn-primary">Log In</a>
+                    <a href="/register.html" class="btn btn-outline">Sign Up</a>
+                </div>
             </div>
-        </div>
+        </header>
 
-        <!-- Right Login Panel -->
-        <div class="login-panel">
-            <div class="login-card">
-                <div class="login-header">
-                    <h1>Welcome back</h1>
-                    <p>Sign in to your account to continue</p>
+        <main class="auth-container">
+            <div class="auth-card">
+                <!-- Lottie Animation for Login -->
+                <div id="loginAnimation" class="animation-container"></div>
+                
+                <div class="auth-header">
+                    <h1>Welcome Back</h1>
+                    <p>Log in to your WorkTalk account</p>
                 </div>
 
-                <form id="loginForm" class="login-form">
+                <form id="loginForm" class="auth-form">
                     <div class="form-group">
-                        <label for="email" class="form-label">Email address</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            class="form-input" 
-                            placeholder="you@example.com"
-                            required 
-                            autocomplete="email"
-                        >
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-input" 
+                               placeholder="you@example.com" required autocomplete="email">
                         <div class="form-error" id="emailError"></div>
                     </div>
 
                     <div class="form-group">
                         <label for="password" class="form-label">Password</label>
-                        <div class="password-input-container">
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password" 
-                                class="form-input" 
-                                placeholder="••••••••"
-                                required 
-                                autocomplete="current-password"
-                            >
-                            <button type="button" id="showPasswordBtn" class="show-password-btn">
-                                <span id="eyeIcon">👁️</span>
-                            </button>
-                        </div>
+                        <input type="password" id="password" name="password" class="form-input" 
+                               placeholder="••••••••" required autocomplete="current-password">
                         <div class="form-error" id="passwordError"></div>
                     </div>
 
                     <div class="form-options">
                         <label class="checkbox-label">
-                            <input type="checkbox" id="rememberMe" name="rememberMe">
-                            Remember me
+                            <input type="checkbox" id="rememberMe"> Remember me
                         </label>
                         <a href="/forgot-password.html" class="forgot-link">Forgot password?</a>
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
-                        <span id="btnText">Log In</span>
+                        Log In
                     </button>
                 </form>
 
-                <div class="form-divider">
-                    <span>OR</span>
-                </div>
-
-                <button class="btn btn-google btn-full" id="googleLoginBtn">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                        <path d="M17.64 9.20455C17.64 8.56637 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8196H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z" fill="#4285F4"/>
-                        <path d="M9 18C11.43 18 13.4673 17.1941 14.9564 15.8196L12.0477 13.5614C11.2418 14.1014 10.2109 14.4205 9 14.4205C6.65591 14.4205 4.67182 12.8373 3.96409 10.71H0.957273V13.0418C2.43818 15.9832 5.48182 18 9 18Z" fill="#34A853"/>
-                        <path d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29V4.95818H0.957273C0.347727 6.17318 0 7.54773 0 9C0 10.4523 0.347727 11.8268 0.957273 13.0418L3.96409 10.71Z" fill="#FBBC05"/>
-                        <path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957273 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335"/>
-                    </svg>
-                    Continue with Google
-                </button>
-
-                <div class="login-footer">
+                <div class="auth-footer">
                     <p>Don't have an account? <a href="/register.html">Sign up</a></p>
+                    <p class="employee-note">Employee? <a href="/invite-accept.html">Accept an invite</a></p>
                 </div>
             </div>
-        </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">Work<span>Talk</span></div>
+                    <p>Workplace transparency platform for Kenya</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="/companies.html">Companies</a>
+                    <a href="/public-timeline.html">Public Timeline</a>
+                    <a href="/company-register.html">Register Company</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Community Guidelines</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 WorkTalk. All rights reserved.</p>
+            </div>
+        </footer>
     </div>
 
     <script type="module">
         import { login } from '/js/auth.js';
         import { sanitizeInput, showToast } from '/js/utils.js';
-
-        // Initialize Lottie Animation
-        let loginAnimation;
         
-        function initLoginAnimation() {
-            const container = document.getElementById('loginLottie');
-            
-            // Try multiple approaches for Cloudflare compatibility
-            const animationUrls = [
-                './js/animations/login-animation.json',
-                '/js/animations/login-animation.json',
-                'js/animations/login-animation.json'
-            ];
-            
-            function tryLoadAnimation(urlIndex = 0) {
-                if (urlIndex >= animationUrls.length) {
-                    // All URLs failed, show fallback
-                    console.error('All animation URLs failed, showing fallback');
-                    container.innerHTML = `
-                        <div style="
-                            font-size: 80px; 
-                            animation: pulse 2s infinite;
-                            text-align: center;
-                            line-height: 300px;
-                            color: white;
-                        ">🔐</div>
-                        <style>
-                            @keyframes pulse {
-                                0%, 100% { transform: scale(1); opacity: 1; }
-                                50% { transform: scale(1.1); opacity: 0.8; }
-                            }
-                        </style>
-                    `;
-                    return;
-                }
-                
-                const url = animationUrls[urlIndex];
-                console.log(`Trying to load animation from: ${url}`);
-                
-                fetch(url)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(animationData => {
-                        console.log('Login animation data loaded successfully');
-                        loginAnimation = lottie.loadAnimation({
-                            container: container,
-                            renderer: 'svg',
-                            loop: true,
-                            autoplay: true,
-                            animationData: animationData,
-                            rendererSettings: {
-                                progressiveLoad: true,
-                                hideOnTransparent: true,
-                                preserveAspectRatio: 'xMidYMid meet'
-                            }
-                        });
-                        
-                        // Set container size based on animation dimensions
-                        if (animationData.w && animationData.h) {
-                            const scale = Math.min(300 / animationData.w, 300 / animationData.h);
-                            container.style.width = (animationData.w * scale) + 'px';
-                            container.style.height = (animationData.h * scale) + 'px';
-                        }
-                    })
-                    .catch(error => {
-                        console.error(`Failed to load from ${url}:`, error);
-                        // Try next URL
-                        tryLoadAnimation(urlIndex + 1);
-                    });
-            }
-            
-            tryLoadAnimation();
-        }
+        // Initialize Lottie Animation for Login Page
+        document.addEventListener('DOMContentLoaded', function() {
+            var loginAnimation = lottie.loadAnimation({
+                container: document.getElementById('loginAnimation'),
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: '/json/Sample Animation.json'
+            });
+        });
 
-        // Form elements
         const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
-        const showPasswordBtn = document.getElementById('showPasswordBtn');
-        const eyeIcon = document.getElementById('eyeIcon');
+        const rememberMe = document.getElementById('rememberMe');
         const loginBtn = document.getElementById('loginBtn');
-        const btnText = document.getElementById('btnText');
-        const googleLoginBtn = document.getElementById('googleLoginBtn');
 
-        // Error elements
-        const emailError = document.getElementById('emailError');
-        const passwordError = document.getElementById('passwordError');
-
-        // Password visibility toggle
-        let isPasswordVisible = false;
-        showPasswordBtn.addEventListener('click', () => {
-            isPasswordVisible = !isPasswordVisible;
-            
-            if (isPasswordVisible) {
-                passwordInput.type = 'text';
-                eyeIcon.textContent = '🙈';
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.textContent = '👁️';
-            }
-        });
-
-        // Clear errors on input
-        emailInput.addEventListener('input', () => {
-            emailError.classList.remove('show');
-            emailError.textContent = '';
-        });
-
-        passwordInput.addEventListener('input', () => {
-            passwordError.classList.remove('show');
-            passwordError.textContent = '';
-        });
-
-        // Form submission
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             // Clear previous errors
-            emailError.classList.remove('show');
-            passwordError.classList.remove('show');
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
             
             // Get and sanitize inputs
             const email = sanitizeInput(emailInput.value.trim());
             const password = passwordInput.value;
             
-            // Validation
+            // Validate
             let hasError = false;
-            
             if (!email) {
-                emailError.textContent = 'Email is required';
-                emailError.classList.add('show');
-                hasError = true;
-            } else if (!email.includes('@')) {
-                emailError.textContent = 'Please enter a valid email';
-                emailError.classList.add('show');
+                document.getElementById('emailError').textContent = 'Email is required';
                 hasError = true;
             }
-            
             if (!password) {
-                passwordError.textContent = 'Password is required';
-                passwordError.classList.add('show');
+                document.getElementById('passwordError').textContent = 'Password is required';
                 hasError = true;
             }
             
@@ -670,10 +150,10 @@
             
             // Show loading state
             loginBtn.disabled = true;
-            btnText.innerHTML = '<span class="loading"></span> Signing in...';
+            loginBtn.textContent = 'Logging in...';
             
             try {
-                const result = await login(email, password);
+                const result = await login(email, password, rememberMe.checked);
                 
                 if (result.success) {
                     showToast('Login successful! Redirecting...', 'success');
@@ -681,26 +161,20 @@
                         window.location.href = result.redirectTo || '/dashboard.html';
                     }, 1000);
                 } else {
-                    passwordError.textContent = result.message || 'Invalid email or password';
-                    passwordError.classList.add('show');
+                    showToast(result.message || 'Login failed', 'error');
+                    if (result.message === 'Too many failed attempts') {
+                        document.getElementById('passwordError').textContent = 
+                            'Too many failed attempts. Please try again later.';
+                    }
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                passwordError.textContent = 'An error occurred. Please try again.';
-                passwordError.classList.add('show');
+                showToast('An error occurred. Please try again.', 'error');
             } finally {
                 loginBtn.disabled = false;
-                btnText.textContent = 'Log In';
+                loginBtn.textContent = 'Log In';
             }
         });
-
-        // Google login (placeholder)
-        googleLoginBtn.addEventListener('click', () => {
-            showToast('Google login coming soon!', 'info');
-        });
-
-        // Initialize animation when page loads
-        document.addEventListener('DOMContentLoaded', initLoginAnimation);
     </script>
 </body>
 </html>
