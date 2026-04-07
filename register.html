@@ -864,14 +864,36 @@
         // Redirect to main platform
         window.location.href = 'index.html';
       } else {
-        const errorData = await response.json();
-        alert(errorData.message || 'Registration failed. Please try again.');
+        // Handle different HTTP status codes
+        let errorMessage = 'Registration failed. Please try again.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+          console.error('Backend error:', errorData);
+        } catch (parseError) {
+          console.error('Could not parse error response:', parseError);
+          console.error('Response status:', response.status);
+          console.error('Response text:', await response.text());
+        }
+        
+        alert(errorMessage);
         signupBtn.classList.remove('loading');
         playFlip(false);
       }
     } catch (error) {
       console.error('Registration error:', error);
-      alert('Registration failed. Please try again.');
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // More detailed error message
+      let errorMessage = 'Registration failed. Please try again.';
+      if (error.message.includes('fetch')) {
+        errorMessage = 'Network error: Cannot connect to server. Please check your internet connection.';
+      } else if (error.message.includes('CORS')) {
+        errorMessage = 'CORS error: Server configuration issue. Please contact support.';
+      }
+      
+      alert(errorMessage + '\n\nCheck browser console (F12) for more details.');
       signupBtn.classList.remove('loading');
       playFlip(false);
     }

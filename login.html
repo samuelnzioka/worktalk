@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Log In — AjiraTalk</title>
+  <title>Login — Worktalk</title>
 
   <!-- Lottie Web -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
@@ -61,7 +61,7 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
-      padding: 60px 64px;
+      padding: 60px 48px 48px;
     }
 
     /* subtle grid texture */
@@ -128,15 +128,20 @@
       position: relative;
       z-index: 2;
       text-align: center;
-      max-width: 440px;
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
     }
 
     .lottie-wrap {
-      width: 340px;
-      height: 145px;
-      margin: 0 auto 48px;
+      width: 100%;
+      max-width: 480px;
+      flex: 1;
+      margin: 0 auto 24px;
       animation: fadeUp 0.8s ease 0.2s both;
-      /* soft drop shadow so it pops on dark bg */
       filter: drop-shadow(0 8px 32px rgba(201,153,58,0.18));
     }
 
@@ -147,11 +152,12 @@
 
     .tagline {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-size: 1.1rem;
       font-weight: 300;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
+      line-height: 1.35;
+      letter-spacing: 0.01em;
       color: var(--text);
+      margin-top: auto;
       animation: fadeUp 0.8s ease 0.35s both;
     }
 
@@ -266,7 +272,7 @@
       position: relative;
     }
 
-    .input-wrap svg {
+    .input-wrap > svg {
       position: absolute;
       left: 16px;
       top: 50%;
@@ -529,9 +535,9 @@
 
       .brand { top: 28px; left: 28px; }
 
-      .lottie-wrap { width: 400px; height: 400px; }
+      .lottie-wrap { width: 260px; height: 112px; margin-bottom: 32px; }
 
-      .tagline { font-size: 1.4rem; position: absolute; bottom: 40px; left: 0; right: 0; text-align: center; }
+      .tagline { font-size: 1.8rem; }
 
       .panel-right {
         flex: none;
@@ -559,7 +565,7 @@
       <div class="brand-icon">
         <svg viewBox="0 0 16 16"><path d="M2 3h12v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3zm4 9v2m4-2v2M5 14h6"/></svg>
       </div>
-      <span class="brand-name">AjiraTalk</span>
+      <span class="brand-name">Worktalk</span>
     </div>
 
     <div class="left-content">
@@ -568,8 +574,12 @@
       </div>
 
       <h2 class="tagline">
-        Where employees<br><em>speak</em> &amp; thrive
+        Where teams<br><em>connect</em> &amp; thrive
       </h2>
+      <p class="sub">
+        Collaborate in real time, manage projects effortlessly,
+        and keep every conversation in one place.
+      </p>
 
       <div class="dots">
         <div class="dot active"></div>
@@ -631,7 +641,7 @@
       <div class="divider"><span>or continue with</span></div>
 
       <div class="socials">
-        <button class="btn-social" type="button" id="googleLoginBtn">
+        <button class="btn-social" type="button">
           <!-- Google -->
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -642,7 +652,7 @@
           Google
         </button>
 
-        <button class="btn-social" type="button" id="microsoftLoginBtn">
+        <button class="btn-social" type="button">
           <!-- Microsoft -->
           <svg viewBox="0 0 24 24">
             <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
@@ -665,10 +675,10 @@
     renderer: 'svg',
     loop: true,
     autoplay: true,
-    path: '/json/Sign up.json'   // correct path for login animation
+    path: 'json/Sign_up.json'   // correct path relative to login.html
   });
 
-  // ── Password toggle ───────────────────────────────────────
+  // ── Password visibility toggle ─────────────────────────────────────────────
   const pwInput  = document.getElementById('password');
   const togglePw = document.getElementById('togglePw');
   const eyeIcon  = document.getElementById('eyeIcon');
@@ -683,70 +693,20 @@
     togglePw.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
   });
 
-  // ── OAuth Login Handlers ───────────────────────────────────
-  const googleLoginBtn = document.getElementById('googleLoginBtn');
-  const microsoftLoginBtn = document.getElementById('microsoftLoginBtn');
-
-  // Google OAuth Login
-  googleLoginBtn.addEventListener('click', async () => {
-    try {
-      // Show loading state
-      googleLoginBtn.disabled = true;
-      googleLoginBtn.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid #ccc; border-radius: 50%; border-top-color: #667eea; animation: spin 0.8s linear infinite;"></span>';
-      
-      // Initiate Google OAuth flow
-      const googleClientId = 'your-google-client-id.apps.googleusercontent.com'; // Replace with actual client ID
-      const redirectUri = encodeURIComponent(window.location.origin + '/auth/google/callback');
-      const scope = encodeURIComponent('openid email profile');
-      
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-        `client_id=${googleClientId}&` +
-        `redirect_uri=${redirectUri}&` +
-        `response_type=code&` +
-        `scope=${scope}&` +
-        `access_type=offline&` +
-        `prompt=consent`;
-      
-      window.location.href = authUrl;
-      
-    } catch (error) {
-      console.error('Google login error:', error);
-      googleLoginBtn.disabled = false;
-      googleLoginBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none">...</svg>Google';
-      alert('Google login failed. Please try again.');
+  // ── Check if user is already logged in (persistent login) ─────
+  document.addEventListener('DOMContentLoaded', function() {
+    const accessToken = localStorage.getItem('accessToken');
+    const user = localStorage.getItem('user');
+    
+    // If user is already logged in, redirect to main platform
+    if (accessToken && user) {
+      console.log('User already logged in, redirecting to main platform...');
+      window.location.href = 'index.html';
+      return;
     }
   });
 
-  // Microsoft OAuth Login
-  microsoftLoginBtn.addEventListener('click', async () => {
-    try {
-      // Show loading state
-      microsoftLoginBtn.disabled = true;
-      microsoftLoginBtn.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid #ccc; border-radius: 50%; border-top-color: #667eea; animation: spin 0.8s linear infinite;"></span>';
-      
-      // Initiate Microsoft OAuth flow
-      const microsoftClientId = 'your-microsoft-client-id'; // Replace with actual client ID
-      const redirectUri = encodeURIComponent(window.location.origin + '/auth/microsoft/callback');
-      const scope = encodeURIComponent('openid email profile');
-      
-      const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?` +
-        `client_id=${microsoftClientId}&` +
-        `redirect_uri=${redirectUri}&` +
-        `response_type=code&` +
-        `scope=${scope}&` +
-        `response_mode=query`;
-      
-      window.location.href = authUrl;
-      
-    } catch (error) {
-      console.error('Microsoft login error:', error);
-      microsoftLoginBtn.disabled = false;
-      microsoftLoginBtn.innerHTML = '<svg viewBox="0 0 24 24">...</svg>Microsoft';
-      alert('Microsoft login failed. Please try again.');
-    }
-  });
-
-  // ── Login button (actual authentication) ────────────────────
+  // ── Login button (real API integration) ────────────────────
   const loginBtn = document.getElementById('loginBtn');
   loginBtn.addEventListener('click', async () => {
     const email = document.getElementById('email').value.trim();
@@ -771,10 +731,9 @@
         })
       });
       
-      const data = await response.json();
-      
       if (response.ok) {
-        // Login successful - redirect to platform
+        const data = await response.json();
+        // Store tokens for persistent login
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         localStorage.setItem('user', JSON.stringify(data.user));
@@ -783,13 +742,14 @@
         window.location.href = 'index.html';
       } else {
         // Login failed - show error
-        alert(data.message || 'Login failed. Please check your credentials.');
+        const errorData = await response.json();
+        alert(errorData.message || 'Login failed. Please check your credentials.');
         loginBtn.classList.remove('loading');
       }
     } catch (error) {
       console.error('Login error:', error);
-      // For demo purposes, redirect anyway (remove this when backend is ready)
-      window.location.href = 'index.html';
+      alert('Login failed. Please check your internet connection and try again.');
+      loginBtn.classList.remove('loading');
     }
   });
 
