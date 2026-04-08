@@ -21,16 +21,16 @@
     }
 
     :root {
-      --bg:        #080b12;
-      --panel-l:   #0d1220;
-      --panel-r:   #0a0d18;
+      --bg:        #f8f9fa;
+      --panel-l:   #f5f6f7;
+      --panel-r:   #fafbfc;
       --gold:      #c9993a;
       --gold-lite: #e8b84b;
       --gold-dim:  rgba(201, 153, 58, 0.18);
-      --text:      #eee8d8;
-      --muted:     #6e7a94;
+      --text:      #2c3e50;
+      --muted:     #6c757d;
       --border:    rgba(201, 153, 58, 0.22);
-      --input-bg:  rgba(255,255,255,0.04);
+      --input-bg:  rgba(255,255,255,0.8);
       --input-focus: rgba(201, 153, 58, 0.12);
       --error:     #e05c5c;
       --radius:    14px;
@@ -175,6 +175,24 @@
       max-width: 340px;
       margin-inline: auto;
       animation: fadeUp 0.8s ease 0.5s both;
+    }
+
+    .back-home {
+      margin-top: 24px;
+      animation: fadeUp 0.8s ease 0.65s both;
+    }
+
+    .back-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      opacity: 1;
+      color: var(--gold-lite);
     }
 
     .dots {
@@ -565,28 +583,26 @@
       <div class="brand-icon">
         <svg viewBox="0 0 16 16"><path d="M2 3h12v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3zm4 9v2m4-2v2M5 14h6"/></svg>
       </div>
-      <span class="brand-name">Worktalk</span>
+      <span class="brand-name">AjiraTalk</span>
     </div>
 
     <div class="left-content">
       <div class="lottie-wrap">
         <div id="lottie-anim"></div>
       </div>
-
-      <h2 class="tagline">
-        Where teams<br><em>connect</em> &amp; thrive
-      </h2>
-      <p class="sub">
-        Collaborate in real time, manage projects effortlessly,
-        and keep every conversation in one place.
-      </p>
-
-      <div class="dots">
-        <div class="dot active"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+      <h2 class="tagline">Where employees speak & thrive</h2>
+      <p class="subtagline">Join Kenya's premier platform for transparent workplace conversations</p>
+      <div class="back-home">
+        <a href="landing.html" class="back-link">← Back to Home</a>
       </div>
     </div>
+
+    <div class="dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
   </div>
 
   <!-- ════════ RIGHT ════════ -->

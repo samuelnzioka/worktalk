@@ -944,6 +944,7 @@
         let currentDepartment = null;
         let searchTerm = "";
         let companies = [];
+        let publicPosts = [];
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -1446,16 +1447,20 @@
             tabBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const tab = btn.dataset.tab;
+                    console.log('Tab clicked:', tab); // Debug log
+                    
                     tabBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     
                     if (tab === 'companies') {
+                        console.log('Switching to companies tab'); // Debug log
                         companiesPanel.classList.add('active-panel');
                         publicPanelEl.classList.remove('active-panel');
                         if (!currentCompany) {
                             renderCompanyDirectory();
                         }
                     } else {
+                        console.log('Switching to public tab'); // Debug log
                         publicPanelEl.classList.add('active-panel');
                         companiesPanel.classList.remove('active-panel');
                         renderPublicTimeline();
@@ -1549,8 +1554,6 @@
             }
         }
 
-        // Initialize public posts array
-        let publicPosts = [];
-    </script>
+        </script>
 </body>
 </html>

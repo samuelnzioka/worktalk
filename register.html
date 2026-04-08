@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Account — Worktalk</title>
+  <title>Create Account — AjiraTalk</title>
 
   <!-- Lottie Web -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
@@ -21,16 +21,16 @@
     }
 
     :root {
-      --bg:        #080b12;
-      --panel-l:   #0a0d18;
-      --panel-r:   #0d1220;
+      --bg:        #f8f9fa;
+      --panel-l:   #f5f6f7;
+      --panel-r:   #fafbfc;
       --gold:      #c9993a;
       --gold-lite: #e8b84b;
       --gold-dim:  rgba(201, 153, 58, 0.18);
-      --text:      #eee8d8;
-      --muted:     #6e7a94;
+      --text:      #2c3e50;
+      --muted:     #6c757d;
       --border:    rgba(201, 153, 58, 0.22);
-      --input-bg:  rgba(255,255,255,0.04);
+      --input-bg:  rgba(255,255,255,0.8);
       --input-focus: rgba(201, 153, 58, 0.12);
       --success:   #4caf7d;
       --error:     #e05c5c;
@@ -503,6 +503,24 @@
       animation: fadeUp 0.9s ease 0.6s both;
     }
 
+    .back-home {
+      margin-top: 20px;
+      animation: fadeUp 0.9s ease 0.75s both;
+    }
+
+    .back-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      opacity: 1;
+      color: var(--gold-lite);
+    }
+
     /* Feature pills */
     .pills {
       display: flex;
@@ -597,8 +615,12 @@
       </div>
 
       <h2 class="tagline">
-        Join a team that<br><em>moves fast</em> together
+        Where teams<br><em>connect &</em> thrive
       </h2>
+
+      <div class="back-home">
+        <a href="landing.html" class="back-link">← Back to Home</a>
+      </div>
 
     </div>
   </div><!-- /panel-right -->
@@ -610,7 +632,7 @@
       <div class="brand-icon">
         <svg viewBox="0 0 16 16"><path d="M2 3h12v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3zm4 9v2m4-2v2M5 14h6"/></svg>
       </div>
-      <span class="brand-name">Worktalk</span>
+      <span class="brand-name">AjiraTalk</span>
     </div>
 
     <div class="form-box">
