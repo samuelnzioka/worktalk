@@ -950,7 +950,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Check if user is logged in
             const userStr = localStorage.getItem('user');
+            const accessToken = localStorage.getItem('accessToken');
+            
+            console.log('Index.html - Checking login status:');
+            console.log('User exists:', !!userStr);
+            console.log('Token exists:', !!accessToken);
+            console.log('User data:', userStr);
+            
             if (!userStr) {
+                console.log('No user found, redirecting to login...');
                 window.location.href = 'login.html';
                 return;
             }
