@@ -953,12 +953,25 @@
       
       if (response.ok) {
         const data = await response.json();
-        // Store tokens
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('user', JSON.stringify(data.user));
         
-        // Redirect to main platform
+        console.log('Registration response data:', data); // Debug
+        
+        // ✅ Store tokens and user data
+        if (data.accessToken) {
+            localStorage.setItem('accessToken', data.accessToken);
+        }
+        if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+        }
+        if (data.user) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        
+        // ✅ Verify storage before redirect
+        console.log('Stored user:', localStorage.getItem('user'));
+        console.log('Stored token:', localStorage.getItem('accessToken'));
+        
+        // ✅ Redirect to index.html
         window.location.href = 'index.html';
       } else {
         // Handle different HTTP status codes

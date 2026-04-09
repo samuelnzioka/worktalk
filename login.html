@@ -748,24 +748,25 @@
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Login response data:', data); // Debug log
         
-        // Store tokens for persistent login
+        console.log('Login response data:', data); // Debug
+        
+        // ✅ Store tokens and user data
         if (data.accessToken) {
-          localStorage.setItem('accessToken', data.accessToken);
-          console.log('Access token stored');
+            localStorage.setItem('accessToken', data.accessToken);
         }
         if (data.refreshToken) {
-          localStorage.setItem('refreshToken', data.refreshToken);
-          console.log('Refresh token stored');
+            localStorage.setItem('refreshToken', data.refreshToken);
         }
         if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          console.log('User data stored:', data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
         }
         
-        // Redirect to main platform
-        console.log('Redirecting to index.html...');
+        // ✅ Verify storage before redirect
+        console.log('Stored user:', localStorage.getItem('user'));
+        console.log('Stored token:', localStorage.getItem('accessToken'));
+        
+        // ✅ Redirect to index.html
         window.location.href = 'index.html';
       } else {
         // Login failed - show error
