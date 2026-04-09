@@ -833,18 +833,18 @@
             observer.observe(el);
         });
 
-        // Check if user is already logged in
-        document.addEventListener('DOMContentLoaded', function() {
-            const accessToken = localStorage.getItem('accessToken');
-            const user = localStorage.getItem('user');
-            
-            // If user is already logged in, redirect to main platform
-            if (accessToken && user) {
-                console.log('User already logged in, redirecting to main platform...');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-        });
+        // Check if user is already logged in - REMOVED to always show landing page
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     const accessToken = localStorage.getItem('accessToken');
+        //     const user = localStorage.getItem('user');
+        //     
+        //     // If user is already logged in, redirect to main platform
+        //     if (accessToken && user) {
+        //         console.log('User already logged in, redirecting to main platform...');
+        //         window.location.href = 'dashboard.html';
+        //         return;
+        //     }
+        // });
     </script>
 </body>
 </html>

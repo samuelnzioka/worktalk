@@ -1,5 +1,5 @@
 # Cloudflare Pages redirects file
-# Landing page is the main entry point for new visitors
+# Landing page is the main entry point for ALL visitors
 /    /landing.html   200
 
 # Handle single-page application routing for other paths
