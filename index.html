@@ -950,11 +950,19 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Check if user is logged in
             const userStr = localStorage.getItem('user');
+            const accessToken = localStorage.getItem('accessToken');
+            
+            console.log('Index.html - Auth check:');
+            console.log('User string:', userStr);
+            console.log('Access token:', accessToken);
+            
             if (!userStr) {
+                console.log('No user found, redirecting to login.html');
                 window.location.href = 'login.html';
                 return;
             }
             
+            console.log('User found, loading platform...');
             currentUser = JSON.parse(userStr);
             initializeUserProfile();
             loadCompanies();

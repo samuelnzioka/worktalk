@@ -2,5 +2,5 @@
 # Landing page is the main entry point for ALL visitors
 /    /landing.html   200
 
-# Handle single-page application routing for other paths
+# Handle single-page application routing for other paths (except landing.html)
 /*    /index.html   200
