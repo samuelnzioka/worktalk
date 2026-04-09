@@ -3,4 +3,4 @@
 /    /landing.html   200
 
 # Handle single-page application routing for other paths
-/*    /index.html   200
+/*    /dashboard.html   200
