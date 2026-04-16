@@ -832,19 +832,527 @@
         .success-text {
             color: var(--success);
         }
+
+        /* ==================== USER DROPDOWN MENU ==================== */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px 6px 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-avatar-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-chevron {
+            font-size: 12px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .user-avatar-btn.active .user-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown Menu */
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 320px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .user-dropdown.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .dropdown-header {
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .dropdown-user-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .dropdown-user-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .dropdown-section {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dropdown-section:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-title {
+            padding: 8px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: var(--transition);
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gray-100);
+        }
+
+        .dropdown-item-icon {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        .dropdown-item-text {
+            flex: 1;
+        }
+
+        .dropdown-item-badge {
+            font-size: 11px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        /* Profile Switcher inside dropdown */
+        .profile-switcher-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 8px;
+            margin: 0 8px;
+        }
+
+        .profile-switcher-item:hover {
+            background: var(--gray-100);
+        }
+
+        .profile-switcher-item.active {
+            background: var(--primary-light);
+        }
+
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--gray-200);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .profile-type {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .profile-badge {
+            font-size: 10px;
+            background: var(--success-light);
+            color: var(--success);
+            padding: 2px 6px;
+            border-radius: 12px;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+        }
+
+        .theme-toggle-switch {
+            width: 44px;
+            height: 22px;
+            background: var(--gray-300);
+            border-radius: 40px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .theme-toggle-slider {
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle-switch.active .theme-toggle-slider {
+            transform: translateX(22px);
+        }
+
+        /* Modal for profile edit */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius-sm);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+            min-width: 260px;
+        }
+
+        .toast-success {
+            border-left-color: var(--success);
+        }
+        .toast-error {
+            border-left-color: var(--danger);
+        }
+        .toast-info {
+            border-left-color: var(--primary);
+        }
+
+        .toast-icon {
+            font-size: 18px;
+        }
+        .toast-message {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Additional CSS variables needed */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --transition: all 0.2s ease;
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1e293b;
+            --bg-secondary: #334155;
+            --bg-tertiary: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #475569;
+        }
     </style>
 </head>
 <body>
     <div class="app">
         <header class="header">
             <div class="header-content">
-                <div class="logo">Ajira<span>Talk</span></div>
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div class="profile-switcher">
-                        <button class="profile-btn active" id="publicProfileBtn">Public</button>
-                        <button class="profile-btn" id="employeeProfileBtn" style="display: none;">Employee</button>
+                <a href="platform.html" class="logo">Ajira<span>Talk</span></a>
+                
+                <!-- User Menu -->
+                <div class="user-menu">
+                    <div class="user-avatar-btn" id="userMenuBtn">
+                        <div class="user-avatar" id="userAvatar">?</div>
+                        <span class="user-name" id="userNameDisplay">Loading...</span>
+                        <span class="user-chevron">?</span>
                     </div>
-                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div class="user-dropdown" id="userDropdown">
+                        <!-- User Info Header -->
+                        <div class="dropdown-header">
+                            <div class="dropdown-avatar" id="dropdownAvatar">?</div>
+                            <div class="dropdown-user-info">
+                                <h4 id="dropdownName">User Name</h4>
+                                <p id="dropdownEmail">user@example.com</p>
+                                <p id="dropdownRole" style="font-size: 10px; margin-top: 4px;">Public User</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Switcher Section -->
+                        <div class="dropdown-section">
+                            <div class="dropdown-title">Switch Profile</div>
+                            <div id="profileSwitcherList">
+                                <!-- Profiles will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Account Section -->
+                        <div class="dropdown-section">
+                            <div class="dropdown-title">Account</div>
+                            <button class="dropdown-item" id="editProfileBtn">
+                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-text">Edit Profile</span>
+                            </button>
+                            <button class="dropdown-item" id="settingsBtn">
+                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-text">Settings</span>
+                            </button>
+                            <div class="theme-toggle">
+                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-text">Dark Mode</span>
+                                <div class="theme-toggle-switch" id="themeToggle">
+                                    <div class="theme-toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Legal Section -->
+                        <div class="dropdown-section">
+                            <div class="dropdown-title">Legal</div>
+                            <button class="dropdown-item" id="privacyPolicyBtn">
+                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-text">Privacy Policy</span>
+                            </button>
+                            <button class="dropdown-item" id="termsOfUseBtn">
+                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-text">Terms of Use</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Logout Section -->
+                        <div class="dropdown-section">
+                            <button class="dropdown-item" id="logoutBtn" style="color: var(--danger);">
+                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-text">Logout</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -1555,6 +2063,347 @@
             }
         }
 
+        // ==================== USER DROPDOWN MENU ====================
+
+        // DOM Elements
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        const userAvatar = document.getElementById('userAvatar');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const dropdownAvatar = document.getElementById('dropdownAvatar');
+        const dropdownName = document.getElementById('dropdownName');
+        const dropdownEmail = document.getElementById('dropdownEmail');
+        const dropdownRole = document.getElementById('dropdownRole');
+        const profileSwitcherList = document.getElementById('profileSwitcherList');
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const privacyPolicyBtn = document.getElementById('privacyPolicyBtn');
+        const termsOfUseBtn = document.getElementById('termsOfUseBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const editProfileModal = document.getElementById('editProfileModal');
+
+        // Current user data
+        let currentUserData = null;
+        let currentActiveProfile = null;
+
+        // ==================== LOAD USER DATA ====================
+        function loadUserData() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) return;
+            
+            try {
+                currentUserData = JSON.parse(userStr);
+                updateUserInterface();
+            } catch(e) {
+                console.error('Error parsing user data:', e);
+            }
+        }
+
+        function updateUserInterface() {
+            if (!currentUserData) return;
+            
+            // Get active profile
+            const activeProfile = currentUserData.activeProfile || 
+                              (currentUserData.profiles && currentUserData.profiles[0]);
+            currentActiveProfile = activeProfile;
+            
+            // Update avatar (first letter of name)
+            const initial = currentUserData.name ? currentUserData.name.charAt(0).toUpperCase() : '?';
+            userAvatar.textContent = initial;
+            dropdownAvatar.textContent = initial;
+            
+            // Update name display
+            const displayName = activeProfile?.username || currentUserData.name || 'User';
+            userNameDisplay.textContent = displayName.length > 15 ? displayName.substring(0, 12) + '...' : displayName;
+            dropdownName.textContent = currentUserData.name || 'User';
+            dropdownEmail.textContent = currentUserData.email || '';
+            
+            // Update role badge
+            if (activeProfile?.type === 'employee') {
+                dropdownRole.innerHTML = `<span style="background: var(--success-light); color: var(--success); padding: 2px 8px; border-radius: 12px;">? Employee at ${activeProfile.companyName || 'Company'}</span>`;
+            } else {
+                dropdownRole.innerHTML = `<span style="background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: 12px;">? Public User</span>`;
+            }
+            
+            // Render profile switcher
+            renderProfileSwitcher();
+        }
+
+        // ==================== PROFILE SWITCHER ====================
+        function renderProfileSwitcher() {
+            if (!currentUserData?.profiles || currentUserData.profiles.length <= 1) {
+                profileSwitcherList.innerHTML = '<div style="padding: 8px 16px; font-size: 12px; color: var(--text-muted);">No other profiles</div>';
+                return;
+            }
+            
+            const activeProfileId = currentUserData.activeProfileId || currentUserData.profiles[0]?._id;
+            
+            profileSwitcherList.innerHTML = currentUserData.profiles.map(profile => {
+                const isActive = profile._id === activeProfileId;
+                const isEmployee = profile.type === 'employee';
+                
+                return `
+                    <div class="profile-switcher-item ${isActive ? 'active' : ''}" data-profile-id="${profile._id}">
+                        <div class="profile-icon">${isEmployee ? '?' : '?'}</div>
+                        <div class="profile-info">
+                            <div class="profile-name">${escapeHtml(profile.username)}</div>
+                            <div class="profile-type">${isEmployee ? `Employee at ${profile.companyName || 'Company'}` : 'Public Account'}</div>
+                        </div>
+                        ${isActive ? '<span class="profile-badge">Active</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            // Add click handlers for profile switching
+            document.querySelectorAll('.profile-switcher-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                    const profileId = item.dataset.profileId;
+                    await switchProfile(profileId);
+                });
+            });
+        }
+
+        async function switchProfile(profileId) {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch('https://worktalk-backend2.onrender.com/api/profiles/switch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ profileId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        currentUserData = data.user;
+                        updateUserInterface();
+                        showToast('Profile switched successfully', 'success');
+                        setTimeout(() => window.location.reload(), 500);
+                    }
+                } else {
+                    showToast('Failed to switch profile', 'error');
+                }
+            } catch (error) {
+                console.error('Error switching profile:', error);
+                showToast('Failed to switch profile', 'error');
+            }
+        }
+
+        // ==================== THEME TOGGLE ====================
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle?.classList.add('active');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                themeToggle.classList.remove('active');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.classList.add('active');
+            }
+            showToast(`Switched to ${isDark ? 'light' : 'dark'} mode`, 'success');
+        }
+
+        // ==================== EDIT PROFILE ====================
+        function openEditProfileModal() {
+            if (!currentUserData) return;
+            
+            document.getElementById('editName').value = currentUserData.name || '';
+            document.getElementById('editEmail').value = currentUserData.email || '';
+            
+            const activeProfile = currentUserData.activeProfile || currentUserData.profiles?.[0];
+            document.getElementById('editUsername').value = activeProfile?.username || '';
+            document.getElementById('editBio').value = activeProfile?.bio || '';
+            
+            editProfileModal.classList.add('show');
+        }
+
+        function closeEditProfileModal() {
+            editProfileModal.classList.remove('show');
+        }
+
+        async function saveProfileChanges() {
+            const newName = document.getElementById('editName').value.trim();
+            const newUsername = document.getElementById('editUsername').value.trim();
+            const newBio = document.getElementById('editBio').value.trim();
+            
+            if (!newName) {
+                showToast('Name is required', 'error');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch('https://worktalk-backend2.onrender.com/api/users/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({
+                        name: newName,
+                        username: newUsername,
+                        bio: newBio
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    currentUserData = data.user;
+                    updateUserInterface();
+                    showToast('Profile updated successfully', 'success');
+                    closeEditProfileModal();
+                } else {
+                    showToast('Failed to update profile', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showToast('Failed to update profile', 'error');
+            }
+        }
+
+        // ==================== SETTINGS ====================
+        function openSettings() {
+            showToast('Settings coming soon!', 'info');
+        }
+
+        // ==================== LEGAL PAGES ====================
+        function openPrivacyPolicy() {
+            window.open('privacy-policy.html', '_blank');
+        }
+
+        function openTermsOfUse() {
+            window.open('terms-of-use.html', '_blank');
+        }
+
+        // ==================== LOGOUT ====================
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            window.location.href = 'landing.html';
+        }
+
+        // ==================== TOAST NOTIFICATION ====================
+        function showToast(message, type = 'info') {
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container';
+                document.body.appendChild(toastContainer);
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${type === 'success' ? '?' : type === 'error' ? '?' : '?'}</span>
+                <span class="toast-message">${escapeHtml(message)}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ==================== DROPDOWN TOGGLE ====================
+        function setupDropdown() {
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('show');
+                userMenuBtn.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove('show');
+                    userMenuBtn.classList.remove('active');
+                }
+            });
+        }
+
+        // ==================== ESCAPE HTML ====================
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            setupDropdown();
+            initTheme();
+            
+            // Event listeners
+            themeToggle?.addEventListener('click', toggleTheme);
+            editProfileBtn?.addEventListener('click', openEditProfileModal);
+            settingsBtn?.addEventListener('click', openSettings);
+            privacyPolicyBtn?.addEventListener('click', openPrivacyPolicy);
+            termsOfUseBtn?.addEventListener('click', openTermsOfUse);
+            logoutBtn?.addEventListener('click', logout);
+            
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            if (saveProfileBtn) {
+                saveProfileBtn.addEventListener('click', saveProfileChanges);
+            }
+            
+            // Close modal on overlay click
+            editProfileModal?.addEventListener('click', (e) => {
+                if (e.target === editProfileModal) closeEditProfileModal();
+            });
+        });
+
         </script>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editProfileModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Edit Profile</h3>
+            <button class="modal-close" onclick="closeEditProfileModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="editName" class="form-input" placeholder="Your name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="editEmail" class="form-input" placeholder="email@example.com" disabled>
+                <small style="font-size: 11px; color: var(--text-muted);">Email cannot be changed</small>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" id="editUsername" class="form-input" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Bio</label>
+                <textarea id="editBio" class="form-input" rows="3" placeholder="Tell us about yourself..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeEditProfileModal()">Cancel</button>
+            <button class="btn-primary" id="saveProfileBtn">Save Changes</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
