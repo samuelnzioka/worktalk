@@ -1287,16 +1287,16 @@
                 <!-- User Menu -->
                 <div class="user-menu">
                     <div class="user-avatar-btn" id="userMenuBtn">
-                        <div class="user-avatar" id="userAvatar">?</div>
+                        <div class="user-avatar" id="userAvatar">👤</div>
                         <span class="user-name" id="userNameDisplay">Loading...</span>
-                        <span class="user-chevron">?</span>
+                        <span class="user-chevron">▼</span>
                     </div>
                     
                     <!-- Dropdown Menu -->
                     <div class="user-dropdown" id="userDropdown">
                         <!-- User Info Header -->
                         <div class="dropdown-header">
-                            <div class="dropdown-avatar" id="dropdownAvatar">?</div>
+                            <div class="dropdown-avatar" id="dropdownAvatar">👤</div>
                             <div class="dropdown-user-info">
                                 <h4 id="dropdownName">User Name</h4>
                                 <p id="dropdownEmail">user@example.com</p>
@@ -1316,15 +1316,15 @@
                         <div class="dropdown-section">
                             <div class="dropdown-title">Account</div>
                             <button class="dropdown-item" id="editProfileBtn">
-                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-icon">👤</span>
                                 <span class="dropdown-item-text">Edit Profile</span>
                             </button>
                             <button class="dropdown-item" id="settingsBtn">
-                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-icon">⚙️</span>
                                 <span class="dropdown-item-text">Settings</span>
                             </button>
                             <div class="theme-toggle">
-                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-icon">🌓</span>
                                 <span class="dropdown-item-text">Dark Mode</span>
                                 <div class="theme-toggle-switch" id="themeToggle">
                                     <div class="theme-toggle-slider"></div>
@@ -1336,11 +1336,11 @@
                         <div class="dropdown-section">
                             <div class="dropdown-title">Legal</div>
                             <button class="dropdown-item" id="privacyPolicyBtn">
-                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-icon">🔒</span>
                                 <span class="dropdown-item-text">Privacy Policy</span>
                             </button>
                             <button class="dropdown-item" id="termsOfUseBtn">
-                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-icon">📄</span>
                                 <span class="dropdown-item-text">Terms of Use</span>
                             </button>
                         </div>
@@ -1348,7 +1348,7 @@
                         <!-- Logout Section -->
                         <div class="dropdown-section">
                             <button class="dropdown-item" id="logoutBtn" style="color: var(--danger);">
-                                <span class="dropdown-item-icon">?</span>
+                                <span class="dropdown-item-icon">🚪</span>
                                 <span class="dropdown-item-text">Logout</span>
                             </button>
                         </div>
@@ -2121,9 +2121,9 @@
             
             // Update role badge
             if (activeProfile?.type === 'employee') {
-                dropdownRole.innerHTML = `<span style="background: var(--success-light); color: var(--success); padding: 2px 8px; border-radius: 12px;">? Employee at ${activeProfile.companyName || 'Company'}</span>`;
+                dropdownRole.innerHTML = `<span style="background: var(--success-light); color: var(--success); padding: 2px 8px; border-radius: 12px;">👔 Employee at ${activeProfile.companyName || 'Company'}</span>`;
             } else {
-                dropdownRole.innerHTML = `<span style="background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: 12px;">? Public User</span>`;
+                dropdownRole.innerHTML = `<span style="background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: 12px;">🌍 Public User</span>`;
             }
             
             // Render profile switcher
@@ -2145,7 +2145,7 @@
                 
                 return `
                     <div class="profile-switcher-item ${isActive ? 'active' : ''}" data-profile-id="${profile._id}">
-                        <div class="profile-icon">${isEmployee ? '?' : '?'}</div>
+                        <div class="profile-icon">${isEmployee ? '🏢' : '🌍'}</div>
                         <div class="profile-info">
                             <div class="profile-name">${escapeHtml(profile.username)}</div>
                             <div class="profile-type">${isEmployee ? `Employee at ${profile.companyName || 'Company'}` : 'Public Account'}</div>
@@ -2214,7 +2214,6 @@
                 localStorage.setItem('theme', 'dark');
                 themeToggle.classList.add('active');
             }
-            showToast(`Switched to ${isDark ? 'light' : 'dark'} mode`, 'success');
         }
 
         // ==================== EDIT PROFILE ====================
@@ -2310,7 +2309,7 @@
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `
-                <span class="toast-icon">${type === 'success' ? '?' : type === 'error' ? '?' : '?'}</span>
+                <span class="toast-icon">${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</span>
                 <span class="toast-message">${escapeHtml(message)}</span>
             `;
             
