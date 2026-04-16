@@ -685,7 +685,7 @@
       <h1 class="form-heading">Create account</h1>
       <p class="form-sub">Already have one? <a href="login.html">Sign in</a></p>
 
-      <form id="registerForm">
+      <form id="registerForm" onsubmit="return false;">
         <!-- Name row -->
         <div class="row-2">
           <div class="field">
@@ -965,7 +965,7 @@
         localStorage.setItem('user', JSON.stringify(data.user));
         
         // Redirect to main platform
-        window.location.href = 'index.html';
+        window.location.replace('/index.html');
       } else {
         // Handle different HTTP status codes
         let errorMessage = 'Registration failed. Please try again.';
