@@ -719,7 +719,7 @@
     // If user is already logged in, redirect to main platform
     if (accessToken && user) {
       console.log('User already logged in, redirecting to main platform...');
-      window.location.replace('/index.html');
+      window.location.replace('/platform.html');
       return;
     }
   });
@@ -761,7 +761,7 @@
         localStorage.setItem('user', JSON.stringify(data.user));
         
         // Redirect to main platform
-        window.location.replace('/index.html');
+        window.location.replace('/platform.html');
       } else {
         // Login failed - show error
         const errorData = await response.json();
