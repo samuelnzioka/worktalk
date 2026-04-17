@@ -2092,8 +2092,6 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const themeToggle = document.getElementById('themeToggle');
         const editProfileModal = document.getElementById('editProfileModal');
-        const settingsModal = document.getElementById('settingsModal');
-
         // Current user data
         let currentUserData = null;
         let currentActiveProfile = null;
@@ -2289,13 +2287,21 @@
         // ==================== SETTINGS ====================
         function openSettings() {
             console.log('openSettings() called'); // Debug
+            const settingsModal = document.getElementById('settingsModal');
             console.log('settingsModal:', settingsModal); // Debug
-            settingsModal.classList.add('show');
+            if (settingsModal) {
+                settingsModal.classList.add('show');
+            } else {
+                console.error('settingsModal element not found!');
+            }
         }
 
         function closeSettingsModal() {
             console.log('closeSettingsModal() called'); // Debug
-            settingsModal.classList.remove('show');
+            const settingsModal = document.getElementById('settingsModal');
+            if (settingsModal) {
+                settingsModal.classList.remove('show');
+            }
         }
 
         // ==================== LEGAL PAGES ====================
