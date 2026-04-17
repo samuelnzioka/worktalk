@@ -1974,7 +1974,10 @@
             // Event listeners
             themeToggle?.addEventListener('click', toggleTheme);
             editProfileBtn?.addEventListener('click', openEditProfileModal);
-            settingsBtn?.addEventListener('click', openSettings);
+            settingsBtn?.addEventListener('click', () => {
+                console.log('Settings button clicked'); // Debug
+                openSettings();
+            });
             privacyPolicyBtn?.addEventListener('click', openPrivacyPolicy);
             termsOfUseBtn?.addEventListener('click', openTermsOfUse);
             logoutBtn?.addEventListener('click', logout);
@@ -2285,10 +2288,13 @@
 
         // ==================== SETTINGS ====================
         function openSettings() {
+            console.log('openSettings() called'); // Debug
+            console.log('settingsModal:', settingsModal); // Debug
             settingsModal.classList.add('show');
         }
 
         function closeSettingsModal() {
+            console.log('closeSettingsModal() called'); // Debug
             settingsModal.classList.remove('show');
         }
 
