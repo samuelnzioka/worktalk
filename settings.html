@@ -1397,6 +1397,19 @@
                 return m;
             });
         }
+
+        // ==================== EMBED MODE ====================
+        // When loaded inside the platform.html settings modal, hide the standalone header
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('embed') === 'true') {
+                const header = document.querySelector('.header');
+                if (header) header.style.display = 'none';
+                const settingsHeader = document.querySelector('.settings-header');
+                if (settingsHeader) settingsHeader.style.display = 'none';
+                document.querySelector('.settings-container').style.paddingTop = '16px';
+            }
+        })();
     </script>
 </body>
 </html>
