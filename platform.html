@@ -1971,6 +1971,20 @@
             setupDropdown();
             initTheme();
 
+            // Listen for theme changes from other pages (e.g. settings.html)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'theme') {
+                    const isDark = e.newValue === 'dark';
+                    if (isDark) {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        themeToggle?.classList.add('active');
+                    } else {
+                        document.documentElement.removeAttribute('data-theme');
+                        themeToggle?.classList.remove('active');
+                    }
+                }
+            });
+
             // Event listeners
             themeToggle?.addEventListener('click', toggleTheme);
             editProfileBtn?.addEventListener('click', openEditProfileModal);
