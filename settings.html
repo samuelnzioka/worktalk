@@ -1088,17 +1088,66 @@
             });
         }
         
+        // ==================== TOKEN REFRESH ====================
+        async function refreshToken() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) return false;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('accessToken', data.accessToken);
+                    if (data.refreshToken) {
+                        localStorage.setItem('refreshToken', data.refreshToken);
+                    }
+                    return true;
+                }
+            } catch (error) {
+                console.error('Token refresh failed:', error);
+            }
+            return false;
+        }
+
+        async function saveWithAuthCheck(apiCall) {
+            let token = localStorage.getItem('accessToken');
+            
+            // Try the API call first
+            let response = await apiCall(token);
+            
+            // If token expired, refresh and retry
+            if (response.status === 401) {
+                const refreshed = await refreshToken();
+                if (refreshed) {
+                    const newToken = localStorage.getItem('accessToken');
+                    response = await apiCall(newToken);
+                } else {
+                    // Refresh failed, redirect to login
+                    window.location.href = 'login.html';
+                    return;
+                }
+            }
+            
+            return response;
+        }
+
         // ==================== SAVE SETTINGS ====================
         async function saveSettings(section, settings) {
             try {
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch(`${API_BASE_URL}/settings/user`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ section, settings })
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch(`${API_BASE_URL}/settings/user`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ section, settings })
+                    });
                 });
                 
                 if (response.ok) {
@@ -1128,17 +1177,18 @@
             }
             
             try {
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch(`${API_BASE_URL}/settings/profile`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ name, username, bio })
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch(`${API_BASE_URL}/settings/profile`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ name, username, bio })
+                    });
                 });
                 
-                if (response.ok) {
+                if (response && response.ok) {
                     const data = await response.json();
                     if (data.user) {
                         localStorage.setItem('user', JSON.stringify(data.user));
@@ -1237,17 +1287,18 @@
             }
             
             try {
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch(`${API_BASE_URL}/settings/change-password`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ currentPassword, newPassword })
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch(`${API_BASE_URL}/settings/change-password`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ currentPassword, newPassword })
+                    });
                 });
                 
-                if (response.ok) {
+                if (response && response.ok) {
                     document.getElementById('passwordSuccess').textContent = 'Password changed successfully!';
                     document.getElementById('currentPassword').value = '';
                     document.getElementById('newPassword').value = '';
@@ -1272,17 +1323,18 @@
             if (!password) return;
             
             try {
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch(`${API_BASE_URL}/settings/account`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ password })
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch(`${API_BASE_URL}/settings/account`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ password })
+                    });
                 });
                 
-                if (response.ok) {
+                if (response && response.ok) {
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
                     localStorage.removeItem('user');
