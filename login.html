@@ -757,11 +757,21 @@
         
         // Store tokens and user data
         localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
         
-        // Redirect to main platform
-        window.location.replace('/platform.html');
+        // Redirect based on user role
+        if (data.user?.role === 'company_admin') {
+          // Company admin goes to company dashboard
+          window.location.replace('/company-dashboard.html');
+        } else {
+          // Regular users go to main platform
+          window.location.replace('/platform.html');
+        }
       } else {
         // Login failed - show error
         const errorData = await response.json();
