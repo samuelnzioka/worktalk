@@ -518,6 +518,158 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ==================== COMPANY ADMIN STYLES ==================== */
+        .admin-nav-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 16px;
+        }
+        .admin-nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 8px 16px 4px;
+        }
+        .admin-only {
+            display: none;
+        }
+        .admin-only.visible {
+            display: block;
+        }
+
+        .analytics-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .stat-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .trends-section {
+            margin-bottom: 24px;
+        }
+        .trends-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .trend-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .trend-card h4 {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .trend-card p {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .top-departments-section,
+        .top-employees-section {
+            margin-bottom: 24px;
+        }
+        .top-departments-section h3,
+        .top-employees-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .add-department-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .add-department-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .departments-list h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        .dept-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .dept-item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .dept-item-icon {
+            font-size: 20px;
+        }
+        .dept-item-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .dept-item-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .dept-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .dept-item-actions button {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .dept-edit-btn {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .dept-delete-btn {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .analytics-stats-grid,
+            .trends-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -565,6 +717,34 @@
                     <button class="nav-item" data-panel="account">
                         <span class="nav-icon">⚙️</span>
                         <span>Account</span>
+                    </button>
+
+                    <div class="admin-nav-divider admin-only"></div>
+                    <div class="admin-nav-label admin-only">Company Admin</div>
+
+                    <button class="nav-item admin-only" data-panel="companyGeneral">
+                        <span class="nav-icon">🏢</span>
+                        <span>Company General</span>
+                    </button>
+                    <button class="nav-item admin-only" data-panel="companyDepartments">
+                        <span class="nav-icon">🏗️</span>
+                        <span>Departments</span>
+                    </button>
+                    <button class="nav-item admin-only" data-panel="companyModeration">
+                        <span class="nav-icon">🛡️</span>
+                        <span>Moderation</span>
+                    </button>
+                    <button class="nav-item admin-only" data-panel="companyEmployeeManagement">
+                        <span class="nav-icon">👥</span>
+                        <span>Employees</span>
+                    </button>
+                    <button class="nav-item admin-only" data-panel="companyPrivacy">
+                        <span class="nav-icon">🔐</span>
+                        <span>Company Privacy</span>
+                    </button>
+                    <button class="nav-item admin-only" data-panel="companyAnalytics">
+                        <span class="nav-icon">📊</span>
+                        <span>Analytics</span>
                     </button>
                 </div>
             </div>
@@ -924,6 +1104,376 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ==================== COMPANY GENERAL SETTINGS PANEL ==================== -->
+                <div id="companyGeneralPanel" class="settings-panel admin-only">
+                    <div class="panel-header">
+                        <h2>Company General Settings</h2>
+                        <p>Manage your company's basic information</p>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" id="companyName" class="form-input" placeholder="Company name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Industry</label>
+                                <select id="companyIndustry" class="form-select">
+                                    <option value="">Select industry</option>
+                                    <option value="Telecommunications">Telecommunications</option>
+                                    <option value="Banking">Banking</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Aviation">Aviation</option>
+                                    <option value="Energy">Energy</option>
+                                    <option value="E-commerce">E-commerce</option>
+                                    <option value="Logistics">Logistics</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Manufacturing">Manufacturing</option>
+                                    <option value="Retail">Retail</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Hospitality">Hospitality</option>
+                                    <option value="Construction">Construction</option>
+                                    <option value="Agriculture">Agriculture</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Company Description</label>
+                            <textarea id="companyDescription" class="form-textarea" rows="4" placeholder="Describe your company..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <input type="url" id="companyWebsite" class="form-input" placeholder="https://example.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Location</label>
+                                <input type="text" id="companyLocation" class="form-input" placeholder="Nairobi, Kenya">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Contact Email</label>
+                                <input type="email" id="companyContactEmail" class="form-input" placeholder="hr@company.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Contact Phone</label>
+                                <input type="tel" id="companyContactPhone" class="form-input" placeholder="+254 700 000000">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Company Logo URL</label>
+                                <input type="url" id="companyLogo" class="form-input" placeholder="https://example.com/logo.png">
+                                <p class="form-hint">Enter a URL for your company logo</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Cover Image URL</label>
+                                <input type="url" id="companyBanner" class="form-input" placeholder="https://example.com/banner.png">
+                                <p class="form-hint">Enter a URL for your company cover image</p>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-primary" id="saveCompanyGeneralBtn">Save Company Settings</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== DEPARTMENT MANAGEMENT PANEL ==================== -->
+                <div id="companyDepartmentsPanel" class="settings-panel admin-only">
+                    <div class="panel-header">
+                        <h2>Department Management</h2>
+                        <p>Create, edit, and manage your company departments</p>
+                    </div>
+                    <div class="panel-body">
+                        <div class="add-department-section">
+                            <h3>Add New Department</h3>
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 2;">
+                                    <input type="text" id="newDeptName" class="form-input" placeholder="Department name (e.g., Engineering, Sales, HR)">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <input type="text" id="newDeptIcon" class="form-input" placeholder="Icon (e.g., 💻, 📊, 👥)">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn-primary" id="addDepartmentBtn">+ Add Department</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <textarea id="newDeptDescription" class="form-textarea" rows="2" placeholder="Department description (optional)"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="departments-list" id="departmentsList">
+                            <h3>Existing Departments</h3>
+                            <div id="departmentsContainer">
+                                <!-- Departments will be loaded here -->
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-primary" id="saveDepartmentsOrderBtn">Save Department Order</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== MODERATION SETTINGS PANEL ==================== -->
+                <div id="companyModerationPanel" class="settings-panel admin-only">
+                    <div class="panel-header">
+                        <h2>Moderation Settings</h2>
+                        <p>Control how content is moderated in your company space</p>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="form-label">Post Moderation</label>
+                            <select id="postModeration" class="form-select">
+                                <option value="auto_approve">Auto-approve - Posts appear immediately</option>
+                                <option value="manual_review">Manual Review - Posts require admin approval</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Comment Moderation</label>
+                            <select id="commentModeration" class="form-select">
+                                <option value="auto_approve">Auto-approve - Comments appear immediately</option>
+                                <option value="manual_review">Manual Review - Comments require admin approval</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle-info">
+                                <h4>Allow Anonymous Posts</h4>
+                                <p>Allow employees to post anonymously in company spaces</p>
+                            </div>
+                            <div class="toggle-switch" id="allowAnonymousToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Flag Threshold</label>
+                            <select id="flagThreshold" class="form-select">
+                                <option value="3">3 flags - Auto-hide post</option>
+                                <option value="5">5 flags - Auto-hide post</option>
+                                <option value="10">10 flags - Auto-hide post</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle-info">
+                                <h4>Auto-hide Flagged Content</h4>
+                                <p>Automatically hide posts that reach the flag threshold</p>
+                            </div>
+                            <div class="toggle-switch" id="autoHideFlaggedToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Blocked Keywords</label>
+                            <textarea id="blockedKeywords" class="form-textarea" rows="4" placeholder="Enter keywords to block, one per line&#10;e.g.,&#10;spam&#10;offensiveword&#10;promotion"></textarea>
+                            <p class="form-hint">Posts containing these keywords will be automatically flagged for review</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Flagged Content Review</label>
+                            <div id="flaggedContentList">
+                                <!-- Flagged posts will be loaded here -->
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-primary" id="saveModerationBtn">Save Moderation Settings</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== EMPLOYEE MANAGEMENT PANEL ==================== -->
+                <div id="companyEmployeeManagementPanel" class="settings-panel admin-only">
+                    <div class="panel-header">
+                        <h2>Employee Management</h2>
+                        <p>Control how employees join and interact with your company</p>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="form-label">Employee Verification Method</label>
+                            <select id="employeeVerificationMethod" class="form-select">
+                                <option value="invite_code">Invite Code - Employees need an invite code</option>
+                                <option value="email_domain">Email Domain - Employees with @company.com email can join</option>
+                                <option value="admin_approval">Admin Approval - All requests need admin approval</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle-info">
+                                <h4>Auto-approve New Employees</h4>
+                                <p>Automatically verify employees when they join (if using email domain verification)</p>
+                            </div>
+                            <div class="toggle-switch" id="autoApproveEmployeesToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle-info">
+                                <h4>Allow Employee Registration</h4>
+                                <p>Allow employees to join without an invite code (uses email domain)</p>
+                            </div>
+                            <div class="toggle-switch" id="allowEmployeeRegistrationToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Employee Departure Action</label>
+                            <select id="employeeDepartureAction" class="form-select">
+                                <option value="anonymize">Anonymize - Replace name with "Former Employee"</option>
+                                <option value="delete">Delete - Remove all employee data</option>
+                                <option value="keep">Keep - Keep posts as is</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Department Assignment</label>
+                            <select id="departmentAssignment" class="form-select">
+                                <option value="admin">Admin Assigns - Company admin assigns departments</option>
+                                <option value="employee">Employee Chooses - Employees select their department</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-primary" id="saveEmployeeManagementBtn">Save Employee Management Settings</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== COMPANY PRIVACY PANEL ==================== -->
+                <div id="companyPrivacyPanel" class="settings-panel admin-only">
+                    <div class="panel-header">
+                        <h2>Company Privacy Settings</h2>
+                        <p>Control who can see your company's discussions</p>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="form-label">Company Space Visibility</label>
+                            <select id="companySpaceVisibility" class="form-select">
+                                <option value="public">Public - Anyone can view discussions</option>
+                                <option value="employees_only">Employees Only - Only verified employees can view</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle-info">
+                                <h4>Show Employee Count</h4>
+                                <p>Display the number of employees on your company page</p>
+                            </div>
+                            <div class="toggle-switch" id="showEmployeeCountToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle-info">
+                                <h4>Show Department Details</h4>
+                                <p>Display department information on your company page</p>
+                            </div>
+                            <div class="toggle-switch" id="showDepartmentDetailsToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle-info">
+                                <h4>Allow External Sharing</h4>
+                                <p>Allow company posts to be shared outside the platform</p>
+                            </div>
+                            <div class="toggle-switch" id="allowExternalSharingToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-primary" id="saveCompanyPrivacyBtn">Save Privacy Settings</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== ANALYTICS PANEL ==================== -->
+                <div id="companyAnalyticsPanel" class="settings-panel admin-only">
+                    <div class="panel-header">
+                        <h2>Analytics & Reporting</h2>
+                        <p>View your company's engagement metrics</p>
+                    </div>
+                    <div class="panel-body">
+                        <div class="analytics-stats-grid">
+                            <div class="stat-card">
+                                <h3 id="totalEmployees">0</h3>
+                                <p>Total Employees</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="totalDepartments">0</h3>
+                                <p>Departments</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="totalPosts">0</h3>
+                                <p>Total Posts</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="totalComments">0</h3>
+                                <p>Comments</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="totalLikes">0</h3>
+                                <p>Likes</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="engagementRate">0%</h3>
+                                <p>Engagement Rate</p>
+                            </div>
+                        </div>
+
+                        <div class="trends-section">
+                            <h3>Activity Trends</h3>
+                            <div class="trends-grid">
+                                <div class="trend-card">
+                                    <h4>Weekly Posts</h4>
+                                    <p id="weeklyPosts">0</p>
+                                </div>
+                                <div class="trend-card">
+                                    <h4>Monthly Posts</h4>
+                                    <p id="monthlyPosts">0</p>
+                                </div>
+                                <div class="trend-card">
+                                    <h4>Weekly Growth</h4>
+                                    <p id="weeklyGrowth">0%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="top-departments-section">
+                            <h3>Most Active Departments</h3>
+                            <div id="topDepartmentsList"></div>
+                        </div>
+
+                        <div class="top-employees-section">
+                            <h3>Most Active Employees</h3>
+                            <div id="topEmployeesList"></div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-secondary" id="exportCompanyDataBtn">📥 Export Company Data</button>
+                            <button class="btn-primary" id="refreshAnalyticsBtn">🔄 Refresh Analytics</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -984,6 +1534,10 @@
             
             // Setup save buttons
             setupSaveButtons();
+            
+            // Show admin panels if user is a company admin
+            initCompanyAdmin();
+            updateNavigationForCompanyAdmin();
         });
         
         // ==================== LOAD DATA ====================
@@ -1396,7 +1950,10 @@
             const toggles = [
                 'compactModeToggle', 'animationsToggle', 'emailEnabledToggle', 'emailCommentsToggle',
                 'emailLikesToggle', 'emailMentionsToggle', 'weeklyDigestToggle', 'showEmailToggle',
-                'showActivityToggle', 'showInSearchToggle', 'hideFlaggedToggle', 'loginNotificationsToggle'
+                'showActivityToggle', 'showInSearchToggle', 'hideFlaggedToggle', 'loginNotificationsToggle',
+                'allowAnonymousToggle', 'autoHideFlaggedToggle', 'autoApproveEmployeesToggle',
+                'allowEmployeeRegistrationToggle', 'showEmployeeCountToggle', 'showDepartmentDetailsToggle',
+                'allowExternalSharingToggle'
             ];
             
             toggles.forEach(toggleId => {
@@ -1422,6 +1979,8 @@
             document.getElementById('changePasswordBtn').addEventListener('click', changePassword);
             document.getElementById('deleteAccountBtn').addEventListener('click', deleteAccount);
             document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            
+            // Admin save buttons are now handled by setupCompanyAdminEventListeners() function
             
             // Avatar upload
             document.getElementById('uploadAvatarBtn').addEventListener('click', () => {
@@ -1467,6 +2026,380 @@
                 if (m === '>') return '&gt;';
                 return m;
             });
+        }
+
+        // ==================== COMPANY ADMIN FUNCTIONS ====================
+
+        // Company ID (set when user logs in as company admin)
+        let currentCompanyId = null;
+
+        // Initialize company admin sections
+        async function initCompanyAdmin() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const isCompanyAdmin = user?.role === 'company_admin';
+            
+            if (!isCompanyAdmin) {
+                // Hide company admin sections
+                document.getElementById('companyGeneralPanel').style.display = 'none';
+                document.getElementById('companyDepartmentsPanel').style.display = 'none';
+                document.getElementById('companyModerationPanel').style.display = 'none';
+                document.getElementById('companyEmployeeManagementPanel').style.display = 'none';
+                document.getElementById('companyPrivacyPanel').style.display = 'none';
+                document.getElementById('companyAnalyticsPanel').style.display = 'none';
+                return;
+            }
+            
+            // Get company ID from user data
+            currentCompanyId = user.companyId || user.employeeProfile?.companyId;
+            
+            if (!currentCompanyId) {
+                console.error('No company ID found for company admin');
+                return;
+            }
+            
+            // Load all company data
+            await loadCompanyGeneralSettings();
+            await loadCompanyDepartments();
+            await loadModerationSettings();
+            await loadEmployeeManagementSettings();
+            await loadCompanyPrivacySettings();
+            await loadCompanyAnalytics();
+            await loadFlaggedContent();
+            
+            // Setup company admin event listeners
+            setupCompanyAdminEventListeners();
+        }
+
+        // Load company general settings
+        async function loadCompanyGeneralSettings() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${API_BASE_URL}/settings/company/${currentCompanyId}/general`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const company = data.company;
+                    
+                    document.getElementById('companyName').value = company.name || '';
+                    document.getElementById('companyIndustry').value = company.industry || '';
+                    document.getElementById('companyDescription').value = company.description || '';
+                    document.getElementById('companyWebsite').value = company.website || '';
+                    document.getElementById('companyLocation').value = company.location || '';
+                    document.getElementById('companyContactEmail').value = company.contactEmail || '';
+                    document.getElementById('companyContactPhone').value = company.contactPhone || '';
+                    document.getElementById('companyLogo').value = company.logo || '';
+                    document.getElementById('companyBanner').value = company.banner || '';
+                }
+            } catch (error) {
+                console.error('Error loading company settings:', error);
+            }
+        }
+
+        // Save company general settings
+        async function saveCompanyGeneralSettings() {
+            const data = {
+                name: document.getElementById('companyName').value.trim(),
+                industry: document.getElementById('companyIndustry').value,
+                description: document.getElementById('companyDescription').value.trim(),
+                website: document.getElementById('companyWebsite').value.trim(),
+                location: document.getElementById('companyLocation').value.trim(),
+                contactEmail: document.getElementById('companyContactEmail').value.trim(),
+                contactPhone: document.getElementById('companyContactPhone').value.trim(),
+                logo: document.getElementById('companyLogo').value.trim(),
+                banner: document.getElementById('companyBanner').value.trim()
+            };
+            
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${API_BASE_URL}/settings/company/${currentCompanyId}/general`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast('Company settings saved successfully', 'success');
+                    await loadCompanyGeneralSettings();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to save company settings', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving company settings:', error);
+                showToast('Failed to save company settings', 'error');
+            }
+        }
+
+        // Render departments list
+        function renderDepartmentsList(departments) {
+            const container = document.getElementById('departmentsContainer');
+            
+            if (!departments || departments.length === 0) {
+                container.innerHTML = '<p class="text-muted">No departments yet. Create your first department!</p>';
+                return;
+            }
+            
+            container.innerHTML = departments.map(dept => `
+                <div class="department-item" data-department-id="${dept._id}">
+                    <div class="department-info">
+                        <span class="department-icon">${dept.icon || '📁'}</span>
+                        <div class="department-details">
+                            <input type="text" class="department-name-input" value="${escapeHtml(dept.name)}" data-field="name">
+                            <input type="text" class="department-icon-input" value="${dept.icon || '📁'}" data-field="icon" placeholder="Icon">
+                            <textarea class="department-desc-input" data-field="description" placeholder="Description">${escapeHtml(dept.description || '')}</textarea>
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="department-active-checkbox" ${dept.isActive ? 'checked' : ''} data-field="isActive">
+                                Active
+                            </label>
+                        </div>
+                    </div>
+                    <div class="department-actions">
+                        <button class="btn-secondary btn-sm save-dept-btn" data-id="${dept._id}">Save</button>
+                        <button class="btn-danger btn-sm delete-dept-btn" data-id="${dept._id}">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners for save buttons
+            document.querySelectorAll('.save-dept-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const deptId = btn.dataset.id;
+                    const item = btn.closest('.department-item');
+                    const name = item.querySelector('.department-name-input').value;
+                    const icon = item.querySelector('.department-icon-input').value;
+                    const description = item.querySelector('.department-desc-input').value;
+                    const isActive = item.querySelector('.department-active-checkbox').checked;
+                    
+                    await updateDepartment(deptId, { name, icon, description, isActive });
+                });
+            });
+            
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-dept-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (confirm('Are you sure you want to delete this department?')) {
+                        const deptId = btn.dataset.id;
+                        await deleteDepartment(deptId);
+                    }
+                });
+            });
+        }
+
+        // Create new department
+        async function createDepartment() {
+            const name = document.getElementById('newDeptName').value.trim();
+            const icon = document.getElementById('newDeptIcon').value.trim();
+            const description = document.getElementById('newDeptDescription').value.trim();
+            
+            if (!name) {
+                showToast('Department name is required', 'error');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${API_BASE_URL}/settings/company/${currentCompanyId}/departments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ name, icon: icon || '📁', description })
+                });
+                
+                if (response.ok) {
+                    showToast('Department created successfully', 'success');
+                    document.getElementById('newDeptName').value = '';
+                    document.getElementById('newDeptIcon').value = '';
+                    document.getElementById('newDeptDescription').value = '';
+                    await loadCompanyDepartments();
+                } else {
+                    const data = await response.json();
+                    showToast(data.message || 'Failed to create department', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating department:', error);
+                showToast('Failed to create department', 'error');
+            }
+        }
+
+        function editDepartment(index) {
+            const dept = companyDepartments[index];
+            if (!dept) return;
+            document.getElementById('newDeptName').value = dept.name;
+            document.getElementById('newDeptIcon').value = dept.icon || '';
+            document.getElementById('newDeptDescription').value = dept.description || '';
+            companyDepartments.splice(index, 1);
+            renderDepartments();
+        }
+
+        function deleteDepartment(index) {
+            if (!confirm(`Delete department "${companyDepartments[index]?.name}"?`)) return;
+            companyDepartments.splice(index, 1);
+            renderDepartments();
+            showToast('Department removed', 'success');
+        }
+
+        async function saveDepartmentsOrder() {
+            try {
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch(`${API_BASE_URL}/company/settings`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ section: 'departments', settings: companyDepartments })
+                    });
+                });
+                if (response && response.ok) {
+                    showToast('Departments saved successfully!', 'success');
+                } else {
+                    showToast('Failed to save departments', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving departments:', error);
+                showToast('Failed to save departments', 'error');
+            }
+        }
+
+        async function saveModeration() {
+            const blockedKeywordsText = document.getElementById('blockedKeywords').value;
+            const settings = {
+                postModeration: document.getElementById('postModeration').value,
+                commentModeration: document.getElementById('commentModeration').value,
+                allowAnonymous: document.getElementById('allowAnonymousToggle').classList.contains('active'),
+                flagThreshold: parseInt(document.getElementById('flagThreshold').value),
+                autoHideFlagged: document.getElementById('autoHideFlaggedToggle').classList.contains('active'),
+                blockedKeywords: blockedKeywordsText.split('\n').map(k => k.trim()).filter(k => k)
+            };
+            try {
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch(`${API_BASE_URL}/company/settings`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ section: 'moderation', settings })
+                    });
+                });
+                if (response && response.ok) {
+                    showToast('Moderation settings saved!', 'success');
+                } else {
+                    showToast('Failed to save moderation settings', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving moderation:', error);
+                showToast('Failed to save moderation settings', 'error');
+            }
+        }
+
+        async function saveEmployeeManagement() {
+            const settings = {
+                verificationMethod: document.getElementById('employeeVerificationMethod').value,
+                autoApprove: document.getElementById('autoApproveEmployeesToggle').classList.contains('active'),
+                allowRegistration: document.getElementById('allowEmployeeRegistrationToggle').classList.contains('active'),
+                departureAction: document.getElementById('employeeDepartureAction').value,
+                departmentAssignment: document.getElementById('departmentAssignment').value
+            };
+            try {
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch(`${API_BASE_URL}/company/settings`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ section: 'employeeManagement', settings })
+                    });
+                });
+                if (response && response.ok) {
+                    showToast('Employee management settings saved!', 'success');
+                } else {
+                    showToast('Failed to save employee management settings', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving employee management:', error);
+                showToast('Failed to save employee management settings', 'error');
+            }
+        }
+
+        async function saveCompanyPrivacy() {
+            const settings = {
+                visibility: document.getElementById('companySpaceVisibility').value,
+                showEmployeeCount: document.getElementById('showEmployeeCountToggle').classList.contains('active'),
+                showDepartmentDetails: document.getElementById('showDepartmentDetailsToggle').classList.contains('active'),
+                allowExternalSharing: document.getElementById('allowExternalSharingToggle').classList.contains('active')
+            };
+            try {
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch(`${API_BASE_URL}/company/settings`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ section: 'companyPrivacy', settings })
+                    });
+                });
+                if (response && response.ok) {
+                    showToast('Company privacy settings saved!', 'success');
+                } else {
+                    showToast('Failed to save company privacy settings', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving company privacy:', error);
+                showToast('Failed to save company privacy settings', 'error');
+            }
+        }
+
+        async function loadCompanyAnalytics() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${API_BASE_URL}/company/analytics`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+                    el('totalEmployees', data.totalEmployees || 0);
+                    el('totalDepartments', data.totalDepartments || 0);
+                    el('totalPosts', data.totalPosts || 0);
+                    el('totalComments', data.totalComments || 0);
+                    el('totalLikes', data.totalLikes || 0);
+                    el('engagementRate', (data.engagementRate || 0) + '%');
+                    el('weeklyPosts', data.weeklyPosts || 0);
+                    el('monthlyPosts', data.monthlyPosts || 0);
+                    el('weeklyGrowth', (data.weeklyGrowth || 0) + '%');
+                    if (data.topDepartments) {
+                        const list = document.getElementById('topDepartmentsList');
+                        if (list) list.innerHTML = data.topDepartments.map(d =>
+                            `<div class="dept-item"><div class="dept-item-info"><span class="dept-item-icon">${d.icon || '📁'}</span><span class="dept-item-name">${escapeHtml(d.name)}</span></div><span style="color:var(--text-muted);font-size:13px">${d.postCount || 0} posts</span></div>`
+                        ).join('');
+                    }
+                    if (data.topEmployees) {
+                        const list = document.getElementById('topEmployeesList');
+                        if (list) list.innerHTML = data.topEmployees.map(e =>
+                            `<div class="dept-item"><div class="dept-item-info"><span class="dept-item-icon">👤</span><span class="dept-item-name">${escapeHtml(e.name)}</span></div><span style="color:var(--text-muted);font-size:13px">${e.postCount || 0} posts</span></div>`
+                        ).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        function exportCompanyData() {
+            const data = {
+                company: { name: document.getElementById('companyName')?.value, industry: document.getElementById('companyIndustry')?.value },
+                departments: companyDepartments,
+                exportDate: new Date().toISOString()
+            };
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `company-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Company data exported!', 'success');
         }
 
         // ==================== EMBED MODE ====================
