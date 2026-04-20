@@ -692,7 +692,7 @@
     </div>
 
     <script type="module">
-        import { registerCompany } from '/js/auth.js';
+        import { registerCompany } from '/js/companies.js';
         import { sanitizeInput, validatePassword, getDepartmentIcon, showToast } from '/js/utils.js';
 
         const companyRegisterForm = document.getElementById('companyRegisterForm');
@@ -832,9 +832,20 @@
                 const result = await registerCompany(formData);
                 
                 if (result.success) {
+                    // Store authentication tokens if provided
+                    if (result.accessToken) {
+                        localStorage.setItem('accessToken', result.accessToken);
+                    }
+                    if (result.refreshToken) {
+                        localStorage.setItem('refreshToken', result.refreshToken);
+                    }
+                    if (result.user) {
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                    }
+                    
                     showToast('Company registered successfully! Redirecting...', 'success');
                     setTimeout(() => {
-                        window.location.href = result.redirectTo || '/company-dashboard.html';
+                        window.location.href = '/company-dashboard.html';
                     }, 2000);
                 } else {
                     showToast(result.message || 'Registration failed', 'error');
