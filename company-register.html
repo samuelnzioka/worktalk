@@ -335,6 +335,14 @@
                             <div class="form-error" id="companyNameError"></div>
                         </div>
 
+                        <div class="form-group">
+                            <label for="description" class="form-label">Company Description *</label>
+                            <textarea id="description" name="description" class="form-input" rows="4" 
+                                      placeholder="Describe your company, its mission, and what it does..." required></textarea>
+                            <div class="form-hint">Brief overview of your company for verification purposes</div>
+                            <div class="form-error" id="descriptionError"></div>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="totalDepartments" class="form-label">Total Departments *</label>
@@ -483,6 +491,23 @@
                                        placeholder="+1 123 456 7890">
                                 <div class="form-hint">Optional but useful for verification</div>
                                 <div class="form-error" id="adminPhoneError"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="adminPassword" class="form-label">Password *</label>
+                                <input type="password" id="adminPassword" name="adminPassword" class="form-input" 
+                                       placeholder="At least 8 characters" required>
+                                <div class="form-hint">Minimum 8 characters, include numbers and symbols</div>
+                                <div class="form-error" id="adminPasswordError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword" class="form-label">Confirm Password *</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" 
+                                       placeholder="Re-enter your password" required>
+                                <div class="form-error" id="confirmPasswordError"></div>
                             </div>
                         </div>
                     </div>
@@ -747,16 +772,32 @@
             // Get form data
             const formData = {
                 companyName: sanitizeInput(document.getElementById('companyName').value.trim()),
-                companyEmail: sanitizeInput(document.getElementById('companyEmail').value.trim()),
-                industry: document.getElementById('industry').value,
-                companySize: document.getElementById('companySize').value,
                 description: sanitizeInput(document.getElementById('description').value.trim()),
-                adminName: sanitizeInput(document.getElementById('adminName').value.trim()),
-                adminEmail: sanitizeInput(document.getElementById('adminEmail').value.trim()),
-                adminPassword: document.getElementById('adminPassword').value,
+                totalDepartments: parseInt(document.getElementById('totalDepartments').value) || 0,
+                totalEmployees: parseInt(document.getElementById('totalEmployees').value) || 0,
                 departments: Array.from(departmentsList.querySelectorAll('.department-name'))
                     .map(input => sanitizeInput(input.value.trim()))
-                    .filter(name => name.length > 0)
+                    .filter(name => name.length > 0),
+                taxId: sanitizeInput(document.getElementById('taxId').value.trim()),
+                registrationNumber: sanitizeInput(document.getElementById('registrationNumber').value.trim()),
+                country: document.getElementById('country').value,
+                companyEmail: sanitizeInput(document.getElementById('companyEmail').value.trim()),
+                companyPhone: sanitizeInput(document.getElementById('companyPhone').value.trim()),
+                companyWebsite: sanitizeInput(document.getElementById('companyWebsite').value.trim()),
+                adminName: sanitizeInput(document.getElementById('adminName').value.trim()),
+                jobTitle: document.getElementById('jobTitle').value,
+                adminEmail: sanitizeInput(document.getElementById('adminEmail').value.trim()),
+                adminPhone: sanitizeInput(document.getElementById('adminPhone')?.value?.trim() || ''),
+                adminPassword: document.getElementById('adminPassword').value,
+                confirmPassword: document.getElementById('confirmPassword').value,
+                industry: document.getElementById('industry').value,
+                yearFounded: parseInt(document.getElementById('yearFounded').value) || 0,
+                revenueRange: document.getElementById('revenueRange').value,
+                streetAddress: sanitizeInput(document.getElementById('streetAddress').value.trim()),
+                city: sanitizeInput(document.getElementById('city').value.trim()),
+                postalCode: sanitizeInput(document.getElementById('postalCode').value.trim()),
+                emailVerificationCode: sanitizeInput(document.getElementById('emailVerificationCode').value.trim()),
+                agreeTerms: document.getElementById('agreeTerms').checked
             };
             
             // Validate
@@ -767,18 +808,13 @@
                 hasError = true;
             }
             
-            if (!formData.companyEmail) {
-                document.getElementById('companyEmailError').textContent = 'Company email is required';
+            if (!formData.totalDepartments || formData.totalDepartments < 1) {
+                document.getElementById('totalDepartmentsError').textContent = 'Total departments is required';
                 hasError = true;
             }
             
-            if (!formData.industry) {
-                document.getElementById('industryError').textContent = 'Please select an industry';
-                hasError = true;
-            }
-            
-            if (!formData.companySize) {
-                document.getElementById('companySizeError').textContent = 'Please select company size';
+            if (!formData.totalEmployees || formData.totalEmployees < 1) {
+                document.getElementById('totalEmployeesError').textContent = 'Total employees is required';
                 hasError = true;
             }
             
@@ -787,13 +823,53 @@
                 hasError = true;
             }
             
+            if (!formData.taxId) {
+                document.getElementById('taxIdError').textContent = 'Tax ID is required';
+                hasError = true;
+            }
+            
+            if (!formData.registrationNumber) {
+                document.getElementById('registrationNumberError').textContent = 'Registration number is required';
+                hasError = true;
+            }
+            
+            if (!formData.country) {
+                document.getElementById('countryError').textContent = 'Country is required';
+                hasError = true;
+            }
+            
+            if (!formData.description) {
+                document.getElementById('descriptionError').textContent = 'Company description is required';
+                hasError = true;
+            }
+            
+            if (!formData.companyEmail) {
+                document.getElementById('companyEmailError').textContent = 'Company email is required';
+                hasError = true;
+            }
+            
+            if (!formData.companyPhone) {
+                document.getElementById('companyPhoneError').textContent = 'Company phone is required';
+                hasError = true;
+            }
+            
+            if (!formData.companyWebsite) {
+                document.getElementById('companyWebsiteError').textContent = 'Company website is required';
+                hasError = true;
+            }
+            
             if (!formData.adminName) {
                 document.getElementById('adminNameError').textContent = 'Your name is required';
                 hasError = true;
             }
             
+            if (!formData.jobTitle) {
+                document.getElementById('jobTitleError').textContent = 'Your job title is required';
+                hasError = true;
+            }
+            
             if (!formData.adminEmail) {
-                document.getElementById('adminEmailError').textContent = 'Your email is required';
+                document.getElementById('adminEmailError').textContent = 'Your work email is required';
                 hasError = true;
             }
             
@@ -805,7 +881,45 @@
                 hasError = true;
             }
             
-            if (!document.getElementById('agreeTerms').checked) {
+            if (!formData.confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Please confirm your password';
+                hasError = true;
+            } else if (formData.adminPassword !== formData.confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+                hasError = true;
+            }
+            
+            if (!formData.industry) {
+                document.getElementById('industryError').textContent = 'Please select an industry';
+                hasError = true;
+            }
+            
+            if (!formData.yearFounded || formData.yearFounded < 1900) {
+                document.getElementById('yearFoundedError').textContent = 'Valid year founded is required';
+                hasError = true;
+            }
+            
+            if (!formData.streetAddress) {
+                document.getElementById('streetAddressError').textContent = 'Street address is required';
+                hasError = true;
+            }
+            
+            if (!formData.city) {
+                document.getElementById('cityError').textContent = 'City is required';
+                hasError = true;
+            }
+            
+            if (!formData.postalCode) {
+                document.getElementById('postalCodeError').textContent = 'Postal code is required';
+                hasError = true;
+            }
+            
+            if (!formData.emailVerificationCode) {
+                document.getElementById('emailVerificationCodeError').textContent = 'Verification code is required';
+                hasError = true;
+            }
+            
+            if (!formData.agreeTerms) {
                 showToast('Please agree to the terms and conditions', 'error');
                 hasError = true;
             }
