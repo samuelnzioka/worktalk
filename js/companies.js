@@ -66,7 +66,34 @@ export async function getCompanyDepartments(companyId) {
  */
 export async function registerCompany(formData) {
     try {
-        const response = await companiesAPI.register(formData);
+        // Map frontend field names to backend field names
+        const backendData = {
+            name: formData.companyName,
+            industry: formData.industry,
+            description: formData.description,
+            website: formData.website,
+            companyEmail: formData.companyEmail,
+            contactName: formData.adminName,
+            contactEmail: formData.adminEmail,
+            contactPhone: formData.companyPhone,
+            adminPhone: formData.adminPhone,
+            departments: JSON.stringify(formData.departments),
+            adminPassword: formData.adminPassword,
+            confirmPassword: formData.confirmPassword,
+            emailVerificationCode: formData.emailVerificationCode,
+            // Optional fields
+            taxId: formData.taxId,
+            registrationNumber: formData.registrationNumber,
+            country: formData.country,
+            jobTitle: formData.jobTitle,
+            yearFounded: formData.yearFounded,
+            revenueRange: formData.revenueRange,
+            streetAddress: formData.streetAddress,
+            city: formData.city,
+            postalCode: formData.postalCode
+        };
+        
+        const response = await companiesAPI.register(backendData);
         return response;
     } catch (error) {
         console.error('Failed to register company:', error);

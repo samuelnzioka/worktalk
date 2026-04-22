@@ -13,28 +13,34 @@
     <link rel="stylesheet" href="/css/responsive.css">
     
     <style>
-        /* Company Registration Form Styles */
+        /* Modern Company Registration Form */
+        body {
+            background: #f8fafc;
+        }
+        
         .company-register-form {
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
         }
         
         .form-section {
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .section-title {
-            font-size: 1.25rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 1.25rem;
             padding-bottom: 0.75rem;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 1px solid #e5e7eb;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
         }
         
         .form-row {
@@ -46,7 +52,7 @@
         
         .verification-row {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.5rem;
             align-items: center;
         }
         
@@ -58,21 +64,21 @@
             white-space: nowrap;
         }
         
-        /* File Upload Styles */
+        /* File Upload */
         .file-upload {
             position: relative;
-            border: 2px dashed #cbd5e0;
-            border-radius: 8px;
-            padding: 2rem;
+            border: 1px dashed #d1d5db;
+            border-radius: 6px;
+            padding: 1.5rem;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.5);
+            background: #f9fafb;
         }
         
         .file-upload:hover {
-            border-color: #4299e1;
-            background: rgba(66, 153, 225, 0.05);
+            border-color: #3b82f6;
+            background: #eff6ff;
         }
         
         .file-upload input[type="file"] {
@@ -92,26 +98,27 @@
         }
         
         .upload-icon {
-            font-size: 2rem;
-            opacity: 0.6;
+            font-size: 1.5rem;
+            opacity: 0.5;
         }
         
         .upload-text {
             font-weight: 500;
-            color: #4a5568;
+            color: #6b7280;
+            font-size: 0.875rem;
         }
         
         .upload-hint {
-            font-size: 0.875rem;
-            color: #718096;
+            font-size: 0.75rem;
+            color: #9ca3af;
         }
         
         .file-preview {
-            margin-top: 1rem;
-            padding: 0.75rem;
-            background: rgba(66, 153, 225, 0.1);
-            border-radius: 6px;
-            border: 1px solid rgba(66, 153, 225, 0.2);
+            margin-top: 0.75rem;
+            padding: 0.5rem;
+            background: #eff6ff;
+            border-radius: 4px;
+            border: 1px solid #bfdbfe;
             display: none;
         }
         
@@ -123,16 +130,16 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.875rem;
-            color: #2b6cb0;
+            font-size: 0.8rem;
+            color: #1e40af;
         }
         
-        /* CAPTCHA Styles */
+        /* CAPTCHA */
         .captcha-container {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
             padding: 1rem;
-            background: rgba(255, 255, 255, 0.5);
+            background: #f9fafb;
             text-align: center;
         }
         
@@ -141,28 +148,28 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            color: #718096;
+            color: #9ca3af;
             font-size: 0.875rem;
         }
         
         .captcha-icon {
-            font-size: 1.25rem;
+            font-size: 1rem;
         }
         
-        /* Enhanced Button Styles */
+        /* Button */
         .btn-large {
-            padding: 1rem 2rem;
-            font-size: 1.125rem;
-            font-weight: 600;
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
         }
         
         .btn-text {
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
         }
         
         .btn-loader {
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
         }
         
         .btn:disabled .btn-text {
@@ -173,62 +180,65 @@
             opacity: 1;
         }
         
-        /* Enhanced Form Input Styles */
+        /* Form Input */
         .company-register-form .form-input {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            padding: 0.625rem 0.75rem;
+            font-size: 0.875rem;
         }
         
         .company-register-form .form-input:focus {
-            background: rgba(255, 255, 255, 0.95);
-            border-color: #4299e1;
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
-            transform: translateY(-1px);
+            background: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
         }
         
         .company-register-form .form-label {
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.375rem;
+            font-size: 0.875rem;
         }
         
         .company-register-form .form-hint {
-            font-size: 0.8rem;
-            color: #718096;
+            font-size: 0.75rem;
+            color: #6b7280;
             margin-top: 0.25rem;
-            font-style: italic;
         }
         
         .company-register-form .form-error {
-            font-size: 0.875rem;
-            color: #e53e3e;
+            font-size: 0.8rem;
+            color: #ef4444;
             margin-top: 0.25rem;
-            font-weight: 500;
+            font-weight: 400;
         }
         
         /* Department Icon Preview */
         .department-icon-preview {
-            font-size: 1.25rem;
-            padding: 0.5rem;
-            background: rgba(66, 153, 225, 0.1);
-            border-radius: 6px;
-            border: 1px solid rgba(66, 153, 225, 0.2);
+            font-size: 1rem;
+            padding: 0.375rem 0.5rem;
+            background: #eff6ff;
+            border-radius: 4px;
+            border: 1px solid #bfdbfe;
         }
         
         .department-input-row {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             margin-bottom: 0.75rem;
         }
         
         .department-input-row .remove-dept {
-            padding: 0.5rem;
+            padding: 0.375rem 0.5rem;
             min-width: auto;
         }
         
-        /* Responsive Design */
+        /* Responsive */
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -253,7 +263,7 @@
             }
         }
         
-        /* Loading States */
+        /* Loading */
         .company-register-form.loading {
             opacity: 0.6;
             pointer-events: none;
@@ -266,8 +276,8 @@
             left: 50%;
             width: 2rem;
             height: 2rem;
-            border: 2px solid #e2e8f0;
-            border-top: 2px solid #4299e1;
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #3b82f6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             transform: translate(-50%, -50%);
@@ -278,22 +288,11 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         
-        /* Success/Error States */
-        .form-section.success {
-            border-color: #48bb78;
-            background: rgba(72, 187, 120, 0.05);
-        }
-        
-        .form-section.error {
-            border-color: #e53e3e;
-            background: rgba(229, 62, 62, 0.05);
-        }
-        
-        /* Enhanced Checkbox */
+        /* Checkbox */
         .checkbox-label {
             display: flex;
             align-items: flex-start;
-            gap: 0.75rem;
+            gap: 0.5rem;
             cursor: pointer;
             font-size: 0.875rem;
             line-height: 1.5;
@@ -310,7 +309,7 @@
         }
         
         .password-wrapper .form-input {
-            padding-right: 2.75rem;
+            padding-right: 2.5rem;
         }
         
         .password-toggle {
@@ -321,8 +320,8 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #718096;
-            font-size: 1.1rem;
+            color: #9ca3af;
+            font-size: 1rem;
             padding: 0.25rem;
             line-height: 1;
             display: flex;
@@ -332,45 +331,44 @@
         }
         
         .password-toggle:hover {
-            color: #4a5568;
+            color: #6b7280;
         }
         
-        /* Password Match Indicator */
+        /* Password Match */
         .password-match {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             margin-top: 0.25rem;
             display: flex;
             align-items: center;
             gap: 0.35rem;
-            transition: all 0.3s ease;
         }
         
         .password-match.match {
-            color: #48bb78;
+            color: #10b981;
         }
         
         .password-match.no-match {
-            color: #e53e3e;
+            color: #ef4444;
         }
         
         .password-match.hidden {
             display: none;
         }
         
-        /* Terms Layout */
+        /* Terms */
         .terms-label {
             display: flex;
             align-items: flex-start;
-            gap: 0.75rem;
+            gap: 0.5rem;
             cursor: pointer;
             font-size: 0.875rem;
             line-height: 1.6;
-            color: #4a5568;
+            color: #4b5563;
         }
         
         .terms-label input[type="checkbox"] {
             margin-top: 0.25rem;
-            min-width: 1.1rem;
+            min-width: 1rem;
             flex-shrink: 0;
         }
         
@@ -379,15 +377,14 @@
         }
         
         .terms-text a {
-            color: #4299e1;
+            color: #3b82f6;
             text-decoration: underline;
-            text-decoration-color: rgba(66, 153, 225, 0.4);
-            text-underline-offset: 2px;
+            text-decoration-color: rgba(59, 130, 246, 0.3);
             transition: color 0.2s ease;
         }
         
         .terms-text a:hover {
-            color: #3182ce;
+            color: #2563eb;
         }
     </style>
 </head>
@@ -427,22 +424,6 @@
                                       placeholder="Describe your company, its mission, and what it does..." required></textarea>
                             <div class="form-hint">Brief overview of your company for verification purposes</div>
                             <div class="form-error" id="descriptionError"></div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="totalDepartments" class="form-label">Total Departments *</label>
-                                <input type="number" id="totalDepartments" name="totalDepartments" class="form-input" 
-                                       placeholder="e.g., 5" min="1" required>
-                                <div class="form-error" id="totalDepartmentsError"></div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="totalEmployees" class="form-label">Total Employees *</label>
-                                <input type="number" id="totalEmployees" name="totalEmployees" class="form-input" 
-                                       placeholder="e.g., 50" min="1" required>
-                                <div class="form-error" id="totalEmployeesError"></div>
-                            </div>
                         </div>
 
                         <div class="form-group departments-section">
@@ -511,7 +492,6 @@
                             <label for="companyEmail" class="form-label">Official Company Email *</label>
                             <input type="email" id="companyEmail" name="companyEmail" class="form-input" 
                                    placeholder="contact@yourcompany.com" required>
-                            <div class="form-hint">Must be your company domain (no Gmail/Yahoo)</div>
                             <div class="form-error" id="companyEmailError"></div>
                         </div>
 
@@ -567,7 +547,6 @@
                                 <label for="adminEmail" class="form-label">Your Work Email *</label>
                                 <input type="email" id="adminEmail" name="adminEmail" class="form-input" 
                                        placeholder="john.doe@yourcompany.com" required>
-                                <div class="form-hint">Must match company domain</div>
                                 <div class="form-error" id="adminEmailError"></div>
                             </div>
                             
@@ -609,41 +588,6 @@
                                 </div>
                                 <div class="form-error" id="confirmPasswordError"></div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Business Proof -->
-                    <div class="form-section">
-                        <h3 class="section-title">📄 Business Proof Documents</h3>
-                        
-                        <div class="form-group">
-                            <label for="businessLicense" class="form-label">Business License / Certificate of Incorporation *</label>
-                            <div class="file-upload">
-                                <input type="file" id="businessLicense" name="businessLicense" 
-                                       accept=".pdf,.jpg,.jpeg,.png" required>
-                                <label for="businessLicense" class="file-upload-label">
-                                    <span class="upload-icon">📁</span>
-                                    <span class="upload-text">Choose file or drag here</span>
-                                    <span class="upload-hint">PDF, JPG, PNG (Max 10MB)</span>
-                                </label>
-                                <div class="file-preview" id="businessLicensePreview"></div>
-                            </div>
-                            <div class="form-error" id="businessLicenseError"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="utilityBill" class="form-label">Utility Bill or Bank Statement *</label>
-                            <div class="file-upload">
-                                <input type="file" id="utilityBill" name="utilityBill" 
-                                       accept=".pdf,.jpg,.jpeg,.png" required>
-                                <label for="utilityBill" class="file-upload-label">
-                                    <span class="upload-icon">📄</span>
-                                    <span class="upload-text">Choose file or drag here</span>
-                                    <span class="upload-hint">Must show company name & address</span>
-                                </label>
-                                <div class="file-preview" id="utilityBillPreview"></div>
-                            </div>
-                            <div class="form-error" id="utilityBillError"></div>
                         </div>
                     </div>
 
@@ -744,18 +688,6 @@
                             </div>
                             <div class="form-hint">We'll send a code to your company email domain</div>
                             <div class="form-error" id="emailVerificationCodeError"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="captcha" class="form-label">Verification *</label>
-                            <div class="captcha-container">
-                                <div class="captcha-placeholder">
-                                    <span class="captcha-icon">🤖</span>
-                                    <span class="captcha-text">CAPTCHA verification</span>
-                                </div>
-                                <input type="hidden" id="captcha" name="captcha" required>
-                            </div>
-                            <div class="form-error" id="captchaError"></div>
                         </div>
 
                         <div class="form-options">
@@ -921,8 +853,6 @@
             const formData = {
                 companyName: sanitizeInput(document.getElementById('companyName').value.trim()),
                 description: sanitizeInput(document.getElementById('description').value.trim()),
-                totalDepartments: parseInt(document.getElementById('totalDepartments').value) || 0,
-                totalEmployees: parseInt(document.getElementById('totalEmployees').value) || 0,
                 departments: Array.from(departmentsList.querySelectorAll('.department-name'))
                     .map(input => sanitizeInput(input.value.trim()))
                     .filter(name => name.length > 0),
@@ -931,7 +861,7 @@
                 country: document.getElementById('country').value,
                 companyEmail: sanitizeInput(document.getElementById('companyEmail').value.trim()),
                 companyPhone: sanitizeInput(document.getElementById('companyPhone').value.trim()),
-                companyWebsite: sanitizeInput(document.getElementById('companyWebsite').value.trim()),
+                website: sanitizeInput(document.getElementById('companyWebsite').value.trim()),
                 adminName: sanitizeInput(document.getElementById('adminName').value.trim()),
                 jobTitle: document.getElementById('jobTitle').value,
                 adminEmail: sanitizeInput(document.getElementById('adminEmail').value.trim()),
@@ -953,16 +883,6 @@
             
             if (!formData.companyName) {
                 document.getElementById('companyNameError').textContent = 'Company name is required';
-                hasError = true;
-            }
-            
-            if (!formData.totalDepartments || formData.totalDepartments < 1) {
-                document.getElementById('totalDepartmentsError').textContent = 'Total departments is required';
-                hasError = true;
-            }
-            
-            if (!formData.totalEmployees || formData.totalEmployees < 1) {
-                document.getElementById('totalEmployeesError').textContent = 'Total employees is required';
                 hasError = true;
             }
             
