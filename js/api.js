@@ -3,7 +3,7 @@
  * Handles all API calls with authentication, error handling, and security
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://worktalk-backend2.onrender.com/api';
+const API_BASE_URL = 'https://worktalk-backend2.onrender.com/api';
 
 // Helper function for API calls
 export async function apiCall(endpoint, options = {}) {

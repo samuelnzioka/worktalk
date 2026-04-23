@@ -15,32 +15,130 @@
     <style>
         /* Modern Company Registration Form */
         body {
-            background: #f8fafc;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-        
+
+        /* Modern Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .logo-text {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a202c;
+            letter-spacing: -0.025em;
+        }
+
+        .logo-text span {
+            color: #667eea;
+        }
+
+        /* Modern Auth Container */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 3rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .auth-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-header p {
+            font-size: 1.125rem;
+            color: #64748b;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
         .company-register-form {
             max-width: 700px;
             margin: 0 auto;
         }
         
         .form-section {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: #ffffff;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            padding: 1.75rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
         }
-        
+
+        .form-section:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+
         .section-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid #e5e7eb;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.875rem;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
             letter-spacing: 0.025em;
             text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .form-row {
@@ -158,9 +256,31 @@
         
         /* Button */
         .btn-large {
-            padding: 0.875rem 2rem;
+            padding: 1rem 2.5rem;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 600;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-large:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-large:active {
+            transform: translateY(0);
+        }
+
+        .btn-large:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .btn-text {
@@ -844,7 +964,9 @@
 
         // Form submission
         companyRegisterForm.addEventListener('submit', async (e) => {
+            console.log('Form submit event triggered');
             e.preventDefault();
+            console.log('Default prevented');
             
             // Clear previous errors
             document.querySelectorAll('.form-error').forEach(error => error.textContent = '');
@@ -853,6 +975,8 @@
             const formData = {
                 companyName: sanitizeInput(document.getElementById('companyName').value.trim()),
                 description: sanitizeInput(document.getElementById('description').value.trim()),
+                totalDepartments: parseInt(document.getElementById('totalDepartments').value) || 0,
+                totalEmployees: parseInt(document.getElementById('totalEmployees').value) || 0,
                 departments: Array.from(departmentsList.querySelectorAll('.department-name'))
                     .map(input => sanitizeInput(input.value.trim()))
                     .filter(name => name.length > 0),
@@ -861,7 +985,7 @@
                 country: document.getElementById('country').value,
                 companyEmail: sanitizeInput(document.getElementById('companyEmail').value.trim()),
                 companyPhone: sanitizeInput(document.getElementById('companyPhone').value.trim()),
-                website: sanitizeInput(document.getElementById('companyWebsite').value.trim()),
+                companyWebsite: sanitizeInput(document.getElementById('companyWebsite').value.trim()),
                 adminName: sanitizeInput(document.getElementById('adminName').value.trim()),
                 jobTitle: document.getElementById('jobTitle').value,
                 adminEmail: sanitizeInput(document.getElementById('adminEmail').value.trim()),
@@ -885,7 +1009,17 @@
                 document.getElementById('companyNameError').textContent = 'Company name is required';
                 hasError = true;
             }
-            
+
+            if (!formData.totalDepartments || formData.totalDepartments < 1) {
+                document.getElementById('totalDepartmentsError').textContent = 'Total departments is required';
+                hasError = true;
+            }
+
+            if (!formData.totalEmployees || formData.totalEmployees < 1) {
+                document.getElementById('totalEmployeesError').textContent = 'Total employees is required';
+                hasError = true;
+            }
+
             if (formData.departments.length === 0) {
                 document.getElementById('departmentsError').textContent = 'At least one department is required';
                 hasError = true;
