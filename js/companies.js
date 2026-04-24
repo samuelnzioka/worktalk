@@ -165,3 +165,75 @@ export async function updateCompanySettings(companyId, settings) {
         throw error;
     }
 }
+
+/**
+ * Switch to public account
+ * Sets currentAccount to 'public' and uses public tokens
+ */
+export function switchToPublicAccount() {
+    localStorage.setItem('currentAccount', 'public');
+    console.log('Switched to public account');
+    // Reload to apply changes
+    window.location.reload();
+}
+
+/**
+ * Switch to company account
+ * Sets currentAccount to 'company' and uses company tokens
+ */
+export function switchToCompanyAccount() {
+    const companyUser = localStorage.getItem('companyUser');
+    if (!companyUser) {
+        console.error('No company account found');
+        return false;
+    }
+    localStorage.setItem('currentAccount', 'company');
+    console.log('Switched to company account');
+    // Reload to apply changes
+    window.location.reload();
+    return true;
+}
+
+/**
+ * Get current active account type
+ * Returns 'public', 'company', or null if not set
+ */
+export function getCurrentAccountType() {
+    return localStorage.getItem('currentAccount') || 'public';
+}
+
+/**
+ * Get current active user
+ * Returns the user object for the currently active account
+ */
+export function getCurrentUser() {
+    const currentAccount = getCurrentAccountType();
+    if (currentAccount === 'company') {
+        return JSON.parse(localStorage.getItem('companyUser') || 'null');
+    }
+    return JSON.parse(localStorage.getItem('user') || 'null');
+}
+
+/**
+ * Get current active access token
+ * Returns the access token for the currently active account
+ */
+export function getCurrentAccessToken() {
+    const currentAccount = getCurrentAccountType();
+    if (currentAccount === 'company') {
+        return localStorage.getItem('companyAccessToken');
+    }
+    return localStorage.getItem('accessToken');
+}
+
+/**
+ * Get current active refresh token
+ * Returns the refresh token for the currently active account
+ */
+export function getCurrentRefreshToken() {
+    const currentAccount = getCurrentAccountType();
+    if (currentAccount === 'company') {
+        return localStorage.getItem('companyRefreshToken');
+    }
+    return localStorage.getItem('refreshToken');
+}
