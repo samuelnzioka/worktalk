@@ -24,7 +24,7 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 1.25rem 2rem;
+            padding: 0.75rem 2rem;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
         }
 
@@ -453,6 +453,19 @@
         .password-toggle:hover {
             color: #6b7280;
         }
+
+        .password-toggle.password-visible::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 16px;
+            background: #9ca3af;
+            transform: rotate(45deg);
+            top: 50%;
+            left: 50%;
+            margin-top: -8px;
+            margin-left: -1px;
+        }
         
         /* Password Match */
         .password-match {
@@ -857,13 +870,24 @@
     </div>
 
     <script type="module">
+        console.log('Company register script loading...');
+
         import { registerCompany } from '/js/companies.js';
         import { sanitizeInput, validatePassword, getDepartmentIcon, showToast } from '/js/utils.js';
+
+        console.log('Imports loaded successfully');
 
         const companyRegisterForm = document.getElementById('companyRegisterForm');
         const registerBtn = document.getElementById('registerBtn');
         const departmentsList = document.getElementById('departmentsList');
         const addDepartmentBtn = document.getElementById('addDepartmentBtn');
+
+        console.log('Elements found:', {
+            companyRegisterForm: !!companyRegisterForm,
+            registerBtn: !!registerBtn,
+            departmentsList: !!departmentsList,
+            addDepartmentBtn: !!addDepartmentBtn
+        });
 
         // Department management
         function updateDepartmentIconPreview(input) {
@@ -921,10 +945,10 @@
                 const input = document.getElementById(targetId);
                 if (input.type === 'password') {
                     input.type = 'text';
-                    toggle.textContent = '🙈';
+                    toggle.classList.add('password-visible');
                 } else {
                     input.type = 'password';
-                    toggle.textContent = '👁️';
+                    toggle.classList.remove('password-visible');
                 }
             });
         });
@@ -975,8 +999,6 @@
             const formData = {
                 companyName: sanitizeInput(document.getElementById('companyName').value.trim()),
                 description: sanitizeInput(document.getElementById('description').value.trim()),
-                totalDepartments: parseInt(document.getElementById('totalDepartments').value) || 0,
-                totalEmployees: parseInt(document.getElementById('totalEmployees').value) || 0,
                 departments: Array.from(departmentsList.querySelectorAll('.department-name'))
                     .map(input => sanitizeInput(input.value.trim()))
                     .filter(name => name.length > 0),
@@ -1007,16 +1029,6 @@
             
             if (!formData.companyName) {
                 document.getElementById('companyNameError').textContent = 'Company name is required';
-                hasError = true;
-            }
-
-            if (!formData.totalDepartments || formData.totalDepartments < 1) {
-                document.getElementById('totalDepartmentsError').textContent = 'Total departments is required';
-                hasError = true;
-            }
-
-            if (!formData.totalEmployees || formData.totalEmployees < 1) {
-                document.getElementById('totalEmployeesError').textContent = 'Total employees is required';
                 hasError = true;
             }
 
