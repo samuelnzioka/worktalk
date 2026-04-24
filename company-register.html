@@ -932,11 +932,21 @@
             });
         }
 
-        addDepartmentBtn.addEventListener('click', addDepartmentRow);
+        if (addDepartmentBtn) {
+            addDepartmentBtn.addEventListener('click', addDepartmentRow);
+            console.log('Add Department button listener attached');
+        } else {
+            console.error('Add Department button not found!');
+        }
 
         // Initialize first department input
-        const firstDeptInput = departmentsList.querySelector('.department-name');
-        firstDeptInput.addEventListener('input', () => updateDepartmentIconPreview(firstDeptInput));
+        if (departmentsList) {
+            const firstDeptInput = departmentsList.querySelector('.department-name');
+            if (firstDeptInput) {
+                firstDeptInput.addEventListener('input', () => updateDepartmentIconPreview(firstDeptInput));
+                console.log('First department input initialized');
+            }
+        }
 
         // Password toggle (show/hide)
         document.querySelectorAll('.password-toggle').forEach(toggle => {
