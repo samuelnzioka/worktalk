@@ -511,13 +511,6 @@
         
         .terms-text a {
             color: #3b82f6;
-            text-decoration: underline;
-            text-decoration-color: rgba(59, 130, 246, 0.3);
-            transition: color 0.2s ease;
-        }
-        
-        .terms-text a:hover {
-            color: #2563eb;
         }
     </style>
 </head>
@@ -537,6 +530,15 @@
                 <div class="auth-header">
                     <h1>Register Your Company</h1>
                     <p>Create a company space on AjiraTalk for your employees</p>
+                </div>
+
+                <!-- Logged-in User Info -->
+                <div class="logged-in-user-info" id="loggedInUserInfo" style="display: none;">
+                    <div class="user-info-content">
+                        <span class="user-info-label">Registering as:</span>
+                        <span class="user-info-name" id="publicUserName"></span>
+                        <span class="user-info-email" id="publicUserEmail"></span>
+                    </div>
                 </div>
 
                 <form id="companyRegisterForm" class="auth-form company-register-form">
@@ -881,13 +883,35 @@
         const registerBtn = document.getElementById('registerBtn');
         const departmentsList = document.getElementById('departmentsList');
         const addDepartmentBtn = document.getElementById('addDepartmentBtn');
+        const loggedInUserInfo = document.getElementById('loggedInUserInfo');
+        const publicUserName = document.getElementById('publicUserName');
+        const publicUserEmail = document.getElementById('publicUserEmail');
 
         console.log('Elements found:', {
             companyRegisterForm: !!companyRegisterForm,
             registerBtn: !!registerBtn,
             departmentsList: !!departmentsList,
-            addDepartmentBtn: !!addDepartmentBtn
+            addDepartmentBtn: !!addDepartmentBtn,
+            loggedInUserInfo: !!loggedInUserInfo
         });
+
+        // Display logged-in public user info
+        function displayLoggedInUserInfo() {
+            const publicUser = JSON.parse(localStorage.getItem('user') || 'null');
+            if (publicUser && publicUser.role === 'public') {
+                publicUserName.textContent = publicUser.name;
+                publicUserEmail.textContent = `(${publicUser.email})`;
+                loggedInUserInfo.style.display = 'block';
+                console.log('Logged-in user info displayed:', publicUser);
+            } else {
+                // Redirect to login if not logged in as public user
+                console.log('No public user found, redirecting to login');
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Call on page load
+        displayLoggedInUserInfo();
 
         // Department management
         function updateDepartmentIconPreview(input) {
@@ -1017,7 +1041,7 @@
                 country: document.getElementById('country').value,
                 companyEmail: sanitizeInput(document.getElementById('companyEmail').value.trim()),
                 companyPhone: sanitizeInput(document.getElementById('companyPhone').value.trim()),
-                companyWebsite: sanitizeInput(document.getElementById('companyWebsite').value.trim()),
+                website: sanitizeInput(document.getElementById('companyWebsite').value.trim()),
                 adminName: sanitizeInput(document.getElementById('adminName').value.trim()),
                 jobTitle: document.getElementById('jobTitle').value,
                 adminEmail: sanitizeInput(document.getElementById('adminEmail').value.trim()),
@@ -1158,16 +1182,19 @@
                 const result = await registerCompany(formData);
                 
                 if (result.success) {
-                    // Store authentication tokens if provided
+                    // Store company admin tokens separately (keep public tokens intact)
                     if (result.accessToken) {
-                        localStorage.setItem('accessToken', result.accessToken);
+                        localStorage.setItem('companyAccessToken', result.accessToken);
                     }
                     if (result.refreshToken) {
-                        localStorage.setItem('refreshToken', result.refreshToken);
+                        localStorage.setItem('companyRefreshToken', result.refreshToken);
                     }
                     if (result.user) {
-                        localStorage.setItem('user', JSON.stringify(result.user));
+                        localStorage.setItem('companyUser', JSON.stringify(result.user));
                     }
+                    
+                    // Switch to company account
+                    localStorage.setItem('currentAccount', 'company');
                     
                     showToast('Company registered successfully! Redirecting...', 'success');
                     setTimeout(() => {
