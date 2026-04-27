@@ -817,10 +817,13 @@
   /* ── Lottie — Canvas renderer for blend mode support ─── */
   const anim = lottie.loadAnimation({
     container:  document.getElementById('lottie-anim'),
-    renderer:   'canvas',        // ← canvas handles bm:3 (Multiply) & bm:5 (Screen) correctly
+    renderer:   'svg',
     loop:       false,
     autoplay:   false,
-    path:       'json/computer_use_animation.json'
+    path:       'json/computer_use_animation.json',
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
   });
 
   const animEl  = document.getElementById('lottie-anim');
