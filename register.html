@@ -126,27 +126,54 @@
       padding-top: 64px; /* Account for fixed header */
     }
 
-    /* ─── LEFT — Form Panel ───────────────────────────────── */
+    /* ─── LEFT — Animation Panel ──────────────────────────── */
     .panel-left {
-      flex: 0 0 460px;
+      flex: 1 1 52%;
       background: var(--panel-l);
       display: flex;
       flex-direction: column;
-      padding: 52px 52px;
-      border-left: 1px solid var(--border);
+      align-items: center;
+      justify-content: center;
       position: relative;
       overflow: hidden;
+      padding: 60px 48px 48px;
     }
 
+    /* grid texture */
+    .panel-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(201,153,58,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,153,58,0.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+    }
+
+    /* radial glow */
     .panel-left::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 1px;
-      background: linear-gradient(180deg, transparent, var(--gold), transparent);
-      opacity: 0.35;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 560px;
+      height: 560px;
+      background: radial-gradient(circle, rgba(201,153,58,0.09) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .left-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
     }
 
     .form-box {
@@ -419,54 +446,27 @@
     .btn-social:hover { border-color: rgba(201,153,58,0.45); background: var(--gold-dim); }
     .btn-social svg { width: 17px; height: 17px; flex-shrink: 0; }
 
-    /* ─── RIGHT — Animation Panel ─────────────────────────── */
+    /* ─── RIGHT — Form Panel ──────────────────────────────── */
     .panel-right {
-      flex: 1 1 auto;
+      flex: 0 0 460px;
       background: var(--panel-r);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      padding: 52px 52px;
+      border-left: 1px solid var(--border);
       position: relative;
       overflow: hidden;
-      padding: 60px 48px 40px;
     }
 
-    /* grid texture */
-    .panel-right::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(201,153,58,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(201,153,58,0.04) 1px, transparent 1px);
-      background-size: 36px 36px;
-      pointer-events: none;
-    }
-
-    /* radial glow */
     .panel-right::after {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 560px;
-      height: 560px;
-      background: radial-gradient(circle, rgba(201,153,58,0.09) 0%, transparent 68%);
-      pointer-events: none;
-    }
-
-    .right-content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      width: 100%;
-      max-width: 520px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, var(--gold), transparent);
+      opacity: 0.35;
     }
 
     /* Lottie loader overlay */
@@ -474,10 +474,10 @@
       position: relative;
       width: 100%;
       max-width: 480px;
-      aspect-ratio: 1 / 1;
       flex: 1;
       margin: 0 auto 24px;
       animation: fadeUp 0.9s ease 0.3s both;
+      filter: drop-shadow(0 8px 32px rgba(201,153,58,0.18));
     }
 
     .lottie-loader {
@@ -564,21 +564,6 @@
       border-color: rgba(232,162,58,0.25);
       animation-delay: 2.4s;
       animation-duration: 6.5s;
-    }
-    .bubble:nth-child(4) {
-      top: 68%; right: 8%;
-      background: rgba(100,149,237,0.10);
-      color: #7ba4e8;
-      border-color: rgba(100,149,237,0.25);
-      animation-delay: 0.8s;
-      animation-duration: 7.5s;
-    }
-    .bubble:nth-child(5) {
-      top: 85%; left: 18%;
-      background: rgba(201,153,58,0.10);
-      color: var(--gold-lite);
-      animation-delay: 1.8s;
-      animation-duration: 8.5s;
     }
 
     @keyframes floatBubble {
@@ -683,13 +668,13 @@
     @media (max-width: 960px) {
       .shell { flex-direction: column; }
 
-      .panel-right {
+      .panel-left {
         flex: none;
         padding: 48px 24px 40px;
         min-height: 50vh;
       }
 
-      .panel-left {
+      .panel-right {
         flex: none;
         border-left: none;
         border-top: 1px solid var(--border);
@@ -702,7 +687,7 @@
     @media (max-width: 480px) {
       .row-2 { grid-template-columns: 1fr; }
       .socials { flex-direction: column; }
-      .panel-left { padding: 40px 20px 48px; }
+      .panel-right { padding: 40px 20px 48px; }
       .global-header { padding: 0 16px; }
       .header-links { gap: 12px; }
       .header-links a { font-size: 0.75rem; }
@@ -730,8 +715,8 @@
 <div class="shell">
 
   <!-- ════════ LEFT — Animation ════════ -->
-  <div class="panel-right">
-    <div class="right-content">
+  <div class="panel-left">
+    <div class="left-content">
 
       <div class="lottie-wrap">
         <div id="lottie-anim"></div>
@@ -739,8 +724,6 @@
           <span class="bubble">Name</span>
           <span class="bubble">Email</span>
           <span class="bubble">Password</span>
-          <span class="bubble">Company</span>
-          <span class="bubble">Department</span>
         </div>
       </div>
 
@@ -753,10 +736,10 @@
       </div>
 
     </div>
-  </div><!-- /panel-right -->
+  </div><!-- /panel-left -->
 
   <!-- ════════ RIGHT — Form ════════ -->
-  <div class="panel-left">
+  <div class="panel-right">
 
     <div class="form-box">
 
@@ -868,7 +851,7 @@
       </div>
 
     </div>
-  </div><!-- /panel-left -->
+  </div><!-- /panel-right -->
 
 </div><!-- /shell -->
 
