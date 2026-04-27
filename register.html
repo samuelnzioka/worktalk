@@ -517,6 +517,77 @@
 
     #lottie-anim.visible { opacity: 1; }
 
+    /* ─── Floating Bubbles ────────────────────────────────── */
+    .bubbles-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(201,153,58,0.25);
+      animation: floatBubble 6s ease-in-out infinite;
+      opacity: 0;
+    }
+
+    .bubble.visible { opacity: 1; }
+
+    .bubble:nth-child(1) {
+      top: 12%; left: 8%;
+      background: rgba(201,153,58,0.12);
+      color: var(--gold-lite);
+      animation-delay: 0s;
+      animation-duration: 7s;
+    }
+    .bubble:nth-child(2) {
+      top: 28%; right: 10%;
+      background: rgba(76,175,125,0.10);
+      color: #7dd4a0;
+      border-color: rgba(76,175,125,0.25);
+      animation-delay: 1.2s;
+      animation-duration: 8s;
+    }
+    .bubble:nth-child(3) {
+      top: 50%; left: 5%;
+      background: rgba(232,162,58,0.10);
+      color: #e8b84b;
+      border-color: rgba(232,162,58,0.25);
+      animation-delay: 2.4s;
+      animation-duration: 6.5s;
+    }
+    .bubble:nth-child(4) {
+      top: 68%; right: 8%;
+      background: rgba(100,149,237,0.10);
+      color: #7ba4e8;
+      border-color: rgba(100,149,237,0.25);
+      animation-delay: 0.8s;
+      animation-duration: 7.5s;
+    }
+    .bubble:nth-child(5) {
+      top: 85%; left: 18%;
+      background: rgba(201,153,58,0.10);
+      color: var(--gold-lite);
+      animation-delay: 1.8s;
+      animation-duration: 8.5s;
+    }
+
+    @keyframes floatBubble {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25%      { transform: translateY(-14px) translateX(8px); }
+      50%      { transform: translateY(-6px) translateX(-6px); }
+      75%      { transform: translateY(-18px) translateX(4px); }
+    }
+
     .tagline {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.15rem;
@@ -664,6 +735,13 @@
 
       <div class="lottie-wrap">
         <div id="lottie-anim"></div>
+        <div class="bubbles-layer">
+          <span class="bubble">Name</span>
+          <span class="bubble">Email</span>
+          <span class="bubble">Password</span>
+          <span class="bubble">Company</span>
+          <span class="bubble">Department</span>
+        </div>
       </div>
 
       <h2 class="tagline">
@@ -801,7 +879,7 @@
     renderer:   'canvas',        // ← canvas handles bm:3 (Multiply) & bm:5 (Screen) correctly
     loop:       false,
     autoplay:   false,
-    path:       'json/Sample_Animation.json'
+    path:       'json/computer_use_animation.json'
   });
 
   const animEl  = document.getElementById('lottie-anim');
@@ -832,6 +910,10 @@
   anim.addEventListener('data_ready', () => {
     animEl.classList.add('visible');
     playIdle();
+    // Show floating bubbles after animation loads
+    document.querySelectorAll('.bubble').forEach((b, i) => {
+      setTimeout(() => b.classList.add('visible'), 300 + i * 200);
+    });
   });
 
   /* ── Password visibility toggles ─────────────────────── */
