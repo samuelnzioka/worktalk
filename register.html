@@ -97,7 +97,6 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
-      padding: 60px 48px 48px;
     }
 
     /* grid texture */
@@ -431,10 +430,10 @@
 
     /* Lottie loader overlay */
     .lottie-wrap {
-      position: relative;
+      position: absolute;
+      inset: 0;
       width: 100%;
-      flex: 1;
-      margin: 0 auto 24px;
+      height: 100%;
       animation: fadeUp 0.9s ease 0.3s both;
       filter: drop-shadow(0 8px 32px rgba(201,153,58,0.18));
     }
@@ -533,12 +532,17 @@
     }
 
     .tagline {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.15rem;
       font-weight: 300;
       line-height: 1.35;
       letter-spacing: 0.01em;
-      margin-top: auto;
+      color: var(--text);
+      z-index: 4;
       animation: fadeUp 0.9s ease 0.45s both;
     }
 
@@ -554,7 +558,11 @@
     }
 
     .back-home {
-      margin-top: 20px;
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
       animation: fadeUp 0.9s ease 0.75s both;
     }
 
