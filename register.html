@@ -44,35 +44,16 @@
       color: var(--text);
     }
 
-    /* ─── Global Header ─────────────────────────────────── */
-    .global-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      background: rgba(90, 98, 104, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-    }
-
-    .header-content {
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
+    /* ─── Brand (inside left panel) ──────────────────────── */
     .brand {
+      position: absolute;
+      top: 44px;
+      left: 60px;
       display: flex;
       align-items: center;
       gap: 10px;
+      z-index: 2;
+      animation: fadeDown 0.6s ease both;
     }
 
     .brand-icon {
@@ -88,11 +69,7 @@
     .brand-icon svg {
       width: 16px;
       height: 16px;
-      fill: none;
-      stroke: var(--gold);
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      fill: var(--gold);
     }
 
     .brand-name {
@@ -100,22 +77,7 @@
       font-size: 1.25rem;
       font-weight: 600;
       letter-spacing: 0.04em;
-    }
-
-    .header-links {
-      display: flex;
-      gap: 20px;
-    }
-
-    .header-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-      transition: color 0.2s;
-    }
-
-    .header-links a:hover {
-      color: var(--gold-lite);
+      color: var(--text);
     }
 
     /* ─── Layout ─────────────────────────────────────────── */
@@ -123,7 +85,6 @@
       display: flex;
       min-height: 100vh;
       width: 100vw;
-      padding-top: 64px; /* Account for fixed header */
     }
 
     /* ─── LEFT — Animation Panel ──────────────────────────── */
@@ -473,7 +434,6 @@
     .lottie-wrap {
       position: relative;
       width: 100%;
-      max-width: 480px;
       flex: 1;
       margin: 0 auto 24px;
       animation: fadeUp 0.9s ease 0.3s both;
@@ -688,34 +648,24 @@
       .row-2 { grid-template-columns: 1fr; }
       .socials { flex-direction: column; }
       .panel-right { padding: 40px 20px 48px; }
-      .global-header { padding: 0 16px; }
-      .header-links { gap: 12px; }
-      .header-links a { font-size: 0.75rem; }
+      .brand { top: 28px; left: 28px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ════════ GLOBAL HEADER (Brand at top left corner) ════════ -->
-<header class="global-header">
-  <div class="header-content">
+<div class="shell">
+
+  <!-- ════════ LEFT — Animation ════════ -->
+  <div class="panel-left">
+
     <div class="brand">
       <div class="brand-icon">
         <svg viewBox="0 0 16 16"><path d="M2 3h12v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3zm4 9v2m4-2v2M5 14h6"/></svg>
       </div>
       <span class="brand-name">AjiraTalk</span>
     </div>
-    <div class="header-links">
-      <a href="companies.html">Companies</a>
-      <a href="public-timeline.html">Public Timeline</a>
-    </div>
-  </div>
-</header>
 
-<div class="shell">
-
-  <!-- ════════ LEFT — Animation ════════ -->
-  <div class="panel-left">
     <div class="left-content">
 
       <div class="lottie-wrap">
@@ -728,7 +678,7 @@
       </div>
 
       <h2 class="tagline">
-        Where teams<br><em>connect &</em> thrive
+        Where employees<br><em>speak &</em> thrive
       </h2>
 
       <div class="back-home">
