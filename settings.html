@@ -451,6 +451,105 @@
             font-size: 13px;
         }
 
+        /* Avatar Crop Modal */
+        .avatar-crop-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .avatar-crop-modal.show {
+            display: flex;
+        }
+
+        .avatar-crop-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .avatar-crop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar-crop-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .avatar-crop-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .avatar-crop-area {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+            border: 3px solid var(--primary);
+            cursor: move;
+        }
+
+        .avatar-crop-image {
+            position: absolute;
+            max-width: none;
+            transform-origin: center center;
+        }
+
+        .avatar-crop-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .avatar-crop-slider {
+            width: 100%;
+        }
+
+        .avatar-crop-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .avatar-crop-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .avatar-crop-cancel {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .avatar-crop-save {
+            background: var(--primary);
+            color: white;
+        }
+
         /* Toast */
         .toast-container {
             position: fixed;
@@ -758,12 +857,19 @@
                         <p>Update your personal information and how others see you</p>
                     </div>
                     <div class="panel-body">
-                        <div class="avatar-section">
+                        <div class="avatar-section" id="avatarSection">
                             <div class="avatar-preview" id="avatarPreview">👤</div>
                             <div>
                                 <button class="avatar-upload-btn" id="uploadAvatarBtn">Change Avatar</button>
                                 <input type="file" id="avatarInput" accept="image/*" style="display: none;">
                                 <p class="form-hint">JPG, PNG or GIF. Max 2MB.</p>
+                            </div>
+                        </div>
+                        <div class="avatar-section" id="employeeAvatarSection" style="display: none;">
+                            <div class="avatar-preview" id="employeeAvatarPreview">👤</div>
+                            <div>
+                                <p class="form-hint" style="margin-bottom: 4px;">Employee profiles use your assigned color name.</p>
+                                <p class="form-hint">Contact your company admin to change your color assignment.</p>
                             </div>
                         </div>
 
@@ -1544,15 +1650,20 @@
         async function loadUserSettings() {
             try {
                 const token = localStorage.getItem('accessToken');
+                console.log('Loading settings with token:', token ? 'present' : 'missing');
                 const response = await fetch(`${API_BASE_URL}/settings/user`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
+                console.log('Settings load response status:', response.status);
+                
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Settings loaded from backend:', data);
                     currentSettings = data.settings;
                     applySettingsToUI();
                 } else {
+                    console.log('Settings load failed, using defaults');
                     // Use default settings
                     currentSettings = getDefaultSettings();
                     applySettingsToUI();
@@ -1587,9 +1698,37 @@
                 document.getElementById('profileUsername').value = activeProfile.username || '';
                 document.getElementById('profileBio').value = activeProfile.bio || '';
                 
+                // Check if user is an employee - hide avatar upload
+                const avatarSection = document.getElementById('avatarSection');
+                const employeeAvatarSection = document.getElementById('employeeAvatarSection');
                 const avatarPreview = document.getElementById('avatarPreview');
+                const employeeAvatarPreview = document.getElementById('employeeAvatarPreview');
+                
                 const initial = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : '👤';
-                avatarPreview.textContent = initial;
+                
+                if (activeProfile.type === 'employee') {
+                    // Employee - show color name message, hide upload
+                    avatarSection.style.display = 'none';
+                    employeeAvatarSection.style.display = 'flex';
+                    
+                    // Show color name as avatar
+                    const colorName = activeProfile.colorUsername || initial;
+                    employeeAvatarPreview.textContent = colorName;
+                    employeeAvatarPreview.style.backgroundImage = '';
+                } else {
+                    // Public or company admin - show avatar upload
+                    avatarSection.style.display = 'flex';
+                    employeeAvatarSection.style.display = 'none';
+                    
+                    avatarPreview.textContent = initial;
+                    avatarPreview.style.backgroundImage = '';
+                    
+                    // Show existing avatar if available
+                    if (currentUser.avatar) {
+                        avatarPreview.style.backgroundImage = `url(${currentUser.avatar})`;
+                        avatarPreview.textContent = '';
+                    }
+                }
             }
         }
         
@@ -1723,17 +1862,27 @@
                     });
                 });
                 
+                console.log('Settings save response status:', response?.status);
+                
                 if (response && response.ok) {
                     try {
                         const data = await response.json();
+                        console.log('Settings save response data:', data);
                         if (data.settings) currentSettings = data.settings;
                     } catch (e) {
-                        // Response OK but body not JSON - save still succeeded
+                        console.log('Response OK but body not JSON:', e);
                     }
                     showToast('Settings saved successfully!', 'success');
                     return true;
                 } else {
-                    showToast('Failed to save settings', 'error');
+                    console.error('Settings save failed, response not ok');
+                    try {
+                        const errorData = await response.json();
+                        console.error('Error data:', errorData);
+                        showToast(errorData.message || 'Failed to save settings', 'error');
+                    } catch (e) {
+                        showToast('Failed to save settings', 'error');
+                    }
                     return false;
                 }
             } catch (error) {
@@ -1765,15 +1914,25 @@
                     });
                 });
                 
+                console.log('Profile save response status:', response?.status);
+                
                 if (response && response.ok) {
                     const data = await response.json();
+                    console.log('Profile save response data:', data);
                     if (data.user) {
                         localStorage.setItem('user', JSON.stringify(data.user));
                         currentUser = data.user;
                     }
                     showToast('Profile updated successfully!', 'success');
                 } else {
-                    showToast('Failed to update profile', 'error');
+                    console.error('Profile save failed, response not ok');
+                    try {
+                        const errorData = await response.json();
+                        console.error('Error data:', errorData);
+                        showToast(errorData.message || 'Failed to update profile', 'error');
+                    } catch (e) {
+                        showToast('Failed to update profile', 'error');
+                    }
                 }
             } catch (error) {
                 console.error('Error updating profile:', error);
@@ -1984,11 +2143,11 @@
             document.getElementById('uploadAvatarBtn').addEventListener('click', () => {
                 document.getElementById('avatarInput').click();
             });
-            document.getElementById('avatarInput').addEventListener('change', async (e) => {
+            document.getElementById('avatarInput').addEventListener('change', (e) => {
                 if (e.target.files && e.target.files[0]) {
                     const file = e.target.files[0];
                     
-                    // Validate file size (max 5MB before compression)
+                    // Validate file size (max 5MB)
                     if (file.size > 5 * 1024 * 1024) {
                         showToast('File too large. Max 5MB allowed.', 'error');
                         return;
@@ -2000,105 +2159,17 @@
                         return;
                     }
                     
-                    // Compress image
-                    const compressedBase64 = await compressImage(file);
-                    if (!compressedBase64) {
-                        showToast('Failed to process image. Please try another.', 'error');
-                        return;
-                    }
-                    
-                    // Update preview
-                    avatarPreview.style.backgroundImage = `url(${compressedBase64})`;
-                    avatarPreview.textContent = '';
-                    
-                    // Upload to server
-                    try {
-                        const token = localStorage.getItem('accessToken');
-                        const response = await fetch('https://worktalk-backend2.onrender.com/api/users/profile', {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`
-                            },
-                            body: JSON.stringify({ avatar: compressedBase64 })
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (response.ok && data.success) {
-                            showToast('Avatar updated successfully!', 'success');
-                            
-                            // Update localStorage user data
-                            const userStr = localStorage.getItem('user');
-                            if (userStr) {
-                                const user = JSON.parse(userStr);
-                                user.avatar = compressedBase64;
-                                localStorage.setItem('user', JSON.stringify(user));
-                            }
-                        } else {
-                            showToast(data.message || data.error || 'Failed to update avatar', 'error');
-                            // Revert preview on error
-                            avatarPreview.style.backgroundImage = '';
-                            avatarPreview.textContent = initial;
-                        }
-                    } catch (error) {
-                        console.error('Avatar upload error:', error);
-                        showToast('Failed to upload avatar. Please try again.', 'error');
-                        // Revert preview on error
-                        avatarPreview.style.backgroundImage = '';
-                        avatarPreview.textContent = initial;
-                    }
+                    // Read file and open crop modal
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        openAvatarCropModal(event.target.result);
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
             
-            // Compress image using canvas
-            async function compressImage(file) {
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            
-                            // Calculate dimensions (max 200x200 for avatar)
-                            const maxSize = 200;
-                            let width = img.width;
-                            let height = img.height;
-                            
-                            if (width > height) {
-                                if (width > maxSize) {
-                                    height *= maxSize / width;
-                                    width = maxSize;
-                                }
-                            } else {
-                                if (height > maxSize) {
-                                    width *= maxSize / height;
-                                    height = maxSize;
-                                }
-                            }
-                            
-                            canvas.width = width;
-                            canvas.height = height;
-                            
-                            // Draw and compress
-                            ctx.drawImage(img, 0, 0, width, height);
-                            
-                            // Compress to JPEG with 0.7 quality
-                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                            resolve(compressedDataUrl);
-                        };
-                        img.onerror = () => {
-                            resolve(null);
-                        };
-                        img.src = event.target.result;
-                    };
-                    reader.onerror = () => {
-                        resolve(null);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
+            // Initialize crop modal
+            setupCropModal();
         }
         
         function showToast(message, type = 'info') {
@@ -2516,6 +2587,222 @@
                 document.querySelector('.settings-container').style.paddingTop = '16px';
             }
         })();
+
+        // ==================== AVATAR CROP MODAL ====================
+        let cropState = {
+            image: null,
+            scale: 1,
+            offsetX: 0,
+            offsetY: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0
+        };
+
+        function openAvatarCropModal(imageSrc) {
+            const modal = document.getElementById('avatarCropModal');
+            const cropImage = document.getElementById('cropImage');
+            const cropArea = document.getElementById('cropArea');
+            const zoomSlider = document.getElementById('avatarZoomSlider');
+
+            cropImage.src = imageSrc;
+            cropImage.onload = () => {
+                // Reset crop state
+                cropState = {
+                    image: cropImage,
+                    scale: 1,
+                    offsetX: 0,
+                    offsetY: 0,
+                    isDragging: false,
+                    startX: 0,
+                    startY: 0
+                };
+
+                // Center image
+                const areaSize = 200;
+                const imgRatio = cropImage.naturalWidth / cropImage.naturalHeight;
+                if (imgRatio > 1) {
+                    cropState.scale = areaSize / cropImage.naturalHeight;
+                } else {
+                    cropState.scale = areaSize / cropImage.naturalWidth;
+                }
+
+                cropState.offsetX = (areaSize - cropImage.naturalWidth * cropState.scale) / 2;
+                cropState.offsetY = (areaSize - cropImage.naturalHeight * cropState.scale) / 2;
+
+                zoomSlider.value = cropState.scale;
+                updateCropImage();
+            };
+
+            modal.classList.add('show');
+        }
+
+        function closeAvatarCropModal() {
+            document.getElementById('avatarCropModal').classList.remove('show');
+        }
+
+        function updateCropImage() {
+            const cropImage = document.getElementById('cropImage');
+            cropImage.style.transform = `translate(${cropState.offsetX}px, ${cropState.offsetY}px) scale(${cropState.scale})`;
+        }
+
+        function setupCropModal() {
+            const cropArea = document.getElementById('cropArea');
+            const zoomSlider = document.getElementById('avatarZoomSlider');
+            const saveBtn = document.getElementById('avatarCropSave');
+            const cancelBtn = document.getElementById('avatarCropCancel');
+            const closeBtn = document.getElementById('avatarCropClose');
+
+            // Drag functionality
+            cropArea.addEventListener('mousedown', (e) => {
+                cropState.isDragging = true;
+                cropState.startX = e.clientX - cropState.offsetX;
+                cropState.startY = e.clientY - cropState.offsetY;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!cropState.isDragging) return;
+                cropState.offsetX = e.clientX - cropState.startX;
+                cropState.offsetY = e.clientY - cropState.startY;
+                updateCropImage();
+            });
+
+            document.addEventListener('mouseup', () => {
+                cropState.isDragging = false;
+            });
+
+            // Touch support
+            cropArea.addEventListener('touchstart', (e) => {
+                cropState.isDragging = true;
+                const touch = e.touches[0];
+                cropState.startX = touch.clientX - cropState.offsetX;
+                cropState.startY = touch.clientY - cropState.offsetY;
+                e.preventDefault();
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!cropState.isDragging) return;
+                const touch = e.touches[0];
+                cropState.offsetX = touch.clientX - cropState.startX;
+                cropState.offsetY = touch.clientY - cropState.startY;
+                updateCropImage();
+            });
+
+            document.addEventListener('touchend', () => {
+                cropState.isDragging = false;
+            });
+
+            // Zoom slider
+            zoomSlider.addEventListener('input', (e) => {
+                cropState.scale = parseFloat(e.target.value);
+                updateCropImage();
+            });
+
+            // Close buttons
+            closeBtn.addEventListener('click', closeAvatarCropModal);
+            cancelBtn.addEventListener('click', closeAvatarCropModal);
+
+            // Save button - crop and upload
+            saveBtn.addEventListener('click', async () => {
+                const croppedBase64 = cropAndCompressImage();
+                if (croppedBase64) {
+                    await uploadCroppedAvatar(croppedBase64);
+                }
+                closeAvatarCropModal();
+            });
+        }
+
+        function cropAndCompressImage() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const size = 200;
+
+            canvas.width = size;
+            canvas.height = size;
+
+            // Draw circular clip
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            ctx.clip();
+
+            // Draw image with current transform
+            const cropImage = document.getElementById('cropImage');
+            ctx.drawImage(
+                cropImage,
+                cropState.offsetX,
+                cropState.offsetY,
+                cropImage.naturalWidth * cropState.scale,
+                cropImage.naturalHeight * cropState.scale
+            );
+
+            return canvas.toDataURL('image/jpeg', 0.8);
+        }
+
+        async function uploadCroppedAvatar(base64Avatar) {
+            // Update preview
+            avatarPreview.style.backgroundImage = `url(${base64Avatar})`;
+            avatarPreview.textContent = '';
+
+            // Upload to server
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch('https://worktalk-backend2.onrender.com/api/users/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ avatar: base64Avatar })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showToast('Avatar updated successfully!', 'success');
+
+                    // Update localStorage user data
+                    const userStr = localStorage.getItem('user');
+                    if (userStr) {
+                        const user = JSON.parse(userStr);
+                        user.avatar = base64Avatar;
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
+                } else {
+                    showToast(data.message || data.error || 'Failed to update avatar', 'error');
+                    // Revert preview on error
+                    avatarPreview.style.backgroundImage = '';
+                    avatarPreview.textContent = initial;
+                }
+            } catch (error) {
+                console.error('Avatar upload error:', error);
+                showToast('Failed to upload avatar. Please try again.', 'error');
+                // Revert preview on error
+                avatarPreview.style.backgroundImage = '';
+                avatarPreview.textContent = initial;
+            }
+        }
     </script>
+
+    <!-- Avatar Crop Modal -->
+    <div class="avatar-crop-modal" id="avatarCropModal">
+        <div class="avatar-crop-content">
+            <div class="avatar-crop-header">
+                <h3>Position Your Avatar</h3>
+                <button class="avatar-crop-close" id="avatarCropClose">×</button>
+            </div>
+            <div class="avatar-crop-area" id="cropArea">
+                <img class="avatar-crop-image" id="cropImage" alt="Crop preview">
+            </div>
+            <div class="avatar-crop-controls">
+                <label style="font-size: 13px; color: var(--text-secondary);">Zoom</label>
+                <input type="range" class="avatar-crop-slider" id="avatarZoomSlider" min="0.5" max="3" step="0.1" value="1">
+            </div>
+            <div class="avatar-crop-actions">
+                <button class="avatar-crop-cancel" id="avatarCropCancel">Cancel</button>
+                <button class="avatar-crop-save" id="avatarCropSave">Save</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
