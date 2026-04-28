@@ -1988,9 +1988,9 @@
                 if (e.target.files && e.target.files[0]) {
                     const file = e.target.files[0];
                     
-                    // Validate file size (max 2MB)
-                    if (file.size > 2 * 1024 * 1024) {
-                        showToast('File too large. Max 2MB allowed.', 'error');
+                    // Validate file size (max 5MB before compression)
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('File too large. Max 5MB allowed.', 'error');
                         return;
                     }
                     
@@ -2000,56 +2000,105 @@
                         return;
                     }
                     
-                    // Convert to base64
-                    const reader = new FileReader();
-                    reader.onload = async (event) => {
-                        const base64Avatar = event.target.result;
+                    // Compress image
+                    const compressedBase64 = await compressImage(file);
+                    if (!compressedBase64) {
+                        showToast('Failed to process image. Please try another.', 'error');
+                        return;
+                    }
+                    
+                    // Update preview
+                    avatarPreview.style.backgroundImage = `url(${compressedBase64})`;
+                    avatarPreview.textContent = '';
+                    
+                    // Upload to server
+                    try {
+                        const token = localStorage.getItem('accessToken');
+                        const response = await fetch('https://worktalk-backend2.onrender.com/api/users/profile', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ avatar: compressedBase64 })
+                        });
                         
-                        // Update preview
-                        avatarPreview.style.backgroundImage = `url(${base64Avatar})`;
-                        avatarPreview.textContent = '';
+                        const data = await response.json();
                         
-                        // Upload to server
-                        try {
-                            const token = localStorage.getItem('accessToken');
-                            const response = await fetch('https://worktalk-backend2.onrender.com/api/users/profile', {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${token}`
-                                },
-                                body: JSON.stringify({ avatar: base64Avatar })
-                            });
+                        if (response.ok && data.success) {
+                            showToast('Avatar updated successfully!', 'success');
                             
-                            const data = await response.json();
-                            
-                            if (response.ok && data.success) {
-                                showToast('Avatar updated successfully!', 'success');
-                                
-                                // Update localStorage user data
-                                const userStr = localStorage.getItem('user');
-                                if (userStr) {
-                                    const user = JSON.parse(userStr);
-                                    user.avatar = base64Avatar;
-                                    localStorage.setItem('user', JSON.stringify(user));
-                                }
-                            } else {
-                                showToast(data.message || 'Failed to update avatar', 'error');
-                                // Revert preview on error
-                                avatarPreview.style.backgroundImage = '';
-                                avatarPreview.textContent = initial;
+                            // Update localStorage user data
+                            const userStr = localStorage.getItem('user');
+                            if (userStr) {
+                                const user = JSON.parse(userStr);
+                                user.avatar = compressedBase64;
+                                localStorage.setItem('user', JSON.stringify(user));
                             }
-                        } catch (error) {
-                            console.error('Avatar upload error:', error);
-                            showToast('Failed to upload avatar. Please try again.', 'error');
+                        } else {
+                            showToast(data.message || data.error || 'Failed to update avatar', 'error');
                             // Revert preview on error
                             avatarPreview.style.backgroundImage = '';
                             avatarPreview.textContent = initial;
                         }
-                    };
-                    reader.readAsDataURL(file);
+                    } catch (error) {
+                        console.error('Avatar upload error:', error);
+                        showToast('Failed to upload avatar. Please try again.', 'error');
+                        // Revert preview on error
+                        avatarPreview.style.backgroundImage = '';
+                        avatarPreview.textContent = initial;
+                    }
                 }
             });
+            
+            // Compress image using canvas
+            async function compressImage(file) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            // Calculate dimensions (max 200x200 for avatar)
+                            const maxSize = 200;
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            if (width > height) {
+                                if (width > maxSize) {
+                                    height *= maxSize / width;
+                                    width = maxSize;
+                                }
+                            } else {
+                                if (height > maxSize) {
+                                    width *= maxSize / height;
+                                    height = maxSize;
+                                }
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            
+                            // Draw and compress
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // Compress to JPEG with 0.7 quality
+                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                            resolve(compressedDataUrl);
+                        };
+                        img.onerror = () => {
+                            resolve(null);
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.onerror = () => {
+                        resolve(null);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
         }
         
         function showToast(message, type = 'info') {
