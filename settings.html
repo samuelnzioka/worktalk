@@ -1661,18 +1661,27 @@
                     const data = await response.json();
                     console.log('Settings loaded from backend:', data);
                     currentSettings = data.settings;
-                    applySettingsToUI();
                 } else {
                     console.log('Settings load failed, using defaults');
-                    // Use default settings
+                    // Use default settings but preserve theme from localStorage
+                    const savedTheme = localStorage.getItem('theme');
                     currentSettings = getDefaultSettings();
-                    applySettingsToUI();
+                    if (savedTheme) {
+                        currentSettings.appearance.theme = savedTheme;
+                    }
                 }
             } catch (error) {
                 console.error('Error loading settings:', error);
+                // Use default settings but preserve theme from localStorage
+                const savedTheme = localStorage.getItem('theme');
                 currentSettings = getDefaultSettings();
-                applySettingsToUI();
+                if (savedTheme) {
+                    currentSettings.appearance.theme = savedTheme;
+                }
             }
+            
+            // Always apply settings to UI after loading
+            applySettingsToUI();
         }
         
         function getDefaultSettings() {
