@@ -164,7 +164,7 @@
     </div>
 
     <script type="module">
-        import { isAuthenticated, getCurrentUser } from '/js/auth.js';
+        import { isAuthenticated, getCurrentUser, switchToPublic, getAvailableAccounts } from '/js/auth.js';
         import { 
             getCompanyStats, getEmployees, getInvites, getDepartments, getFlaggedContent,
             generateInvite, revokeInvite, removeEmployee, addDepartment, updateDepartment,
@@ -208,29 +208,62 @@
             if (currentUser) {
                 const activeProfile = currentUser.activeProfile || currentUser.profiles?.[0];
                 const displayName = activeProfile?.username || currentUser.email?.split('@')[0];
+                const accounts = getAvailableAccounts();
+                
+                let accountSwitcherHTML = '';
+                if (accounts.length > 1) {
+                    accountSwitcherHTML = accounts.map(acc => `
+                        <button class="dropdown-item account-switch ${acc.isActive ? 'active' : ''}" data-type="${acc.type}">
+                            <span class="account-icon">${acc.type === 'company' ? '🏢' : '👤'}</span>
+                            <span class="account-name">${acc.type === 'company' ? 'Company Account' : 'Public Account'}</span>
+                            ${acc.isActive ? '<span class="active-badge">✓</span>' : ''}
+                        </button>
+                    `).join('');
+                }
+                
                 userMenu.innerHTML = `
                     <div class="user-dropdown">
                         <button class="user-avatar" id="userMenuBtn">
-                            <span class="avatar-icon">👤</span>
+                            <span class="avatar-icon">🏢</span>
                             <span class="user-name">${escapeHtml(displayName)}</span>
                             <span class="dropdown-arrow">▼</span>
                         </button>
                         <div class="dropdown-menu" id="userDropdown">
-                            <div class="dropdown-section">
-                                <div class="dropdown-header">Profiles</div>
-                                <div id="profileSwitcher"></div>
-                            </div>
-                            <div class="dropdown-divider"></div>
-                            <a href="/dashboard.html" class="dropdown-item">Dashboard</a>
+                            ${accountSwitcherHTML ? `
+                                <div class="dropdown-section">
+                                    <div class="dropdown-header">Switch Account</div>
+                                    ${accountSwitcherHTML}
+                                </div>
+                                <div class="dropdown-divider"></div>
+                            ` : ''}
+                            <a href="/platform.html" class="dropdown-item">Public Timeline</a>
                             <button id="logoutBtn" class="dropdown-item logout-item">Sign Out</button>
                         </div>
                     </div>
                 `;
+                
+                // Add account switcher event listeners
+                document.querySelectorAll('.account-switch').forEach(btn => {
+                    btn.addEventListener('click', handleAccountSwitch);
+                });
             } else {
                 userMenu.innerHTML = `
                     <a href="/login.html" class="btn btn-outline">Log In</a>
                     <a href="/register.html" class="btn btn-primary">Sign Up</a>
                 `;
+            }
+        }
+        
+        function handleAccountSwitch(e) {
+            const type = e.currentTarget.dataset.type;
+            if (type === 'public') {
+                const result = switchToPublic();
+                if (result.success) {
+                    showToast('Switched to public account', 'success');
+                    window.location.href = '/platform.html';
+                } else {
+                    showToast(result.message, 'error');
+                }
             }
         }
 

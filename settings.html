@@ -1980,25 +1980,78 @@
             document.getElementById('deleteAccountBtn').addEventListener('click', deleteAccount);
             document.getElementById('exportDataBtn').addEventListener('click', exportData);
             
-            // Admin save buttons are now handled by setupCompanyAdminEventListeners() function
-            
             // Avatar upload
             document.getElementById('uploadAvatarBtn').addEventListener('click', () => {
                 document.getElementById('avatarInput').click();
             });
-            document.getElementById('avatarInput').addEventListener('change', (e) => {
+            document.getElementById('avatarInput').addEventListener('change', async (e) => {
                 if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    
+                    // Validate file size (max 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        showToast('File too large. Max 2MB allowed.', 'error');
+                        return;
+                    }
+                    
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        showToast('Please select an image file.', 'error');
+                        return;
+                    }
+                    
+                    // Convert to base64
                     const reader = new FileReader();
-                    reader.onload = (event) => {
-                        // In production, upload to server
-                        showToast('Avatar upload coming soon!', 'info');
+                    reader.onload = async (event) => {
+                        const base64Avatar = event.target.result;
+                        
+                        // Update preview
+                        avatarPreview.style.backgroundImage = `url(${base64Avatar})`;
+                        avatarPreview.textContent = '';
+                        
+                        // Upload to server
+                        try {
+                            const token = localStorage.getItem('accessToken');
+                            const response = await fetch('https://worktalk-backend2.onrender.com/api/users/profile', {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ avatar: base64Avatar })
+                            });
+                            
+                            const data = await response.json();
+                            
+                            if (response.ok && data.success) {
+                                showToast('Avatar updated successfully!', 'success');
+                                
+                                // Update localStorage user data
+                                const userStr = localStorage.getItem('user');
+                                if (userStr) {
+                                    const user = JSON.parse(userStr);
+                                    user.avatar = base64Avatar;
+                                    localStorage.setItem('user', JSON.stringify(user));
+                                }
+                            } else {
+                                showToast(data.message || 'Failed to update avatar', 'error');
+                                // Revert preview on error
+                                avatarPreview.style.backgroundImage = '';
+                                avatarPreview.textContent = initial;
+                            }
+                        } catch (error) {
+                            console.error('Avatar upload error:', error);
+                            showToast('Failed to upload avatar. Please try again.', 'error');
+                            // Revert preview on error
+                            avatarPreview.style.backgroundImage = '';
+                            avatarPreview.textContent = initial;
+                        }
                     };
-                    reader.readAsDataURL(e.target.files[0]);
+                    reader.readAsDataURL(file);
                 }
             });
         }
         
-        // ==================== TOAST NOTIFICATION ====================
         function showToast(message, type = 'info') {
             let container = document.querySelector('.toast-container');
             if (!container) {

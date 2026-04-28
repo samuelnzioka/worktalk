@@ -2156,35 +2156,82 @@
         // ==================== PROFILE SWITCHER ====================
         function renderProfileSwitcher() {
             if (!currentUserData?.profiles || currentUserData.profiles.length <= 1) {
-                profileSwitcherList.innerHTML = '<div style="padding: 8px 16px; font-size: 12px; color: var(--text-muted);">No other profiles</div>';
-                return;
+                // Check if user has a company account stored separately
+                const hasCompanyAccount = localStorage.getItem('companyAccessToken') && localStorage.getItem('currentCompanyId');
+                if (!hasCompanyAccount) {
+                    profileSwitcherList.innerHTML = '<div style="padding: 8px 16px; font-size: 12px; color: var(--text-muted);">No other profiles</div>';
+                    return;
+                }
             }
             
             const activeProfileId = currentUserData.activeProfileId || currentUserData.profiles[0]?._id;
+            let switcherHTML = '';
             
-            profileSwitcherList.innerHTML = currentUserData.profiles.map(profile => {
-                const isActive = profile._id === activeProfileId;
-                const isEmployee = profile.type === 'employee';
-                
-                return `
-                    <div class="profile-switcher-item ${isActive ? 'active' : ''}" data-profile-id="${profile._id}">
-                        <div class="profile-icon">${isEmployee ? '🏢' : '🌍'}</div>
-                        <div class="profile-info">
-                            <div class="profile-name">${escapeHtml(profile.username)}</div>
-                            <div class="profile-type">${isEmployee ? `Employee at ${profile.companyName || 'Company'}` : 'Public Account'}</div>
+            // Render user profiles
+            if (currentUserData?.profiles && currentUserData.profiles.length > 0) {
+                switcherHTML += currentUserData.profiles.map(profile => {
+                    const isActive = profile._id === activeProfileId;
+                    const isEmployee = profile.type === 'employee';
+                    
+                    return `
+                        <div class="profile-switcher-item ${isActive ? 'active' : ''}" data-profile-id="${profile._id}">
+                            <div class="profile-icon">${isEmployee ? '🏢' : '🌍'}</div>
+                            <div class="profile-info">
+                                <div class="profile-name">${escapeHtml(profile.username)}</div>
+                                <div class="profile-type">${isEmployee ? `Employee at ${profile.companyName || 'Company'}` : 'Public Account'}</div>
+                            </div>
+                            ${isActive ? '<span class="profile-badge">Active</span>' : ''}
                         </div>
-                        ${isActive ? '<span class="profile-badge">Active</span>' : ''}
+                    `;
+                }).join('');
+            }
+            
+            // Add company account switch option if available
+            const hasCompanyAccount = localStorage.getItem('companyAccessToken') && localStorage.getItem('currentCompanyId');
+            if (hasCompanyAccount) {
+                const companyUser = JSON.parse(localStorage.getItem('companyUser') || '{}');
+                const isCompanyActive = localStorage.getItem('currentAccount') === 'company';
+                switcherHTML += `
+                    <div class="profile-switcher-item ${isCompanyActive ? 'active' : ''}" data-switch-to="company">
+                        <div class="profile-icon">🏢</div>
+                        <div class="profile-info">
+                            <div class="profile-name">Company Account</div>
+                            <div class="profile-type">Admin Dashboard</div>
+                        </div>
+                        ${isCompanyActive ? '<span class="profile-badge">Active</span>' : ''}
                     </div>
                 `;
-            }).join('');
+            }
+            
+            profileSwitcherList.innerHTML = switcherHTML;
             
             // Add click handlers for profile switching
             document.querySelectorAll('.profile-switcher-item').forEach(item => {
                 item.addEventListener('click', async () => {
-                    const profileId = item.dataset.profileId;
-                    await switchProfile(profileId);
+                    const switchTo = item.dataset.switchTo;
+                    if (switchTo === 'company') {
+                        await switchToCompanyAccount();
+                    } else {
+                        const profileId = item.dataset.profileId;
+                        await switchProfile(profileId);
+                    }
                 });
             });
+        }
+        
+        async function switchToCompanyAccount() {
+            const companyToken = localStorage.getItem('companyAccessToken');
+            const companyUser = localStorage.getItem('companyUser');
+            const companyId = localStorage.getItem('currentCompanyId');
+            
+            if (!companyToken || !companyUser || !companyId) {
+                showToast('No company account found', 'error');
+                return;
+            }
+            
+            localStorage.setItem('currentAccount', 'company');
+            showToast('Switched to company account', 'success');
+            window.location.href = '/company-dashboard.html';
         }
 
         async function switchProfile(profileId) {

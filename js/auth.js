@@ -221,6 +221,70 @@ export async function switchProfile(profileId) {
 }
 
 /**
+ * Switch to company account
+ */
+export function switchToCompany() {
+    const companyToken = localStorage.getItem('companyAccessToken');
+    const companyUser = localStorage.getItem('companyUser');
+    const companyId = localStorage.getItem('currentCompanyId');
+    
+    if (!companyToken || !companyUser || !companyId) {
+        return { success: false, message: 'No company account found' };
+    }
+    
+    localStorage.setItem('currentAccount', 'company');
+    currentUser = JSON.parse(companyUser);
+    
+    return { success: true, user: currentUser, companyId };
+}
+
+/**
+ * Switch to public account
+ */
+export function switchToPublic() {
+    const publicToken = localStorage.getItem('accessToken');
+    const publicUser = localStorage.getItem('user');
+    
+    if (!publicToken || !publicUser) {
+        return { success: false, message: 'No public account found' };
+    }
+    
+    localStorage.setItem('currentAccount', 'public');
+    currentUser = JSON.parse(publicUser);
+    
+    return { success: true, user: currentUser };
+}
+
+/**
+ * Get available accounts for switching
+ */
+export function getAvailableAccounts() {
+    const accounts = [];
+    
+    const publicUser = localStorage.getItem('user');
+    if (publicUser) {
+        accounts.push({
+            type: 'public',
+            user: JSON.parse(publicUser),
+            isActive: localStorage.getItem('currentAccount') === 'public'
+        });
+    }
+    
+    const companyUser = localStorage.getItem('companyUser');
+    const companyId = localStorage.getItem('currentCompanyId');
+    if (companyUser && companyId) {
+        accounts.push({
+            type: 'company',
+            user: JSON.parse(companyUser),
+            companyId,
+            isActive: localStorage.getItem('currentAccount') === 'company'
+        });
+    }
+    
+    return accounts;
+}
+
+/**
  * Create public profile (for employees who want public identity)
  */
 export async function createPublicProfile(username) {
