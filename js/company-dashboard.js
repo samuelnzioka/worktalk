@@ -10,7 +10,9 @@ import { companiesAPI, invitesAPI, departmentsAPI, moderationAPI } from './api.j
  */
 export async function getCompanyStats() {
     try {
-        const stats = await companiesAPI.getStats();
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const stats = await companiesAPI.getStats(companyId);
         return stats;
     } catch (error) {
         console.error('Failed to get company stats:', error);
@@ -23,7 +25,9 @@ export async function getCompanyStats() {
  */
 export async function getEmployees(search = '') {
     try {
-        const employees = await companiesAPI.getEmployees({ search });
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const employees = await companiesAPI.getEmployees(companyId, { search });
         return employees;
     } catch (error) {
         console.error('Failed to get employees:', error);
@@ -36,7 +40,9 @@ export async function getEmployees(search = '') {
  */
 export async function removeEmployee(userId) {
     try {
-        const response = await companiesAPI.removeEmployee(userId);
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const response = await companiesAPI.removeEmployee(companyId, userId);
         return response;
     } catch (error) {
         console.error('Failed to remove employee:', error);
@@ -49,7 +55,9 @@ export async function removeEmployee(userId) {
  */
 export async function getInvites() {
     try {
-        const invites = await invitesAPI.list();
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const invites = await invitesAPI.list(companyId);
         return invites;
     } catch (error) {
         console.error('Failed to get invites:', error);
@@ -62,7 +70,9 @@ export async function getInvites() {
  */
 export async function generateInvite(departmentId) {
     try {
-        const response = await invitesAPI.generate(departmentId);
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const response = await invitesAPI.generate(companyId, departmentId);
         return response;
     } catch (error) {
         console.error('Failed to generate invite:', error);
@@ -75,7 +85,9 @@ export async function generateInvite(departmentId) {
  */
 export async function revokeInvite(inviteId) {
     try {
-        const response = await invitesAPI.revoke(inviteId);
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const response = await invitesAPI.revoke(companyId, inviteId);
         return response;
     } catch (error) {
         console.error('Failed to revoke invite:', error);
@@ -88,7 +100,9 @@ export async function revokeInvite(inviteId) {
  */
 export async function getDepartments() {
     try {
-        const departments = await departmentsAPI.list();
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const departments = await departmentsAPI.list(companyId);
         return departments;
     } catch (error) {
         console.error('Failed to get departments:', error);
@@ -101,7 +115,9 @@ export async function getDepartments() {
  */
 export async function addDepartment(name) {
     try {
-        const response = await departmentsAPI.create({ name });
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const response = await departmentsAPI.create(companyId, { name });
         return response;
     } catch (error) {
         console.error('Failed to add department:', error);
@@ -114,7 +130,9 @@ export async function addDepartment(name) {
  */
 export async function updateDepartment(departmentId, data) {
     try {
-        const response = await departmentsAPI.update(departmentId, data);
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const response = await departmentsAPI.update(companyId, departmentId, data);
         return response;
     } catch (error) {
         console.error('Failed to update department:', error);
@@ -127,7 +145,9 @@ export async function updateDepartment(departmentId, data) {
  */
 export async function deleteDepartment(departmentId) {
     try {
-        const response = await departmentsAPI.delete(departmentId);
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const response = await departmentsAPI.delete(companyId, departmentId);
         return response;
     } catch (error) {
         console.error('Failed to delete department:', error);
@@ -140,7 +160,9 @@ export async function deleteDepartment(departmentId) {
  */
 export async function getFlaggedContent() {
     try {
-        const flagged = await moderationAPI.getFlagged();
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const flagged = await moderationAPI.getFlagged(companyId);
         return flagged;
     } catch (error) {
         console.error('Failed to get flagged content:', error);
@@ -153,7 +175,9 @@ export async function getFlaggedContent() {
  */
 export async function resolveFlagged(flagId, action) {
     try {
-        const response = await moderationAPI.resolveFlag(flagId, action);
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const response = await moderationAPI.resolveFlag(companyId, flagId, action);
         return response;
     } catch (error) {
         console.error('Failed to resolve flag:', error);
@@ -166,7 +190,9 @@ export async function resolveFlagged(flagId, action) {
  */
 export async function updateCompanySettings(settings) {
     try {
-        const response = await companiesAPI.updateSettings(settings);
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const response = await companiesAPI.updateSettings(companyId, settings);
         return response;
     } catch (error) {
         console.error('Failed to update settings:', error);
@@ -179,7 +205,9 @@ export async function updateCompanySettings(settings) {
  */
 export async function getRecentActivity() {
     try {
-        const activity = await companiesAPI.getRecentActivity();
+        const companyId = localStorage.getItem('currentCompanyId');
+        if (!companyId) throw new Error('No company ID found');
+        const activity = await companiesAPI.getRecentActivity(companyId);
         return activity;
     } catch (error) {
         console.error('Failed to get activity:', error);

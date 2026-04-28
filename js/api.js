@@ -205,8 +205,8 @@ export const commentsAPI = {
 export const departmentsAPI = {
     list: (companyId) => apiCall(`/companies/${companyId}/departments`),
     create: (companyId, data) => apiCall(`/companies/${companyId}/departments`, { method: 'POST', body: data }),
-    update: (departmentId, data) => apiCall(`/departments/${departmentId}`, { method: 'PUT', body: data }),
-    delete: (departmentId) => apiCall(`/departments/${departmentId}`, { method: 'DELETE' })
+    update: (companyId, departmentId, data) => apiCall(`/companies/${companyId}/departments/${departmentId}`, { method: 'PUT', body: data }),
+    delete: (companyId, departmentId) => apiCall(`/companies/${companyId}/departments/${departmentId}`, { method: 'DELETE' })
 };
 
 export const profileAPI = {
@@ -230,5 +230,5 @@ export const userAPI = {
 
 export const moderationAPI = {
     getFlagged: (companyId) => apiCall(`/companies/${companyId}/flagged`),
-    resolveFlag: (flagId, action) => apiCall(`/moderation/flag/${flagId}`, { method: 'POST', body: { action } })
+    resolveFlag: (companyId, flagId, action) => apiCall(`/companies/${companyId}/flagged/${flagId}`, { method: 'POST', body: { action } })
 };
