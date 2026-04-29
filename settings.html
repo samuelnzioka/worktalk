@@ -2737,12 +2737,24 @@
 
             // Draw image with current transform
             const cropImage = document.getElementById('cropImage');
+            
+            // Calculate the draw position based on the visual transform
+            // The visual transform is translate(offsetX, offsetY) scale(scale)
+            // We need to replicate this on the canvas
+            const imgWidth = cropImage.naturalWidth * cropState.scale;
+            const imgHeight = cropImage.naturalHeight * cropState.scale;
+            
+            // The offset is relative to the center of the crop area (100, 100)
+            // So we draw at: center + offset - half of image size
+            const drawX = (size / 2) + cropState.offsetX - (imgWidth / 2);
+            const drawY = (size / 2) + cropState.offsetY - (imgHeight / 2);
+            
             ctx.drawImage(
                 cropImage,
-                cropState.offsetX,
-                cropState.offsetY,
-                cropImage.naturalWidth * cropState.scale,
-                cropImage.naturalHeight * cropState.scale
+                drawX,
+                drawY,
+                imgWidth,
+                imgHeight
             );
 
             return canvas.toDataURL('image/jpeg', 0.8);

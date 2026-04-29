@@ -2158,10 +2158,25 @@
                               (currentUserData.profiles && currentUserData.profiles[0]);
             currentActiveProfile = activeProfile;
             
-            // Update avatar (first letter of name)
+            // Update avatar - use avatar image if available, otherwise use initial
             const initial = currentUserData.name ? currentUserData.name.charAt(0).toUpperCase() : '?';
-            userAvatar.textContent = initial;
-            dropdownAvatar.textContent = initial;
+            const avatarImage = currentUserData.avatar || activeProfile?.avatar;
+            
+            if (avatarImage) {
+                userAvatar.style.backgroundImage = `url(${avatarImage})`;
+                userAvatar.style.backgroundSize = 'cover';
+                userAvatar.style.backgroundPosition = 'center';
+                userAvatar.textContent = '';
+                dropdownAvatar.style.backgroundImage = `url(${avatarImage})`;
+                dropdownAvatar.style.backgroundSize = 'cover';
+                dropdownAvatar.style.backgroundPosition = 'center';
+                dropdownAvatar.textContent = '';
+            } else {
+                userAvatar.style.backgroundImage = '';
+                userAvatar.textContent = initial;
+                dropdownAvatar.style.backgroundImage = '';
+                dropdownAvatar.textContent = initial;
+            }
             
             // Update name display
             const displayName = activeProfile?.username || currentUserData.name || 'User';
