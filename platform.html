@@ -1925,6 +1925,54 @@
             window.location.href = 'login.html';
         }
 
+        // ==================== TOKEN REFRESH ====================
+        async function refreshToken() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) return false;
+            
+            try {
+                const response = await fetch('https://worktalk-backend2.onrender.com/api/auth/refresh-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('accessToken', data.accessToken);
+                    if (data.refreshToken) {
+                        localStorage.setItem('refreshToken', data.refreshToken);
+                    }
+                    return true;
+                }
+            } catch (error) {
+                console.error('Token refresh failed:', error);
+            }
+            return false;
+        }
+
+        async function withAuthCheck(apiCall) {
+            let token = localStorage.getItem('accessToken');
+            
+            // Try the API call first
+            let response = await apiCall(token);
+            
+            // If token expired, refresh and retry
+            if (response.status === 401) {
+                const refreshed = await refreshToken();
+                if (refreshed) {
+                    const newToken = localStorage.getItem('accessToken');
+                    response = await apiCall(newToken);
+                } else {
+                    // Refresh failed, redirect to login
+                    window.location.href = 'login.html';
+                    return;
+                }
+            }
+            
+            return response;
+        }
+
         // ==================== EVENT HANDLERS ====================
         function setupEventListeners() {
             document.getElementById('backToDirectoryBtn').addEventListener('click', backToDirectory);
@@ -2010,27 +2058,6 @@
             settingsModal?.addEventListener('click', (e) => {
                 if (e.target === settingsModal) closeSettingsModal();
             });
-        }
-
-        async function switchProfile(profileType) {
-            if (profileType === 'public') {
-                currentProfile = 'public';
-                myCompany = null;
-                myDepartment = null;
-            } else {
-                // Find employee profile
-                const employeeProfile = currentUser.profiles.find(p => p.type === 'employee');
-                if (employeeProfile) {
-                    currentProfile = 'employee';
-                    myCompany = employeeProfile.company;
-                    myDepartment = employeeProfile.department;
-                }
-            }
-            
-            updateWelcomeMessage();
-            if (!currentCompany) {
-                renderCompanyDirectory();
-            }
         }
 
         async function submitDepartmentPost() {
@@ -2236,24 +2263,40 @@
 
         async function switchProfile(profileId) {
             try {
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch('https://worktalk-backend2.onrender.com/api/profiles/switch', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` 
-                    },
-                    body: JSON.stringify({ profileId })
+                const response = await withAuthCheck(async (token) => {
+                    return fetch('https://worktalk-backend2.onrender.com/api/profiles/switch', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        body: JSON.stringify({ profileId })
+                    });
                 });
                 
-                if (response.ok) {
+                if (response && response.ok) {
                     const data = await response.json();
                     if (data.user) {
                         localStorage.setItem('user', JSON.stringify(data.user));
                         currentUserData = data.user;
-                        updateUserInterface();
                         showToast('Profile switched successfully', 'success');
-                        setTimeout(() => window.location.reload(), 500);
+                        
+                        // Route based on role and profile type
+                        if (data.switchedProfile) {
+                            if (data.switchedProfile.isCompanyAdmin && data.switchedProfile.type === 'employee') {
+                                // Company admin switching to employee → company dashboard
+                                setTimeout(() => window.location.href = 'company-dashboard.html', 500);
+                            } else if (data.switchedProfile.type === 'employee') {
+                                // Regular employee → company platform
+                                setTimeout(() => window.location.href = `platform.html?company=${data.switchedProfile.companyId}`, 500);
+                            } else {
+                                // Public profile → public timeline
+                                setTimeout(() => window.location.href = 'platform.html', 500);
+                            }
+                        } else {
+                            // Fallback for old response format
+                            setTimeout(() => window.location.reload(), 500);
+                        }
                     }
                 } else {
                     showToast('Failed to switch profile', 'error');
