@@ -900,6 +900,8 @@
             z-index: 1000;
             display: none;
             overflow: hidden;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         .user-dropdown.show {
@@ -1506,7 +1508,8 @@
                 });
                 
                 if (response.ok) {
-                    companies = await response.json();
+                    const data = await response.json();
+                    companies = data.companies || [];
                     renderCompanyDirectory();
                 } else {
                     // For demo, show empty state
@@ -2186,7 +2189,8 @@
             
             // Update role badge
             if (activeProfile?.type === 'employee') {
-                dropdownRole.innerHTML = `<span style="background: var(--success-light); color: var(--success); padding: 2px 8px; border-radius: 12px;">👔 Employee at ${activeProfile.companyName || 'Company'}</span>`;
+                const companyName = activeProfile.companyName || activeProfile.companyId?.name || 'Company';
+                dropdownRole.innerHTML = `<span style="background: var(--success-light); color: var(--success); padding: 2px 8px; border-radius: 12px;">👔 Employee at ${companyName}</span>`;
             } else {
                 dropdownRole.innerHTML = `<span style="background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: 12px;">🌍 Public User</span>`;
             }
@@ -2214,13 +2218,14 @@
                 switcherHTML += currentUserData.profiles.map(profile => {
                     const isActive = profile._id === activeProfileId;
                     const isEmployee = profile.type === 'employee';
+                    const companyName = isEmployee ? (profile.companyName || profile.companyId?.name || 'Company') : '';
                     
                     return `
                         <div class="profile-switcher-item ${isActive ? 'active' : ''}" data-profile-id="${profile._id}">
                             <div class="profile-icon">${isEmployee ? '🏢' : '🌍'}</div>
                             <div class="profile-info">
                                 <div class="profile-name">${escapeHtml(profile.username)}</div>
-                                <div class="profile-type">${isEmployee ? `Employee at ${profile.companyName || 'Company'}` : 'Public Account'}</div>
+                                <div class="profile-type">${isEmployee ? `Employee at ${companyName}` : 'Public Account'}</div>
                             </div>
                             ${isActive ? '<span class="profile-badge">Active</span>' : ''}
                         </div>
