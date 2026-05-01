@@ -1528,12 +1528,18 @@
                     }
                 });
                 
+                console.log('Companies response status:', response.status);
+                
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Companies data:', data);
                     companies = data.companies || [];
+                    console.log('Companies array:', companies);
                     renderCompanyDirectory();
                 } else {
-                    // For demo, show empty state
+                    console.error('Companies response not ok:', response.status);
+                    const errorData = await response.json();
+                    console.error('Error data:', errorData);
                     companies = [];
                     renderCompanyDirectory();
                 }
