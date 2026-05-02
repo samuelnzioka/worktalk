@@ -2767,30 +2767,37 @@
 
             // Upload to server
             try {
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch('https://worktalk-backend2.onrender.com/api/users/profile', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ avatar: base64Avatar })
+                const response = await saveWithAuthCheck(async (token) => {
+                    return fetch('https://worktalk-backend2.onrender.com/api/users/profile', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ avatar: base64Avatar })
+                    });
                 });
 
-                const data = await response.json();
+                if (response && response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast('Avatar updated successfully!', 'success');
 
-                if (response.ok && data.success) {
-                    showToast('Avatar updated successfully!', 'success');
-
-                    // Update localStorage user data
-                    const userStr = localStorage.getItem('user');
-                    if (userStr) {
-                        const user = JSON.parse(userStr);
-                        user.avatar = base64Avatar;
-                        localStorage.setItem('user', JSON.stringify(user));
+                        // Update localStorage user data
+                        const userStr = localStorage.getItem('user');
+                        if (userStr) {
+                            const user = JSON.parse(userStr);
+                            user.avatar = base64Avatar;
+                            localStorage.setItem('user', JSON.stringify(user));
+                        }
+                    } else {
+                        showToast(data.message || data.error || 'Failed to update avatar', 'error');
+                        // Revert preview on error
+                        avatarPreview.style.backgroundImage = '';
+                        avatarPreview.textContent = initial;
                     }
                 } else {
-                    showToast(data.message || data.error || 'Failed to update avatar', 'error');
+                    showToast('Failed to update avatar', 'error');
                     // Revert preview on error
                     avatarPreview.style.backgroundImage = '';
                     avatarPreview.textContent = initial;
