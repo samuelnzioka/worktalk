@@ -10,9 +10,30 @@ import { companiesAPI, invitesAPI, departmentsAPI, moderationAPI } from './api.j
  */
 export async function getCompanyStats() {
     try {
-        const companyId = localStorage.getItem('currentCompanyId');
-        if (!companyId) throw new Error('No company ID found');
+        // Try to get company ID from localStorage first
+        let companyId = localStorage.getItem('currentCompanyId');
+        
+        // If not found, try to get from user's active profile
+        if (!companyId) {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                const activeProfile = user.activeProfile || user.profiles?.[0];
+                if (activeProfile && activeProfile.companyId) {
+                    companyId = activeProfile.companyId._id || activeProfile.companyId;
+                    // Store for future use
+                    localStorage.setItem('currentCompanyId', companyId);
+                }
+            }
+        }
+        
+        if (!companyId) {
+            throw new Error('No company ID found');
+        }
+        
+        console.log('Fetching stats for company:', companyId);
         const stats = await companiesAPI.getStats(companyId);
+        console.log('Company stats received:', stats);
         return stats;
     } catch (error) {
         console.error('Failed to get company stats:', error);
