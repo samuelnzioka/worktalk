@@ -1193,6 +1193,16 @@
                         localStorage.setItem('companyUser', JSON.stringify(result.user));
                     }
                     
+                    // Update main user data to include the new employee profile
+                    if (result.user) {
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                    }
+                    
+                    // Store company ID for reference
+                    if (result.companyId) {
+                        localStorage.setItem('currentCompanyId', result.companyId);
+                    }
+                    
                     // Switch to company account
                     localStorage.setItem('currentAccount', 'company');
                     
