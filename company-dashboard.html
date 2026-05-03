@@ -182,50 +182,43 @@
             }
             
             try {
-                currentUser = await getCurrentUser();
-                const companyId = localStorage.getItem('currentCompanyId');
-                
-                console.log('Auth check - User:', currentUser?._id);
-                console.log('Auth check - Company ID:', companyId);
-                console.log('Auth check - User profiles:', currentUser?.profiles);
-                
-                if (!currentUser) {
-                    showToast('User not found', 'error');
+                // First try to get user from localStorage (avoids API call that might fail with expired token)
+                const storedUser = localStorage.getItem('user');
+                if (!storedUser) {
+                    showToast('No user data found', 'error');
                     window.location.href = '/login.html';
                     return;
                 }
                 
-                if (!companyId) {
-                    console.log('No company ID found in localStorage');
-                    showToast('No company selected', 'error');
+                currentUser = JSON.parse(storedUser);
+                console.log('Auth check - User from localStorage:', currentUser._id);
+                console.log('Auth check - Profiles:', currentUser.profiles);
+                
+                // Find the employee profile and determine which company to show
+                const employeeProfile = currentUser.profiles?.find(p => p.type === 'employee');
+                
+                if (!employeeProfile) {
+                    console.log('No employee profile found');
+                    showToast('No company profile found', 'error');
                     window.location.href = '/platform.html';
                     return;
                 }
                 
-                // Find the profile for this company
-                const companyProfile = currentUser.profiles?.find(p => {
-                    const profileCompanyId = p.companyId?._id || p.companyId;
-                    return profileCompanyId === companyId;
-                });
+                // Get company ID from the employee profile
+                const profileCompanyId = employeeProfile.companyId?._id || employeeProfile.companyId;
+                console.log('Employee profile company ID:', profileCompanyId);
                 
-                console.log('Auth check - Company profile:', companyProfile);
-                
-                if (!companyProfile) {
-                    console.log('User has no profile for this company');
-                    showToast('You do not have access to this company', 'error');
-                    window.location.href = '/platform.html';
-                    return;
+                // Set currentCompanyId if not already set or if it doesn't match
+                const storedCompanyId = localStorage.getItem('currentCompanyId');
+                if (!storedCompanyId || storedCompanyId !== profileCompanyId) {
+                    console.log('Updating currentCompanyId from', storedCompanyId, 'to', profileCompanyId);
+                    localStorage.setItem('currentCompanyId', profileCompanyId);
                 }
                 
-                // Check if user is admin of this company
-                // The backend sets isCompanyAdmin on the switched profile, but we need to check the profile
-                // For now, we'll allow access if the user has an employee profile for this company
-                // The backend stats endpoint will handle the actual permission check
-                
-                console.log('Auth check passed - User has access to this company');
+                console.log('Auth check passed - Company ID:', profileCompanyId);
                 updateUserMenu();
             } catch (error) {
-                console.error('Failed to get user:', error);
+                console.error('Auth check error:', error);
                 window.location.href = '/login.html';
             }
         }
@@ -847,14 +840,57 @@
 
         async function handleProfileSwitch(profileId) {
             try {
-                const response = await fetch('https://worktalk-backend2.onrender.com/api/profiles/switch', {
+                let token = localStorage.getItem('accessToken');
+                let response = await fetch('https://worktalk-backend2.onrender.com/api/profiles/switch', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ profileId })
                 });
+                
+                // Handle token expiration
+                if (response.status === 401) {
+                    const errorData = await response.json().catch(() => ({}));
+                    if (errorData.code === 'TOKEN_EXPIRED') {
+                        console.log('Token expired, attempting refresh...');
+                        const refreshToken = localStorage.getItem('refreshToken');
+                        if (!refreshToken) {
+                            showToast('Session expired. Please log in again.', 'error');
+                            window.location.href = '/login.html';
+                            return;
+                        }
+                        
+                        const refreshResponse = await fetch('https://worktalk-backend2.onrender.com/api/auth/refresh-token', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ refreshToken })
+                        });
+                        
+                        if (refreshResponse.ok) {
+                            const refreshData = await refreshResponse.json();
+                            localStorage.setItem('accessToken', refreshData.accessToken);
+                            if (refreshData.refreshToken) {
+                                localStorage.setItem('refreshToken', refreshData.refreshToken);
+                            }
+                            
+                            // Retry the profile switch with new token
+                            response = await fetch('https://worktalk-backend2.onrender.com/api/profiles/switch', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${refreshData.accessToken}`
+                                },
+                                body: JSON.stringify({ profileId })
+                            });
+                        } else {
+                            showToast('Session expired. Please log in again.', 'error');
+                            window.location.href = '/login.html';
+                            return;
+                        }
+                    }
+                }
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -865,7 +901,12 @@
                         // Route based on profile type
                         if (data.switchedProfile) {
                             if (data.switchedProfile.isCompanyAdmin && data.switchedProfile.type === 'employee') {
-                                // Staying on company dashboard
+                                // Staying on company dashboard - update company ID
+                                const activeProfile = data.user.profiles.find(p => p._id === profileId);
+                                if (activeProfile && activeProfile.companyId) {
+                                    const newCompanyId = activeProfile.companyId._id || activeProfile.companyId;
+                                    localStorage.setItem('currentCompanyId', newCompanyId);
+                                }
                                 setTimeout(() => window.location.reload(), 500);
                             } else if (data.switchedProfile.type === 'employee') {
                                 // Regular employee → company platform
@@ -877,7 +918,8 @@
                         }
                     }
                 } else {
-                    showToast('Failed to switch profile', 'error');
+                    const errorData = await response.json().catch(() => ({}));
+                    showToast(errorData.message || 'Failed to switch profile', 'error');
                 }
             } catch (error) {
                 console.error('Error switching profile:', error);

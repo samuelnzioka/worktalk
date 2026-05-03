@@ -13,14 +13,15 @@ export async function getCompanyStats() {
         // Try to get company ID from localStorage first
         let companyId = localStorage.getItem('currentCompanyId');
         
-        // If not found, try to get from user's active profile
+        // If not found, try to get from user's employee profile
         if (!companyId) {
             const userStr = localStorage.getItem('user');
             if (userStr) {
                 const user = JSON.parse(userStr);
-                const activeProfile = user.activeProfile || user.profiles?.[0];
-                if (activeProfile && activeProfile.companyId) {
-                    companyId = activeProfile.companyId._id || activeProfile.companyId;
+                // Find the employee profile specifically
+                const employeeProfile = user.profiles?.find(p => p.type === 'employee');
+                if (employeeProfile && employeeProfile.companyId) {
+                    companyId = employeeProfile.companyId._id || employeeProfile.companyId;
                     // Store for future use
                     localStorage.setItem('currentCompanyId', companyId);
                 }
