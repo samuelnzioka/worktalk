@@ -2339,10 +2339,12 @@
                                 // Company admin switching to employee → company dashboard
                                 // Set company tokens for dashboard access
                                 const activeProfile = data.user.profiles.find(p => p._id === profileId);
+                                console.log('Switching to company admin profile:', activeProfile);
                                 if (activeProfile && activeProfile.companyId) {
-                                    localStorage.setItem('currentCompanyId', activeProfile.companyId._id || activeProfile.companyId);
-                                    // Generate company tokens (simplified - in production, this should be done via backend)
-                                    localStorage.setItem('currentAccount', 'public'); // Keep as public but with company context
+                                    const companyId = activeProfile.companyId._id || activeProfile.companyId;
+                                    console.log('Setting currentCompanyId to:', companyId);
+                                    localStorage.setItem('currentCompanyId', companyId);
+                                    localStorage.setItem('currentAccount', 'public');
                                 }
                                 setTimeout(() => window.location.href = 'company-dashboard.html', 500);
                             } else if (data.switchedProfile.type === 'employee') {

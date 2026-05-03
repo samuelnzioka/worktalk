@@ -183,11 +183,34 @@
             
             try {
                 currentUser = await getCurrentUser();
-                if (!currentUser || currentUser.role !== 'company_admin') {
-                    showToast('You do not have access to this page', 'error');
-                    window.location.href = '/dashboard.html';
+                const companyId = localStorage.getItem('currentCompanyId');
+                
+                console.log('Auth check - User:', currentUser?._id);
+                console.log('Auth check - Company ID:', companyId);
+                console.log('Auth check - User profiles:', currentUser?.profiles);
+                
+                if (!currentUser) {
+                    showToast('User not found', 'error');
+                    window.location.href = '/login.html';
                     return;
                 }
+                
+                // Check if user has an employee profile that is admin of the specific company
+                const activeProfile = currentUser.profiles?.find(p => p._id === currentUser.activeProfileId);
+                const profileCompanyId = activeProfile?.companyId?._id || activeProfile?.companyId;
+                
+                console.log('Auth check - Active profile:', activeProfile);
+                console.log('Auth check - Profile company ID:', profileCompanyId);
+                console.log('Auth check - Is company admin:', activeProfile?.isCompanyAdmin);
+                
+                // Verify the user is admin of the specific company
+                if (!activeProfile?.isCompanyAdmin || profileCompanyId !== companyId) {
+                    console.log('Access denied - User is not admin of this company');
+                    showToast('You do not have access to this page', 'error');
+                    window.location.href = '/platform.html';
+                    return;
+                }
+                
                 updateUserMenu();
             } catch (error) {
                 console.error('Failed to get user:', error);
