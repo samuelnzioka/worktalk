@@ -108,6 +108,8 @@
     cursor: pointer;
     transition: all var(--transition-fast);
     border: 1px solid transparent;
+    pointer-events: auto;
+    user-select: none;
 }
 
 .profile-switch-item:hover {

@@ -163,10 +163,16 @@
         let activeSection = 'overview';
 
         document.addEventListener('DOMContentLoaded', async () => {
-            await checkAuth();
-            await loadCompanyData();
-            setupEventListeners();
-            loadSection('overview');
+            console.log('DOM Content Loaded');
+            try {
+                await checkAuth();
+                await loadCompanyData();
+                setupEventListeners();
+                loadSection('overview');
+                console.log('Dashboard initialization complete');
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+            }
         });
 
         async function checkAuth() {
@@ -254,8 +260,10 @@
         }
 
         async function loadCompanyData() {
+            console.log('Loading company data...');
             try {
                 const stats = await getCompanyStats();
+                console.log('Company stats received:', stats);
                 currentCompany = stats.company;
                 updateStats(stats);
                 
@@ -269,7 +277,9 @@
                 `;
                 
                 // Load profile switcher
+                console.log('Loading profile switcher...');
                 await loadProfileSwitcher();
+                console.log('Profile switcher loaded');
             } catch (error) {
                 console.error('Failed to load company data:', error);
                 showToast('Failed to load company data', 'error');
@@ -277,10 +287,25 @@
         }
 
         function updateStats(stats) {
-            document.getElementById('employeeCount').textContent = stats.employeeCount;
-            document.getElementById('departmentCount').textContent = stats.departmentCount;
-            document.getElementById('postCount').textContent = stats.postCount;
-            document.getElementById('flaggedCount').textContent = stats.flaggedCount;
+            console.log('Updating stats with data:', stats);
+            const employeeCountEl = document.getElementById('employeeCount');
+            const departmentCountEl = document.getElementById('departmentCount');
+            const postCountEl = document.getElementById('postCount');
+            const flaggedCountEl = document.getElementById('flaggedCount');
+            
+            console.log('Stats elements found:', {
+                employeeCount: !!employeeCountEl,
+                departmentCount: !!departmentCountEl,
+                postCount: !!postCountEl,
+                flaggedCount: !!flaggedCountEl
+            });
+            
+            if (employeeCountEl) employeeCountEl.textContent = stats.employeeCount;
+            if (departmentCountEl) departmentCountEl.textContent = stats.departmentCount;
+            if (postCountEl) postCountEl.textContent = stats.postCount;
+            if (flaggedCountEl) flaggedCountEl.textContent = stats.flaggedCount;
+            
+            console.log('Stats updated');
         }
 
         function setupEventListeners() {
@@ -712,14 +737,24 @@
         // ==================== PROFILE SWITCHER ====================
         async function loadProfileSwitcher() {
             const profileSwitcher = document.getElementById('profileSwitcher');
+            console.log('Profile switcher element found:', !!profileSwitcher);
             
             try {
                 // Get user data from localStorage
                 const userStr = localStorage.getItem('user');
-                if (!userStr) return;
+                console.log('User data from localStorage:', !!userStr);
+                
+                if (!userStr) {
+                    console.log('No user data found in localStorage');
+                    return;
+                }
                 
                 const userData = JSON.parse(userStr);
+                console.log('User data parsed:', userData);
+                console.log('User profiles:', userData.profiles);
+                
                 const activeProfileId = userData.activeProfileId || userData.profiles?.[0]?._id;
+                console.log('Active profile ID:', activeProfileId);
                 
                 let switcherHTML = '';
                 
@@ -729,6 +764,8 @@
                         const isActive = profile._id === activeProfileId;
                         const isEmployee = profile.type === 'employee';
                         const companyName = isEmployee ? (profile.companyName || profile.companyId?.name || 'Company') : '';
+                        
+                        console.log(`Rendering profile: ${profile.username}, type: ${profile.type}, active: ${isActive}`);
                         
                         return `
                             <div class="profile-switch-item ${isActive ? 'active' : ''}" data-profile-id="${profile._id}">
@@ -741,20 +778,33 @@
                             </div>
                         `;
                     }).join('');
+                } else {
+                    console.log('No profiles found in user data');
+                    switcherHTML = '<p class="text-muted">No profiles available</p>';
                 }
                 
+                console.log('Switcher HTML generated:', switcherHTML.length, 'characters');
                 profileSwitcher.innerHTML = switcherHTML;
+                console.log('Profile switcher innerHTML set');
                 
                 // Add click handlers
-                document.querySelectorAll('.profile-switch-item').forEach(item => {
-                    item.addEventListener('click', async () => {
+                const profileItems = document.querySelectorAll('.profile-switch-item');
+                console.log('Profile switch items found:', profileItems.length);
+                
+                profileItems.forEach(item => {
+                    console.log('Adding click handler to profile:', item.dataset.profileId);
+                    item.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         const profileId = item.dataset.profileId;
+                        console.log('Profile item clicked:', profileId);
                         if (!profileId || item.classList.contains('active')) return;
                         
                         await handleProfileSwitch(profileId);
                     });
                 });
                 
+                console.log('Profile switcher load complete');
             } catch (error) {
                 console.error('Failed to load profile switcher:', error);
             }
