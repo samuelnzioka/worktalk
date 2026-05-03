@@ -78,7 +78,83 @@
     border-left-color: var(--primary);
 }
 
-/* Main Content */
+/* Profile Switch Section */
+.profile-switch-section {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.profile-switch-section h4 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.profile-switcher {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.profile-switch-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+}
+
+.profile-switch-item:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-200);
+}
+
+.profile-switch-item.active {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.profile-switch-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    margin-right: var(--spacing-sm);
+    background: var(--gray-100);
+}
+
+.profile-switch-info {
+    flex: 1;
+}
+
+.profile-switch-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-900);
+}
+
+.profile-switch-type {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.profile-switch-badge {
+    font-size: 0.625rem;
+    padding: 2px 6px;
+    border-radius: var(--radius-full);
+    background: var(--success);
+    color: white;
+    font-weight: 600;
+}
 .dashboard-main {
     flex: 1;
     min-width: 0;

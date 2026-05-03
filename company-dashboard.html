@@ -43,6 +43,14 @@
                     <button class="nav-btn" data-section="moderation">Moderation</button>
                     <button class="nav-btn" data-section="settings">Settings</button>
                 </div>
+                
+                <!-- Profile Switch Section -->
+                <div class="profile-switch-section">
+                    <h4>Switch Profile</h4>
+                    <div id="profileSwitcher" class="profile-switcher">
+                        <!-- Profiles will be populated by JS -->
+                    </div>
+                </div>
             </div>
 
             <div class="dashboard-main">
@@ -281,6 +289,9 @@
                         ${currentCompany.isVerified ? '✓ Verified Company' : '⏳ Pending Verification'}
                     </div>
                 `;
+                
+                // Load profile switcher
+                await loadProfileSwitcher();
             } catch (error) {
                 console.error('Failed to load company data:', error);
                 showToast('Failed to load company data', 'error');
@@ -295,10 +306,15 @@
         }
 
         function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
             // Navigation
             document.querySelectorAll('.dashboard-nav .nav-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                console.log('Found nav button:', btn.dataset.section);
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     const section = btn.dataset.section;
+                    console.log('Nav button clicked:', section);
                     loadSection(section);
                 });
             });
@@ -314,6 +330,7 @@
         }
 
         async function loadSection(section) {
+            console.log('Loading section:', section);
             activeSection = section;
             
             // Update active nav
@@ -323,29 +340,35 @@
             
             // Show/hide sections
             document.querySelectorAll('.dashboard-section').forEach(sec => {
-                sec.classList.toggle('active', sec.id === `${section}Section`);
+                const shouldBeActive = sec.id === `${section}Section`;
+                sec.classList.toggle('active', shouldBeActive);
+                console.log(`Section ${sec.id}: ${shouldBeActive ? 'showing' : 'hiding'}`);
             });
             
             // Load section data
-            switch(section) {
-                case 'overview':
-                    await loadRecentActivity();
-                    break;
-                case 'employees':
-                    await loadEmployees();
-                    break;
-                case 'invites':
-                    await loadInvites();
-                    break;
-                case 'departments':
-                    await loadDepartments();
-                    break;
-                case 'moderation':
-                    await loadFlaggedContent();
-                    break;
-                case 'settings':
-                    await loadSettings();
-                    break;
+            try {
+                switch(section) {
+                    case 'overview':
+                        await loadRecentActivity();
+                        break;
+                    case 'employees':
+                        await loadEmployees();
+                        break;
+                    case 'invites':
+                        await loadInvites();
+                        break;
+                    case 'departments':
+                        await loadDepartments();
+                        break;
+                    case 'moderation':
+                        await loadFlaggedContent();
+                        break;
+                    case 'settings':
+                        await loadSettings();
+                        break;
+                }
+            } catch (error) {
+                console.error('Error loading section data:', error);
             }
         }
 
@@ -706,6 +729,97 @@
                 clearTimeout(timeout);
                 timeout = setTimeout(() => func(...args), wait);
             };
+        }
+
+        // ==================== PROFILE SWITCHER ====================
+        async function loadProfileSwitcher() {
+            const profileSwitcher = document.getElementById('profileSwitcher');
+            
+            try {
+                // Get user data from localStorage
+                const userStr = localStorage.getItem('user');
+                if (!userStr) return;
+                
+                const userData = JSON.parse(userStr);
+                const activeProfileId = userData.activeProfileId || userData.profiles?.[0]?._id;
+                
+                let switcherHTML = '';
+                
+                // Render user profiles
+                if (userData?.profiles && userData.profiles.length > 0) {
+                    switcherHTML += userData.profiles.map(profile => {
+                        const isActive = profile._id === activeProfileId;
+                        const isEmployee = profile.type === 'employee';
+                        const companyName = isEmployee ? (profile.companyName || profile.companyId?.name || 'Company') : '';
+                        
+                        return `
+                            <div class="profile-switch-item ${isActive ? 'active' : ''}" data-profile-id="${profile._id}">
+                                <div class="profile-switch-icon">${isEmployee ? '🏢' : '🌍'}</div>
+                                <div class="profile-switch-info">
+                                    <div class="profile-switch-name">${escapeHtml(profile.username)}</div>
+                                    <div class="profile-switch-type">${isEmployee ? `Employee at ${companyName}` : 'Public Account'}</div>
+                                </div>
+                                ${isActive ? '<span class="profile-switch-badge">Active</span>' : ''}
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                profileSwitcher.innerHTML = switcherHTML;
+                
+                // Add click handlers
+                document.querySelectorAll('.profile-switch-item').forEach(item => {
+                    item.addEventListener('click', async () => {
+                        const profileId = item.dataset.profileId;
+                        if (!profileId || item.classList.contains('active')) return;
+                        
+                        await handleProfileSwitch(profileId);
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Failed to load profile switcher:', error);
+            }
+        }
+
+        async function handleProfileSwitch(profileId) {
+            try {
+                const response = await fetch('https://worktalk-backend2.onrender.com/api/profiles/switch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify({ profileId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        showToast('Profile switched successfully', 'success');
+                        
+                        // Route based on profile type
+                        if (data.switchedProfile) {
+                            if (data.switchedProfile.isCompanyAdmin && data.switchedProfile.type === 'employee') {
+                                // Staying on company dashboard
+                                setTimeout(() => window.location.reload(), 500);
+                            } else if (data.switchedProfile.type === 'employee') {
+                                // Regular employee → company platform
+                                setTimeout(() => window.location.href = `platform.html?company=${data.switchedProfile.companyId}`, 500);
+                            } else {
+                                // Public profile → public timeline
+                                setTimeout(() => window.location.href = 'platform.html', 500);
+                            }
+                        }
+                    }
+                } else {
+                    showToast('Failed to switch profile', 'error');
+                }
+            } catch (error) {
+                console.error('Error switching profile:', error);
+                showToast('Failed to switch profile', 'error');
+            }
         }
     </script>
 </body>
