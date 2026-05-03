@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/dashboard-enhanced.css">
     <link rel="stylesheet" href="/css/responsive.css">
 </head>
 <body>
@@ -32,12 +33,11 @@
                     <!-- Company info will be populated -->
                 </div>
                 <div class="dashboard-nav">
-                    <button class="nav-btn active" data-section="overview">Overview</button>
-                    <button class="nav-btn" data-section="employees">Employees</button>
-                    <button class="nav-btn" data-section="invites">Invites</button>
-                    <button class="nav-btn" data-section="departments">Departments</button>
-                    <button class="nav-btn" data-section="moderation">Moderation</button>
-                    <button class="nav-btn" data-section="settings">Settings</button>
+                    <button class="nav-btn" data-section="settings" data-tab="settings">General Settings</button>
+                    <button class="nav-btn" data-section="moderation" data-tab="moderation">Moderation</button>
+                    <button class="nav-btn" data-section="departments" data-tab="departments">Departments</button>
+                    <button class="nav-btn" data-section="employees" data-tab="employees">Employees</button>
+                    <button class="nav-btn" data-section="invites" data-tab="invites">Invites</button>
                 </div>
                 
                 <!-- Profile Switch Section -->
@@ -81,13 +81,46 @@
                 <div id="employeesSection" class="dashboard-section">
                     <div class="section-header">
                         <h3>Employees</h3>
-                        <button id="inviteEmployeesBtn" class="btn btn-primary">+ Invite Employees</button>
+                        <div class="header-actions">
+                            <button id="inviteEmployeesBtn" class="btn btn-primary">+ Invite Employees</button>
+                            <button id="exportEmployeesBtn" class="btn btn-outline">Export Data</button>
+                        </div>
                     </div>
-                    <div class="search-bar">
-                        <input type="text" id="employeeSearch" class="search-input" placeholder="Search employees...">
-                    </div>
-                    <div id="employeesList" class="employees-table">
-                        <div class="loading-spinner"></div>
+                    
+                    <div class="employees-container">
+                        <div class="search-filters">
+                            <div class="search-bar">
+                                <input type="text" id="employeeSearch" class="search-input" placeholder="Search employees...">
+                                <select id="departmentFilter" class="filter-select">
+                                    <option value="">All Departments</option>
+                                </select>
+                                <select id="statusFilter" class="filter-select">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="suspended">Suspended</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="employees-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="totalEmployees">0</span>
+                                <span class="stat-label">Total Employees</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="activeEmployees">0</span>
+                                <span class="stat-label">Active</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="suspendedEmployees">0</span>
+                                <span class="stat-label">Suspended</span>
+                            </div>
+                        </div>
+                        
+                        <div id="employeesList" class="employees-table">
+                            <div class="loading-spinner"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -106,38 +139,216 @@
                         <h3>Departments</h3>
                         <button id="addDepartmentBtn" class="btn btn-primary">+ Add Department</button>
                     </div>
-                    <div id="departmentsList" class="departments-list">
-                        <div class="loading-spinner"></div>
+                    
+                    <div class="departments-container">
+                        <div class="departments-list" id="departmentsList">
+                            <div class="loading-spinner"></div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="moderationSection" class="dashboard-section">
-                    <h3>Flagged Content</h3>
-                    <div id="flaggedPosts" class="flagged-list">
-                        <div class="loading-spinner"></div>
+                    <div class="section-header">
+                        <h3>Moderation Settings</h3>
+                        <p class="section-description">Configure content moderation and community guidelines</p>
+                    </div>
+                    
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <h4>Post Moderation</h4>
+                            <form id="moderationSettingsForm" class="settings-form">
+                                <div class="form-group">
+                                    <label>Post Moderation</label>
+                                    <div class="radio-group">
+                                        <label class="radio-label">
+                                            <input type="radio" name="postModeration" value="auto_approve">
+                                            <span>Auto-approve all posts</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="postModeration" value="manual_review">
+                                            <span>Manual review required</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="allowAnonymousPosts" name="allowAnonymousPosts">
+                                        <span>Allow anonymous posts</span>
+                                    </label>
+                                </div>
+                                
+                                <h4>Comment Moderation</h4>
+                                <div class="form-group">
+                                    <label>Comment Moderation</label>
+                                    <div class="radio-group">
+                                        <label class="radio-label">
+                                            <input type="radio" name="commentModeration" value="auto_approve">
+                                            <span>Auto-approve comments</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="commentModeration" value="manual_review">
+                                            <span>Manual review required</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <h4>Flagged Content</h4>
+                                <div class="form-group">
+                                    <label>Flagged Content Review</label>
+                                    <div class="radio-group">
+                                        <label class="radio-label">
+                                            <input type="radio" name="flaggedContentReview" value="manual">
+                                            <span>Manual review</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="flaggedContentReview" value="auto_hide">
+                                            <span>Auto-hide flagged content</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="blockedKeywords">Blocked Keywords</label>
+                                    <div class="tags-input-container">
+                                        <input type="text" id="blockedKeywords" placeholder="Type keyword and press Enter">
+                                        <div class="tags-list" id="blockedKeywordsList"></div>
+                                    </div>
+                                    <small class="form-help">Add keywords that should be automatically flagged</small>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="autoSuspendAfterFlags">Auto-suspend after X flags</label>
+                                        <input type="number" id="autoSuspendAfterFlags" name="autoSuspendAfterFlags" min="1" max="100" value="5">
+                                        <small class="form-help">Number of flags before automatic suspension</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="maxCommentsPerDay">Max comments per day</label>
+                                        <input type="number" id="maxCommentsPerDay" name="maxCommentsPerDay" min="0" placeholder="0 = unlimited">
+                                        <small class="form-help">Set 0 for unlimited</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="maxPostsPerDay">Max posts per day</label>
+                                        <input type="number" id="maxPostsPerDay" name="maxPostsPerDay" min="0" placeholder="0 = unlimited">
+                                        <small class="form-help">Set 0 for unlimited</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Save Moderation Settings</button>
+                                    <button type="button" class="btn btn-outline" onclick="resetModerationSettings()">Reset</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
                 <div id="settingsSection" class="dashboard-section">
-                    <h3>Company Settings</h3>
-                    <form id="companySettingsForm" class="settings-form">
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="allowAnonymous"> Allow anonymous posts
-                            </label>
+                    <div class="section-header">
+                        <h3>General Settings</h3>
+                        <p class="section-description">Manage your company's basic information and appearance</p>
+                    </div>
+                    
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <h4>Company Information</h4>
+                            <form id="generalSettingsForm" class="settings-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="companyName">Company Name *</label>
+                                        <input type="text" id="companyName" name="name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="companyIndustry">Industry *</label>
+                                        <select id="companyIndustry" name="industry" required>
+                                            <option value="">Select Industry</option>
+                                            <option value="Technology">Technology</option>
+                                            <option value="Healthcare">Healthcare</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Education">Education</option>
+                                            <option value="Retail">Retail</option>
+                                            <option value="Manufacturing">Manufacturing</option>
+                                            <option value="Consulting">Consulting</option>
+                                            <option value="Media">Media</option>
+                                            <option value="Transportation">Transportation</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="companyDescription">Description</label>
+                                    <textarea id="companyDescription" name="description" rows="3" placeholder="Brief description of your company..."></textarea>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="companyLogo">Company Logo</label>
+                                        <div class="file-upload-group">
+                                            <input type="file" id="companyLogo" accept="image/*" class="file-input">
+                                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('companyLogo').click()">Choose File</button>
+                                            <span class="file-name" id="logoFileName">No file chosen</span>
+                                        </div>
+                                        <input type="hidden" id="logoUrl" name="logo">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="companyBanner">Banner Image</label>
+                                        <div class="file-upload-group">
+                                            <input type="file" id="companyBanner" accept="image/*" class="file-input">
+                                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('companyBanner').click()">Choose File</button>
+                                            <span class="file-name" id="bannerFileName">No file chosen</span>
+                                        </div>
+                                        <input type="hidden" id="bannerUrl" name="banner">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="companyWebsite">Website</label>
+                                    <input type="url" id="companyWebsite" name="website" placeholder="https://example.com">
+                                </div>
+                                
+                                <h4>Contact Information</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="contactEmail">Contact Email *</label>
+                                        <input type="email" id="contactEmail" name="contactEmail" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="contactPhone">Contact Phone</label>
+                                        <input type="tel" id="contactPhone" name="contactPhone" placeholder="+254...">
+                                    </div>
+                                </div>
+                                
+                                <h4>Address Information</h4>
+                                <div class="form-row">
+                                    <div class="form-group full-width">
+                                        <label for="streetAddress">Street Address</label>
+                                        <input type="text" id="streetAddress" name="streetAddress" placeholder="123 Main Street">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <input type="text" id="city" name="city" placeholder="Nairobi">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="postalCode">Postal Code</label>
+                                        <input type="text" id="postalCode" name="postalCode" placeholder="00100">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="country">Country</label>
+                                        <input type="text" id="country" name="country" placeholder="Kenya">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                    <button type="button" class="btn btn-outline" onclick="resetGeneralSettings()">Reset</button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="requireVerification"> Require email verification for employees
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="autoModerate"> Auto-moderate flagged content
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Settings</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </main>
@@ -147,6 +358,112 @@
                 <p>&copy; 2026 AjiraTalk. All rights reserved.</p>
             </div>
         </footer>
+    </div>
+
+    <!-- Modal Dialogs -->
+    <div id="departmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="departmentModalTitle">Add Department</h3>
+                <button class="modal-close" onclick="closeDepartmentModal()">&times;</button>
+            </div>
+            <form id="departmentForm" class="modal-body">
+                <input type="hidden" id="departmentId">
+                <div class="form-group">
+                    <label for="departmentName">Department Name *</label>
+                    <input type="text" id="departmentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="departmentDescription">Description</label>
+                    <textarea id="departmentDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="departmentIcon">Icon</label>
+                    <div class="icon-selector">
+                        <button type="button" class="icon-btn" data-icon="🏢">🏢</button>
+                        <button type="button" class="icon-btn" data-icon="💻">💻</button>
+                        <button type="button" class="icon-btn" data-icon="🔧">🔧</button>
+                        <button type="button" class="icon-btn" data-icon="📊">📊</button>
+                        <button type="button" class="icon-btn" data-icon="🎧">🎧</button>
+                        <button type="button" class="icon-btn" data-icon="💰">💰</button>
+                        <button type="button" class="icon-btn" data-icon="👥">👥</button>
+                        <button type="button" class="icon-btn" data-icon="⚙️">⚙️</button>
+                    </div>
+                    <input type="hidden" id="departmentIcon" value="🏢">
+                </div>
+                <div class="form-group">
+                    <label for="departmentHead">Head of Department</label>
+                    <select id="departmentHead">
+                        <option value="">Select Employee</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="departmentHidden">
+                        <span>Hide department from public view</span>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Save Department</button>
+                    <button type="button" class="btn btn-outline" onclick="closeDepartmentModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="suspendModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Suspend Employee</h3>
+                <button class="modal-close" onclick="closeSuspendModal()">&times;</button>
+            </div>
+            <form id="suspendForm" class="modal-body">
+                <input type="hidden" id="suspendUserId">
+                <input type="hidden" id="suspendUserName">
+                
+                <div class="suspend-info">
+                    <p>You are suspending: <strong id="suspendEmployeeName"></strong></p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="suspendDuration">Suspension Duration</label>
+                    <select id="suspendDuration">
+                        <option value="1">1 day</option>
+                        <option value="3">3 days</option>
+                        <option value="7">7 days</option>
+                        <option value="14">14 days</option>
+                        <option value="30">30 days</option>
+                        <option value="0">Indefinite</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="suspendReason">Reason for Suspension *</label>
+                    <textarea id="suspendReason" rows="3" required placeholder="Please provide a reason for this suspension..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-danger">Suspend Employee</button>
+                    <button type="button" class="btn btn-outline" onclick="closeSuspendModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Confirm Action</h3>
+                <button class="modal-close" onclick="closeConfirmModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-actions">
+                <button id="confirmBtn" class="btn btn-danger">Confirm</button>
+                <button type="button" class="btn btn-outline" onclick="closeConfirmModal()">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -160,7 +477,10 @@
 
         let currentUser = null;
         let currentCompany = null;
-        let activeSection = 'overview';
+        let activeSection = 'settings';
+        let blockedKeywords = [];
+        let departments = [];
+        let employees = [];
 
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DOM Content Loaded');
@@ -168,7 +488,13 @@
                 await checkAuth();
                 await loadCompanyData();
                 setupEventListeners();
-                loadSection('overview');
+                
+                // Handle URL-based navigation
+                const urlParams = new URLSearchParams(window.location.search);
+                const tabParam = urlParams.get('tab');
+                const initialTab = tabParam || 'settings';
+                
+                loadSection(initialTab);
                 console.log('Dashboard initialization complete');
             } catch (error) {
                 console.error('Dashboard initialization error:', error);
@@ -361,25 +687,57 @@
         function setupEventListeners() {
             console.log('Setting up event listeners...');
             
-            // Navigation
+            // Navigation with URL updates
             document.querySelectorAll('.dashboard-nav .nav-btn').forEach(btn => {
                 console.log('Found nav button:', btn.dataset.section);
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     const section = btn.dataset.section;
+                    const tab = btn.dataset.tab;
                     console.log('Nav button clicked:', section);
+                    
+                    // Update URL
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', tab);
+                    window.history.pushState({}, '', url);
+                    
                     loadSection(section);
                 });
             });
             
-            // Invite generation
-            document.getElementById('generateInviteBtn')?.addEventListener('click', handleGenerateInvite);
-            document.getElementById('inviteEmployeesBtn')?.addEventListener('click', () => loadSection('invites'));
-            document.getElementById('addDepartmentBtn')?.addEventListener('click', handleAddDepartment);
-            document.getElementById('companySettingsForm')?.addEventListener('submit', handleSaveSettings);
+            // Form submissions
+            document.getElementById('generalSettingsForm')?.addEventListener('submit', handleSaveGeneralSettings);
+            document.getElementById('moderationSettingsForm')?.addEventListener('submit', handleSaveModerationSettings);
+            document.getElementById('departmentForm')?.addEventListener('submit', handleSaveDepartment);
+            document.getElementById('suspendForm')?.addEventListener('submit', handleSuspendEmployee);
             
-            // Employee search
+            // Department management
+            document.getElementById('addDepartmentBtn')?.addEventListener('click', () => openDepartmentModal());
+            
+            // Employee management
+            document.getElementById('inviteEmployeesBtn')?.addEventListener('click', () => loadSection('invites'));
+            document.getElementById('exportEmployeesBtn')?.addEventListener('click', handleExportEmployees);
+            
+            // File uploads
+            document.getElementById('companyLogo')?.addEventListener('change', handleFileUpload);
+            document.getElementById('companyBanner')?.addEventListener('change', handleFileUpload);
+            
+            // Tags input
+            document.getElementById('blockedKeywords')?.addEventListener('keydown', handleKeywordInput);
+            
+            // Icon selector
+            document.querySelectorAll('.icon-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    document.getElementById('departmentIcon').value = btn.dataset.icon;
+                });
+            });
+            
+            // Search and filters
             document.getElementById('employeeSearch')?.addEventListener('input', debounce(loadEmployees, 300));
+            document.getElementById('departmentFilter')?.addEventListener('change', loadEmployees);
+            document.getElementById('statusFilter')?.addEventListener('change', loadEmployees);
         }
 
         async function loadSection(section) {
@@ -401,8 +759,14 @@
             // Load section data
             try {
                 switch(section) {
-                    case 'overview':
-                        await loadRecentActivity();
+                    case 'settings':
+                        await loadGeneralSettings();
+                        break;
+                    case 'moderation':
+                        await loadModerationSettings();
+                        break;
+                    case 'departments':
+                        await loadDepartments();
                         break;
                     case 'employees':
                         await loadEmployees();
@@ -410,18 +774,146 @@
                     case 'invites':
                         await loadInvites();
                         break;
-                    case 'departments':
-                        await loadDepartments();
-                        break;
-                    case 'moderation':
-                        await loadFlaggedContent();
-                        break;
-                    case 'settings':
-                        await loadSettings();
-                        break;
                 }
             } catch (error) {
                 console.error('Error loading section data:', error);
+            }
+        }
+
+        // ==================== GENERAL SETTINGS ====================
+        async function loadGeneralSettings() {
+            try {
+                const stats = await getCompanyStats();
+                currentCompany = stats.company;
+                
+                // Populate form with current data
+                const form = document.getElementById('generalSettingsForm');
+                if (currentCompany) {
+                    document.getElementById('companyName').value = currentCompany.name || '';
+                    document.getElementById('companyIndustry').value = currentCompany.industry || '';
+                    document.getElementById('companyDescription').value = currentCompany.description || '';
+                    document.getElementById('companyWebsite').value = currentCompany.website || '';
+                    document.getElementById('contactEmail').value = currentCompany.contactEmail || '';
+                    document.getElementById('contactPhone').value = currentCompany.contactPhone || '';
+                    document.getElementById('streetAddress').value = currentCompany.streetAddress || '';
+                    document.getElementById('city').value = currentCompany.city || '';
+                    document.getElementById('postalCode').value = currentCompany.postalCode || '';
+                    document.getElementById('country').value = currentCompany.country || '';
+                    
+                    // Handle logo and banner URLs
+                    if (currentCompany.logo) {
+                        document.getElementById('logoUrl').value = currentCompany.logo;
+                        document.getElementById('logoFileName').textContent = 'Logo uploaded';
+                    }
+                    if (currentCompany.banner) {
+                        document.getElementById('bannerUrl').value = currentCompany.banner;
+                        document.getElementById('bannerFileName').textContent = 'Banner uploaded';
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load general settings:', error);
+                showToast('Failed to load settings', 'error');
+            }
+        }
+
+        async function handleSaveGeneralSettings(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const companyId = localStorage.getItem('currentCompanyId');
+                const response = await fetch(`/api/companies/${companyId}/general`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast('General settings saved successfully', 'success');
+                    await loadCompanyData();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to save settings', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to save general settings:', error);
+                showToast('Failed to save settings', 'error');
+            }
+        }
+
+        // ==================== MODERATION SETTINGS ====================
+        async function loadModerationSettings() {
+            try {
+                const stats = await getCompanyStats();
+                currentCompany = stats.company;
+                
+                if (currentCompany?.settings?.moderation) {
+                    const moderation = currentCompany.settings.moderation;
+                    
+                    // Set radio buttons
+                    document.querySelector(`input[name="postModeration"][value="${moderation.postModeration || 'auto_approve'}"]`)?.setAttribute('checked', 'checked');
+                    document.querySelector(`input[name="commentModeration"][value="${moderation.commentModeration || 'auto_approve'}"]`)?.setAttribute('checked', 'checked');
+                    document.querySelector(`input[name="flaggedContentReview"][value="${moderation.flaggedContentReview || 'manual'}"]`)?.setAttribute('checked', 'checked');
+                    
+                    // Set checkboxes
+                    document.getElementById('allowAnonymousPosts').checked = moderation.allowAnonymousPosts || false;
+                    
+                    // Set number inputs
+                    document.getElementById('autoSuspendAfterFlags').value = moderation.autoSuspendAfterFlags || 5;
+                    document.getElementById('maxCommentsPerDay').value = moderation.maxCommentsPerDay || 0;
+                    document.getElementById('maxPostsPerDay').value = moderation.maxPostsPerDay || 0;
+                    
+                    // Load blocked keywords
+                    blockedKeywords = moderation.blockedKeywords || [];
+                    renderBlockedKeywords();
+                }
+            } catch (error) {
+                console.error('Failed to load moderation settings:', error);
+                showToast('Failed to load moderation settings', 'error');
+            }
+        }
+
+        async function handleSaveModerationSettings(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                postModeration: formData.get('postModeration'),
+                allowAnonymousPosts: document.getElementById('allowAnonymousPosts').checked,
+                commentModeration: formData.get('commentModeration'),
+                flaggedContentReview: formData.get('flaggedContentReview'),
+                blockedKeywords: blockedKeywords,
+                autoSuspendAfterFlags: parseInt(formData.get('autoSuspendAfterFlags')) || 5,
+                maxCommentsPerDay: parseInt(formData.get('maxCommentsPerDay')) || 0,
+                maxPostsPerDay: parseInt(formData.get('maxPostsPerDay')) || 0
+            };
+            
+            try {
+                const companyId = localStorage.getItem('currentCompanyId');
+                const response = await fetch(`/api/companies/${companyId}/settings`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast('Moderation settings saved successfully', 'success');
+                    await loadCompanyData();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to save moderation settings', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to save moderation settings:', error);
+                showToast('Failed to save moderation settings', 'error');
             }
         }
 
@@ -449,49 +941,223 @@
             }
         }
 
+        // ==================== EMPLOYEES ====================
         async function loadEmployees() {
             const container = document.getElementById('employeesList');
             const search = document.getElementById('employeeSearch')?.value || '';
+            const departmentFilter = document.getElementById('departmentFilter')?.value || '';
+            const statusFilter = document.getElementById('statusFilter')?.value || '';
             
             container.innerHTML = '<div class="loading-spinner"></div>';
             
             try {
-                const employees = await getEmployees(search);
-                if (!employees || employees.length === 0) {
-                    container.innerHTML = '<p class="text-muted">No employees found</p>';
-                    return;
-                }
+                const companyId = localStorage.getItem('currentCompanyId');
+                const params = new URLSearchParams({ search, department: departmentFilter, status: statusFilter });
+                const response = await fetch(`/api/companies/${companyId}/employees?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
                 
-                container.innerHTML = `
-                    <table class="data-table">
+                if (response.ok) {
+                    employees = await response.json();
+                    renderEmployees();
+                    updateEmployeeStats();
+                } else {
+                    throw new Error('Failed to load employees');
+                }
+            } catch (error) {
+                console.error('Failed to load employees:', error);
+                container.innerHTML = '<p class="text-muted">Failed to load employees</p>';
+            }
+        }
+
+        function renderEmployees() {
+            const container = document.getElementById('employeesList');
+            
+            if (!employees || employees.length === 0) {
+                container.innerHTML = '<p class="text-muted">No employees found</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="data-table employees-table">
                         <thead>
-                            <tr><th>Name</th><th>Email</th><th>Department</th><th>Joined</th><th>Status</th><th></th></tr>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Contact</th>
+                                <th>Joined</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
                         <tbody>
                             ${employees.map(emp => `
                                 <tr>
-                                    <td>${escapeHtml(emp.name)}</td>
-                                    <td>${escapeHtml(emp.email)}</td>
-                                    <td>${escapeHtml(emp.department)}</td>
-                                    <td>${formatRelativeTime(emp.joinedAt)}</td>
-                                    <td><span class="status-badge ${emp.isActive ? 'active' : 'inactive'}">${emp.isActive ? 'Active' : 'Inactive'}</span></td>
-                                    <td><button class="btn-icon remove-employee" data-id="${emp.id}">✕</button></td>
+                                    <td>
+                                        <div class="employee-info">
+                                            <div class="employee-avatar">${emp.name.charAt(0).toUpperCase()}</div>
+                                            <div>
+                                                <div class="employee-name">${escapeHtml(emp.name)}</div>
+                                                <div class="employee-role">${escapeHtml(emp.role || 'Employee')}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>${escapeHtml(emp.department?.name || 'Unassigned')}</td>
+                                    <td>
+                                        <div class="contact-info">
+                                            <div class="email">${escapeHtml(emp.email)}</div>
+                                            ${emp.phone ? `<div class="phone">${escapeHtml(emp.phone)}</div>` : ''}
+                                        </div>
+                                    </td>
+                                    <td>${formatRelativeTime(emp.createdAt)}</td>
+                                    <td>
+                                        <span class="status-badge ${
+                                            emp.isSuspended ? 'suspended' : 
+                                            emp.isActive ? 'active' : 'inactive'
+                                        }">
+                                            ${emp.isSuspended ? 'Suspended' : emp.isActive ? 'Active' : 'Inactive'}
+                                        </span>
+                                        ${emp.isSuspended && emp.suspensionEnds ? 
+                                            `<div class="suspension-info">Until ${formatRelativeTime(emp.suspensionEnds)}</div>` : ''
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="employee-actions">
+                                            ${emp.isSuspended ? 
+                                                `<button class="btn btn-sm btn-outline unsuspend-employee" data-id="${emp._id}">Unsuspend</button>` :
+                                                `<button class="btn btn-sm btn-warning suspend-employee" data-id="${emp._id}" data-name="${escapeHtml(emp.name)}">Suspend</button>`
+                                            }
+                                            <button class="btn-icon remove-employee" data-id="${emp._id}" title="Remove Employee">✕</button>
+                                        </div>
+                                    </td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
-                `;
-                
-                document.querySelectorAll('.remove-employee').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        if (confirm('Remove this employee? They will lose access to company space.')) {
-                            await handleRemoveEmployee(btn.dataset.id);
-                        }
-                    });
+                </div>
+            `;
+            
+            // Add event listeners
+            document.querySelectorAll('.suspend-employee').forEach(btn => {
+                btn.addEventListener('click', () => openSuspendModal(btn.dataset.id, btn.dataset.name));
+            });
+            
+            document.querySelectorAll('.unsuspend-employee').forEach(btn => {
+                btn.addEventListener('click', () => handleUnsuspendEmployee(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.remove-employee').forEach(btn => {
+                btn.addEventListener('click', () => confirmRemoveEmployee(btn.dataset.id));
+            });
+        }
+
+        function updateEmployeeStats() {
+            const total = employees.length;
+            const active = employees.filter(emp => emp.isActive && !emp.isSuspended).length;
+            const suspended = employees.filter(emp => emp.isSuspended).length;
+            
+            document.getElementById('totalEmployees').textContent = total;
+            document.getElementById('activeEmployees').textContent = active;
+            document.getElementById('suspendedEmployees').textContent = suspended;
+        }
+
+        function openSuspendModal(userId, userName) {
+            const modal = document.getElementById('suspendModal');
+            document.getElementById('suspendUserId').value = userId;
+            document.getElementById('suspendUserName').value = userName;
+            document.getElementById('suspendEmployeeName').textContent = userName;
+            document.getElementById('suspendForm').reset();
+            modal.classList.add('active');
+        }
+
+        function closeSuspendModal() {
+            document.getElementById('suspendModal').classList.remove('active');
+        }
+
+        async function handleSuspendEmployee(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById('suspendUserId').value;
+            const duration = parseInt(document.getElementById('suspendDuration').value);
+            const reason = document.getElementById('suspendReason').value;
+            
+            try {
+                const companyId = localStorage.getItem('currentCompanyId');
+                const response = await fetch(`/api/companies/${companyId}/employees/${userId}/suspend`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify({ duration, reason })
                 });
+                
+                if (response.ok) {
+                    showToast('Employee suspended successfully', 'success');
+                    closeSuspendModal();
+                    await loadEmployees();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to suspend employee', 'error');
+                }
             } catch (error) {
-                console.error('Failed to load employees:', error);
-                container.innerHTML = '<p class="text-muted">Failed to load employees</p>';
+                console.error('Failed to suspend employee:', error);
+                showToast('Failed to suspend employee', 'error');
+            }
+        }
+
+        async function handleUnsuspendEmployee(userId) {
+            try {
+                const companyId = localStorage.getItem('currentCompanyId');
+                const response = await fetch(`/api/companies/${companyId}/employees/${userId}/unsuspend`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showToast('Employee unsuspended successfully', 'success');
+                    await loadEmployees();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to unsuspend employee', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to unsuspend employee:', error);
+                showToast('Failed to unsuspend employee', 'error');
+            }
+        }
+
+        async function handleExportEmployees() {
+            try {
+                const companyId = localStorage.getItem('currentCompanyId');
+                const response = await fetch(`/api/companies/${companyId}/export`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'employees-export.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showToast('Employee data exported successfully', 'success');
+                } else {
+                    throw new Error('Failed to export data');
+                }
+            } catch (error) {
+                console.error('Failed to export employees:', error);
+                showToast('Failed to export employee data', 'error');
             }
         }
 
@@ -531,47 +1197,186 @@
             }
         }
 
+        // ==================== DEPARTMENTS ====================
         async function loadDepartments() {
             const container = document.getElementById('departmentsList');
             container.innerHTML = '<div class="loading-spinner"></div>';
             
             try {
-                const departments = await getDepartments();
-                if (!departments || departments.length === 0) {
-                    container.innerHTML = '<p class="text-muted">No departments. Click "Add Department" to create one.</p>';
-                    return;
+                const companyId = localStorage.getItem('currentCompanyId');
+                const response = await fetch(`/api/companies/${companyId}/departments`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    departments = await response.json();
+                    renderDepartments();
+                } else {
+                    throw new Error('Failed to load departments');
                 }
-                
-                container.innerHTML = departments.map(dept => `
-                    <div class="department-card">
-                        <div class="department-info">
-                            <span class="department-icon">${getDepartmentIcon(dept.name)}</span>
-                            <div>
-                                <h4>${escapeHtml(dept.name)}</h4>
-                                <p class="text-muted">${dept.employeeCount} employees • ${dept.postCount} posts</p>
-                            </div>
-                        </div>
-                        <div class="department-actions">
-                            <button class="btn-icon edit-department" data-id="${dept.id}" data-name="${escapeHtml(dept.name)}">✎</button>
-                            ${dept.employeeCount === 0 ? `<button class="btn-icon delete-department" data-id="${dept.id}">🗑</button>` : ''}
-                        </div>
-                    </div>
-                `).join('');
-                
-                document.querySelectorAll('.edit-department').forEach(btn => {
-                    btn.addEventListener('click', () => handleEditDepartment(btn.dataset.id, btn.dataset.name));
-                });
-                
-                document.querySelectorAll('.delete-department').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        if (confirm('Delete this department? All posts will be moved to General.')) {
-                            await handleDeleteDepartment(btn.dataset.id);
-                        }
-                    });
-                });
             } catch (error) {
                 console.error('Failed to load departments:', error);
                 container.innerHTML = '<p class="text-muted">Failed to load departments</p>';
+            }
+        }
+
+        function renderDepartments() {
+            const container = document.getElementById('departmentsList');
+            
+            if (!departments || departments.length === 0) {
+                container.innerHTML = '<p class="text-muted">No departments. Click "Add Department" to create one.</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="departments-grid sortable">
+                    ${departments.map((dept, index) => `
+                        <div class="department-card" data-department-id="${dept._id}" data-order="${index}">
+                            <div class="department-header">
+                                <div class="drag-handle">⋮⋮</div>
+                                <div class="department-info">
+                                    <span class="department-icon">${dept.icon || '🏢'}</span>
+                                    <div>
+                                        <h4>${escapeHtml(dept.name)}</h4>
+                                        <p class="text-muted">${dept.employeeCount || 0} employees • ${dept.postCount || 0} posts</p>
+                                    </div>
+                                </div>
+                                <div class="department-actions">
+                                    <button class="btn-icon edit-department" data-id="${dept._id}" data-name="${escapeHtml(dept.name)}">✎</button>
+                                    <button class="btn-icon toggle-visibility" data-id="${dept._id}" data-hidden="${dept.isHidden ? 'true' : 'false'}">
+                                        ${dept.isHidden ? '👁️' : '👁️‍🗨️'}
+                                    </button>
+                                    ${(dept.employeeCount || 0) === 0 ? `<button class="btn-icon delete-department" data-id="${dept._id}">🗑</button>` : ''}
+                                </div>
+                            </div>
+                            ${dept.description ? `<div class="department-description">${escapeHtml(dept.description)}</div>` : ''}
+                            ${dept.headOfDepartment ? `<div class="department-head">Head: ${escapeHtml(dept.headOfDepartment.name)}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Add event listeners
+            document.querySelectorAll('.edit-department').forEach(btn => {
+                btn.addEventListener('click', () => openDepartmentModal(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.delete-department').forEach(btn => {
+                btn.addEventListener('click', () => confirmDeleteDepartment(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.toggle-visibility').forEach(btn => {
+                btn.addEventListener('click', () => toggleDepartmentVisibility(btn.dataset.id, btn.dataset.hidden === 'true'));
+            });
+            
+            // Setup drag and drop
+            setupDragAndDrop();
+        }
+
+        function openDepartmentModal(departmentId = null) {
+            const modal = document.getElementById('departmentModal');
+            const title = document.getElementById('departmentModalTitle');
+            const form = document.getElementById('departmentForm');
+            
+            if (departmentId) {
+                const dept = departments.find(d => d._id === departmentId);
+                if (dept) {
+                    title.textContent = 'Edit Department';
+                    document.getElementById('departmentId').value = dept._id;
+                    document.getElementById('departmentName').value = dept.name;
+                    document.getElementById('departmentDescription').value = dept.description || '';
+                    document.getElementById('departmentIcon').value = dept.icon || '🏢';
+                    document.getElementById('departmentHead').value = dept.headOfDepartment?._id || '';
+                    document.getElementById('departmentHidden').checked = dept.isHidden || false;
+                    
+                    // Select icon button
+                    document.querySelectorAll('.icon-btn').forEach(btn => {
+                        btn.classList.toggle('selected', btn.dataset.icon === (dept.icon || '🏢'));
+                    });
+                }
+            } else {
+                title.textContent = 'Add Department';
+                form.reset();
+                document.getElementById('departmentId').value = '';
+                document.querySelectorAll('.icon-btn').forEach(btn => {
+                    btn.classList.toggle('selected', btn.dataset.icon === '🏢');
+                });
+            }
+            
+            // Load employees for department head selection
+            loadDepartmentHeadOptions();
+            
+            modal.classList.add('active');
+        }
+
+        function closeDepartmentModal() {
+            document.getElementById('departmentModal').classList.remove('active');
+        }
+
+        async function loadDepartmentHeadOptions() {
+            try {
+                const companyId = localStorage.getItem('currentCompanyId');
+                const response = await fetch(`/api/companies/${companyId}/employees`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const employees = await response.json();
+                    const select = document.getElementById('departmentHead');
+                    select.innerHTML = '<option value="">Select Employee</option>' +
+                        employees.map(emp => `
+                            <option value="${emp._id}">${escapeHtml(emp.name)}</option>
+                        `).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load employees for department head:', error);
+            }
+        }
+
+        async function handleSaveDepartment(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const departmentId = formData.get('departmentId');
+            const data = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                icon: formData.get('icon'),
+                headOfDepartment: formData.get('headOfDepartment'),
+                isHidden: document.getElementById('departmentHidden').checked
+            };
+            
+            try {
+                const companyId = localStorage.getItem('currentCompanyId');
+                const url = departmentId 
+                    ? `/api/departments/${departmentId}`
+                    : `/api/companies/${companyId}/departments`;
+                const method = departmentId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast(`Department ${departmentId ? 'updated' : 'created'} successfully`, 'success');
+                    closeDepartmentModal();
+                    await loadDepartments();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to save department', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to save department:', error);
+                showToast('Failed to save department', 'error');
             }
         }
 
@@ -668,55 +1473,214 @@
             }
         }
 
-        async function handleAddDepartment() {
-            const name = prompt('Enter department name:');
-            if (!name) return;
-            
-            try {
-                const result = await addDepartment(name);
-                if (result.success) {
-                    showToast('Department added', 'success');
-                    await loadDepartments();
-                } else {
-                    showToast(result.message || 'Failed to add department', 'error');
+        // ==================== UTILITY FUNCTIONS ====================
+        function handleKeywordInput(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const input = e.target;
+                const keyword = input.value.trim();
+                
+                if (keyword && !blockedKeywords.includes(keyword)) {
+                    blockedKeywords.push(keyword);
+                    input.value = '';
+                    renderBlockedKeywords();
                 }
-            } catch (error) {
-                console.error('Failed to add department:', error);
-                showToast('Failed to add department', 'error');
             }
         }
 
-        async function handleEditDepartment(deptId, currentName) {
-            const newName = prompt('Edit department name:', currentName);
-            if (!newName || newName === currentName) return;
+        function renderBlockedKeywords() {
+            const container = document.getElementById('blockedKeywordsList');
+            container.innerHTML = blockedKeywords.map(keyword => `
+                <span class="tag">
+                    ${escapeHtml(keyword)}
+                    <button type="button" class="tag-remove" onclick="removeKeyword('${keyword}')">&times;</button>
+                </span>
+            `).join('');
+        }
+
+        function removeKeyword(keyword) {
+            blockedKeywords = blockedKeywords.filter(k => k !== keyword);
+            renderBlockedKeywords();
+        }
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            const fileNameElement = e.target.parentElement.querySelector('.file-name');
+            const urlInput = e.target.parentElement.querySelector('input[type="hidden"]');
             
+            if (file) {
+                fileNameElement.textContent = file.name;
+                // In a real implementation, you would upload the file to a service
+                // For now, we'll just set a placeholder URL
+                urlInput.value = `https://example.com/uploads/${file.name}`;
+            } else {
+                fileNameElement.textContent = 'No file chosen';
+                urlInput.value = '';
+            }
+        }
+
+        function setupDragAndDrop() {
+            const sortableContainer = document.querySelector('.sortable');
+            if (!sortableContainer) return;
+            
+            let draggedElement = null;
+            
+            sortableContainer.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('department-card')) {
+                    draggedElement = e.target;
+                    e.target.style.opacity = '0.5';
+                }
+            });
+            
+            sortableContainer.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('department-card')) {
+                    e.target.style.opacity = '';
+                }
+            });
+            
+            sortableContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(sortableContainer, e.clientY);
+                if (afterElement == null) {
+                    sortableContainer.appendChild(draggedElement);
+                } else {
+                    sortableContainer.insertBefore(draggedElement, afterElement);
+                }
+            });
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.department-card:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function confirmDeleteDepartment(deptId) {
+            const modal = document.getElementById('confirmModal');
+            const title = document.getElementById('confirmTitle');
+            const message = document.getElementById('confirmMessage');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            title.textContent = 'Delete Department';
+            message.textContent = 'Are you sure you want to delete this department? All posts will be moved to General.';
+            
+            confirmBtn.onclick = async () => {
+                await handleDeleteDepartment(deptId);
+                closeConfirmModal();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function confirmRemoveEmployee(userId) {
+            const modal = document.getElementById('confirmModal');
+            const title = document.getElementById('confirmTitle');
+            const message = document.getElementById('confirmMessage');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            title.textContent = 'Remove Employee';
+            message.textContent = 'Are you sure you want to remove this employee? They will lose access to the company space.';
+            
+            confirmBtn.onclick = async () => {
+                await handleRemoveEmployee(userId);
+                closeConfirmModal();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        async function toggleDepartmentVisibility(deptId, isHidden) {
             try {
-                const result = await updateDepartment(deptId, { name: newName });
-                if (result.success) {
-                    showToast('Department updated', 'success');
+                const response = await fetch(`/api/departments/${deptId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify({ isHidden: !isHidden })
+                });
+                
+                if (response.ok) {
+                    showToast(`Department ${isHidden ? 'shown' : 'hidden'} successfully`, 'success');
                     await loadDepartments();
                 } else {
-                    showToast(result.message || 'Failed to update department', 'error');
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to update department', 'error');
                 }
             } catch (error) {
-                console.error('Failed to update department:', error);
+                console.error('Failed to toggle department visibility:', error);
                 showToast('Failed to update department', 'error');
             }
         }
 
         async function handleDeleteDepartment(deptId) {
             try {
-                const result = await deleteDepartment(deptId);
-                if (result.success) {
-                    showToast('Department deleted', 'success');
+                const response = await fetch(`/api/departments/${deptId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showToast('Department deleted successfully', 'success');
                     await loadDepartments();
                 } else {
-                    showToast(result.message || 'Failed to delete department', 'error');
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to delete department', 'error');
                 }
             } catch (error) {
                 console.error('Failed to delete department:', error);
                 showToast('Failed to delete department', 'error');
             }
+        }
+
+        async function handleRemoveEmployee(userId) {
+            try {
+                const companyId = localStorage.getItem('currentCompanyId');
+                const response = await fetch(`/api/companies/${companyId}/employees/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showToast('Employee removed successfully', 'success');
+                    await loadEmployees();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Failed to remove employee', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to remove employee:', error);
+                showToast('Failed to remove employee', 'error');
+            }
+        }
+
+        function resetGeneralSettings() {
+            document.getElementById('generalSettingsForm').reset();
+            showToast('Form reset', 'info');
+        }
+
+        function resetModerationSettings() {
+            document.getElementById('moderationSettingsForm').reset();
+            blockedKeywords = [];
+            renderBlockedKeywords();
+            showToast('Form reset', 'info');
         }
 
         async function handleResolveFlag(flagId, action) {
