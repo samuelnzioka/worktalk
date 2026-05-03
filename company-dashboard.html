@@ -182,41 +182,63 @@
             }
             
             try {
-                // First try to get user from localStorage (avoids API call that might fail with expired token)
+                // Get user data from localStorage
                 const storedUser = localStorage.getItem('user');
                 if (!storedUser) {
                     showToast('No user data found', 'error');
-                    window.location.href = '/login.html';
+                    setTimeout(() => window.location.href = '/login.html', 2000);
                     return;
                 }
                 
                 currentUser = JSON.parse(storedUser);
-                console.log('Auth check - User from localStorage:', currentUser._id);
-                console.log('Auth check - Profiles:', currentUser.profiles);
+                console.log('=== COMPANY DASHBOARD AUTH CHECK ===');
+                console.log('User ID:', currentUser._id);
+                console.log('User role:', currentUser.role);
+                console.log('Active profile ID:', currentUser.activeProfileId);
+                console.log('All profiles:', JSON.stringify(currentUser.profiles, null, 2));
+                console.log('currentCompanyId in localStorage:', localStorage.getItem('currentCompanyId'));
                 
-                // Find the employee profile and determine which company to show
-                const employeeProfile = currentUser.profiles?.find(p => p.type === 'employee');
+                // Find the ACTIVE profile (the one the user just switched to)
+                const activeProfile = currentUser.profiles?.find(p => p._id === currentUser.activeProfileId);
+                console.log('Active profile found:', activeProfile);
                 
-                if (!employeeProfile) {
-                    console.log('No employee profile found');
-                    showToast('No company profile found', 'error');
-                    window.location.href = '/platform.html';
+                // If active profile is an employee type, use its company
+                if (activeProfile && activeProfile.type === 'employee') {
+                    const companyId = activeProfile.companyId?._id || activeProfile.companyId;
+                    console.log('Active profile is employee, company ID:', companyId);
+                    if (companyId) {
+                        localStorage.setItem('currentCompanyId', companyId);
+                        console.log('Auth check passed - Company ID set:', companyId);
+                        updateUserMenu();
+                        return;
+                    }
+                }
+                
+                // Fallback: find ANY employee profile
+                const anyEmployeeProfile = currentUser.profiles?.find(p => p.type === 'employee');
+                if (anyEmployeeProfile) {
+                    const companyId = anyEmployeeProfile.companyId?._id || anyEmployeeProfile.companyId;
+                    console.log('Fallback: Found employee profile, company ID:', companyId);
+                    if (companyId) {
+                        localStorage.setItem('currentCompanyId', companyId);
+                        console.log('Auth check passed (fallback) - Company ID:', companyId);
+                        updateUserMenu();
+                        return;
+                    }
+                }
+                
+                // Last resort: check if currentCompanyId exists in localStorage
+                const existingCompanyId = localStorage.getItem('currentCompanyId');
+                if (existingCompanyId) {
+                    console.log('Last resort: Using existing currentCompanyId:', existingCompanyId);
+                    updateUserMenu();
                     return;
                 }
                 
-                // Get company ID from the employee profile
-                const profileCompanyId = employeeProfile.companyId?._id || employeeProfile.companyId;
-                console.log('Employee profile company ID:', profileCompanyId);
-                
-                // Set currentCompanyId if not already set or if it doesn't match
-                const storedCompanyId = localStorage.getItem('currentCompanyId');
-                if (!storedCompanyId || storedCompanyId !== profileCompanyId) {
-                    console.log('Updating currentCompanyId from', storedCompanyId, 'to', profileCompanyId);
-                    localStorage.setItem('currentCompanyId', profileCompanyId);
-                }
-                
-                console.log('Auth check passed - Company ID:', profileCompanyId);
-                updateUserMenu();
+                // If we get here, we truly have no company info
+                console.log('No company profile found - cannot access dashboard');
+                showToast('No company profile found. Please switch to your company account first.', 'error');
+                setTimeout(() => window.location.href = '/platform.html', 3000);
             } catch (error) {
                 console.error('Auth check error:', error);
                 window.location.href = '/login.html';
