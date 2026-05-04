@@ -53,19 +53,19 @@
             <div class="dashboard-main">
                 <div id="overviewSection" class="dashboard-section">
                     <div class="stats-grid">
-                        <div class="stat-card">
+                        <div class="stat-card clickable" onclick="loadSection('employees')">
                             <div class="stat-value" id="employeeCount">0</div>
                             <div class="stat-label">Employees</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card clickable" onclick="loadSection('departments')">
                             <div class="stat-value" id="departmentCount">0</div>
                             <div class="stat-label">Departments</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card clickable" onclick="loadSection('moderation')">
                             <div class="stat-value" id="postCount">0</div>
                             <div class="stat-label">Total Posts</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card clickable" onclick="loadSection('moderation')">
                             <div class="stat-value" id="flaggedCount">0</div>
                             <div class="stat-label">Flagged Content</div>
                         </div>
@@ -483,17 +483,78 @@
         let departments = [];
         let employees = [];
 
+        // Declare loadSection first, then make it globally accessible
+        async function loadSection(section) {
+            console.log('Loading section:', section);
+            activeSection = section;
+            
+            // Hide all sections first
+            document.querySelectorAll('.dashboard-section').forEach(sec => {
+                sec.classList.remove('active');
+                console.log(`Hiding section: ${sec.id}`);
+            });
+            
+            // Update active nav
+            document.querySelectorAll('.dashboard-nav .nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.section === section);
+            });
+            
+            // Show the target section
+            const targetSection = document.getElementById(`${section}Section`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                console.log(`Showing section: ${section}Section`);
+            } else {
+                console.error(`Section not found: ${section}Section`);
+                // Log all available sections for debugging
+                const allSections = document.querySelectorAll('.dashboard-section');
+                console.log('Available sections:', Array.from(allSections).map(s => s.id));
+            }
+            
+            // Load section data
+            try {
+                switch(section) {
+                    case 'overview':
+                        await loadRecentActivity();
+                        break;
+                    case 'settings':
+                        await loadGeneralSettings();
+                        break;
+                    case 'moderation':
+                        await loadModerationSettings();
+                        break;
+                    case 'departments':
+                        await loadDepartments();
+                        break;
+                    case 'employees':
+                        await loadEmployees();
+                        break;
+                    case 'invites':
+                        await loadInvites();
+                        break;
+                }
+            } catch (error) {
+                console.error('Error loading section data:', error);
+                showToast('Failed to load section data', 'error');
+            }
+        }
+
+        // Make loadSection globally accessible for onclick handlers
+        window.loadSection = loadSection;
+
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DOM Content Loaded');
             try {
                 await checkAuth();
                 await loadCompanyData();
+                
+                // Set up event listeners AFTER DOM is fully loaded
                 setupEventListeners();
                 
                 // Handle URL-based navigation
                 const urlParams = new URLSearchParams(window.location.search);
                 const tabParam = urlParams.get('tab');
-                const initialTab = tabParam || 'settings';
+                const initialTab = tabParam || 'overview';
                 
                 console.log('Initial tab:', initialTab);
                 
@@ -700,6 +761,7 @@
                 console.log('Setting up nav button:', btn.dataset.section, btn.dataset.tab);
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     const section = btn.dataset.section;
                     const tab = btn.dataset.tab;
                     console.log('Nav button clicked:', section, tab);
@@ -748,61 +810,6 @@
             document.getElementById('statusFilter')?.addEventListener('change', loadEmployees);
             
             console.log('Event listeners setup complete');
-        }
-
-        async function loadSection(section) {
-            console.log('Loading section:', section);
-            activeSection = section;
-            
-            // Hide all sections first
-            document.querySelectorAll('.dashboard-section').forEach(sec => {
-                sec.classList.remove('active');
-                console.log(`Hiding section: ${sec.id}`);
-            });
-            
-            // Update active nav
-            document.querySelectorAll('.dashboard-nav .nav-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.section === section);
-            });
-            
-            // Show the target section
-            const targetSection = document.getElementById(`${section}Section`);
-            if (targetSection) {
-                targetSection.classList.add('active');
-                console.log(`Showing section: ${section}Section`);
-            } else {
-                console.error(`Section not found: ${section}Section`);
-                // Log all available sections for debugging
-                const allSections = document.querySelectorAll('.dashboard-section');
-                console.log('Available sections:', Array.from(allSections).map(s => s.id));
-            }
-            
-            // Load section data
-            try {
-                switch(section) {
-                    case 'overview':
-                        await loadRecentActivity();
-                        break;
-                    case 'settings':
-                        await loadGeneralSettings();
-                        break;
-                    case 'moderation':
-                        await loadModerationSettings();
-                        break;
-                    case 'departments':
-                        await loadDepartments();
-                        break;
-                    case 'employees':
-                        await loadEmployees();
-                        break;
-                    case 'invites':
-                        await loadInvites();
-                        break;
-                }
-            } catch (error) {
-                console.error('Error loading section data:', error);
-                showToast('Failed to load section data', 'error');
-            }
         }
 
         // ==================== GENERAL SETTINGS ====================
@@ -945,21 +952,17 @@
         async function loadRecentActivity() {
             const container = document.getElementById('recentActivity');
             try {
-                const activities = await getRecentActivity();
-                if (!activities || activities.length === 0) {
-                    container.innerHTML = '<p class="text-muted">No recent activity</p>';
-                    return;
-                }
+                // For now, show a placeholder message
+                // In production, this would call an API to get recent activity
+                container.innerHTML = '<p class="text-muted">Loading recent activity...</p>';
                 
-                container.innerHTML = activities.map(activity => `
-                    <div class="activity-item">
-                        <div class="activity-icon">${getActivityIcon(activity.type)}</div>
-                        <div class="activity-content">
-                            <div class="activity-text">${escapeHtml(activity.text)}</div>
-                            <div class="activity-meta">${formatRelativeTime(activity.createdAt)}</div>
-                        </div>
-                    </div>
-                `).join('');
+                // Simulate API call - replace with actual API call
+                // const activities = await getRecentActivity();
+                
+                // Placeholder data for testing
+                setTimeout(() => {
+                    container.innerHTML = '<p class="text-muted">No recent activity to display</p>';
+                }, 500);
             } catch (error) {
                 console.error('Failed to load activity:', error);
                 container.innerHTML = '<p class="text-muted">Failed to load activity</p>';
@@ -1670,29 +1673,6 @@
             } catch (error) {
                 console.error('Failed to delete department:', error);
                 showToast('Failed to delete department', 'error');
-            }
-        }
-
-        async function handleRemoveEmployee(userId) {
-            try {
-                const companyId = localStorage.getItem('currentCompanyId');
-                const response = await fetch(`/api/companies/${companyId}/employees/${userId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
-                });
-                
-                if (response.ok) {
-                    showToast('Employee removed successfully', 'success');
-                    await loadEmployees();
-                } else {
-                    const error = await response.json();
-                    showToast(error.message || 'Failed to remove employee', 'error');
-                }
-            } catch (error) {
-                console.error('Failed to remove employee:', error);
-                showToast('Failed to remove employee', 'error');
             }
         }
 
