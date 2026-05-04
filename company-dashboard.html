@@ -819,6 +819,24 @@
                 });
             });
             
+            // Profile switcher - use event delegation for dynamically added elements
+            const profileSwitcher = document.getElementById('profileSwitcher');
+            if (profileSwitcher) {
+                profileSwitcher.addEventListener('click', async (e) => {
+                    const profileItem = e.target.closest('.profile-switch-item');
+                    if (profileItem) {
+                        const profileId = profileItem.dataset.profileId;
+                        if (!profileId || profileItem.classList.contains('active')) return;
+                        await handleProfileSwitch(profileId);
+                    }
+                });
+            }
+            
+            // Account switcher in user dropdown
+            document.querySelectorAll('.account-switch').forEach(btn => {
+                btn.addEventListener('click', handleAccountSwitch);
+            });
+            
             // Search and filters
             document.getElementById('employeeSearch')?.addEventListener('input', debounce(loadEmployees, 300));
             document.getElementById('departmentFilter')?.addEventListener('change', loadEmployees);
@@ -1727,24 +1745,6 @@
                 console.log('Switcher HTML generated:', switcherHTML.length, 'characters');
                 profileSwitcher.innerHTML = switcherHTML;
                 console.log('Profile switcher innerHTML set');
-                
-                // Add click handlers
-                const profileItems = document.querySelectorAll('.profile-switch-item');
-                console.log('Profile switch items found:', profileItems.length);
-                
-                profileItems.forEach(item => {
-                    console.log('Adding click handler to profile:', item.dataset.profileId);
-                    item.addEventListener('click', async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const profileId = item.dataset.profileId;
-                        console.log('Profile item clicked:', profileId);
-                        if (!profileId || item.classList.contains('active')) return;
-                        
-                        await handleProfileSwitch(profileId);
-                    });
-                });
-                
                 console.log('Profile switcher load complete');
             } catch (error) {
                 console.error('Failed to load profile switcher:', error);
