@@ -175,11 +175,13 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
+    color: var(--text-primary);
 }
 
 .radio-label:hover {
     border-color: var(--border-hover);
     background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .radio-label input[type="radio"] {
@@ -195,11 +197,13 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
+    color: var(--text-primary);
 }
 
 .checkbox-label:hover {
     border-color: var(--border-hover);
     background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .checkbox-label input[type="checkbox"] {

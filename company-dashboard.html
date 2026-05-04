@@ -476,6 +476,8 @@
         } from '/js/company-dashboard.js';
         import { showToast, formatRelativeTime, escapeHtml } from '/js/utils.js';
 
+        const API_BASE_URL = 'https://worktalk-backend2.onrender.com/api';
+
         let currentUser = null;
         let currentCompany = null;
         let activeSection = 'settings';
@@ -705,7 +707,7 @@
             console.log('Loading company data...');
             try {
                 const stats = await getCompanyStats();
-                console.log('Company stats received:', stats);
+                console.log('Company stats received:', JSON.stringify(stats, null, 2));
                 currentCompany = stats.company;
                 updateStats(stats);
                 
@@ -729,7 +731,7 @@
         }
 
         function updateStats(stats) {
-            console.log('Updating stats with data:', stats);
+            console.log('Updating stats with data:', JSON.stringify(stats, null, 2));
             const employeeCountEl = document.getElementById('employeeCount');
             const departmentCountEl = document.getElementById('departmentCount');
             const postCountEl = document.getElementById('postCount');
@@ -742,10 +744,23 @@
                 flaggedCount: !!flaggedCountEl
             });
             
-            if (employeeCountEl) employeeCountEl.textContent = stats.employeeCount;
-            if (departmentCountEl) departmentCountEl.textContent = stats.departmentCount;
-            if (postCountEl) postCountEl.textContent = stats.postCount;
-            if (flaggedCountEl) flaggedCountEl.textContent = stats.flaggedCount;
+            // Handle different possible response structures
+            const employeeCount = stats.employeeCount || stats.employees || stats.employeeCount || 0;
+            const departmentCount = stats.departmentCount || stats.departments || stats.departmentCount || 0;
+            const postCount = stats.postCount || stats.posts || stats.postCount || 0;
+            const flaggedCount = stats.flaggedCount || stats.flagged || stats.flaggedCount || 0;
+            
+            console.log('Mapped counts:', {
+                employeeCount,
+                departmentCount,
+                postCount,
+                flaggedCount
+            });
+            
+            if (employeeCountEl) employeeCountEl.textContent = employeeCount;
+            if (departmentCountEl) departmentCountEl.textContent = departmentCount;
+            if (postCountEl) postCountEl.textContent = postCount;
+            if (flaggedCountEl) flaggedCountEl.textContent = flaggedCount;
             
             console.log('Stats updated');
         }
@@ -856,25 +871,12 @@
             
             try {
                 const companyId = localStorage.getItem('currentCompanyId');
-                const response = await fetch(`/api/companies/${companyId}/general`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (response.ok) {
-                    showToast('General settings saved successfully', 'success');
-                    await loadCompanyData();
-                } else {
-                    const error = await response.json();
-                    showToast(error.message || 'Failed to save settings', 'error');
-                }
+                const response = await companiesAPI.update(companyId, data);
+                showToast('General settings saved successfully', 'success');
+                await loadCompanyData();
             } catch (error) {
                 console.error('Failed to save general settings:', error);
-                showToast('Failed to save settings', 'error');
+                showToast(error.message || 'Failed to save settings', 'error');
             }
         }
 
@@ -927,25 +929,12 @@
             
             try {
                 const companyId = localStorage.getItem('currentCompanyId');
-                const response = await fetch(`/api/companies/${companyId}/settings`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (response.ok) {
-                    showToast('Moderation settings saved successfully', 'success');
-                    await loadCompanyData();
-                } else {
-                    const error = await response.json();
-                    showToast(error.message || 'Failed to save moderation settings', 'error');
-                }
+                const response = await companiesAPI.updateSettings(companyId, data);
+                showToast('Moderation settings saved successfully', 'success');
+                await loadCompanyData();
             } catch (error) {
                 console.error('Failed to save moderation settings:', error);
-                showToast('Failed to save moderation settings', 'error');
+                showToast(error.message || 'Failed to save moderation settings', 'error');
             }
         }
 
@@ -979,21 +968,13 @@
             container.innerHTML = '<div class="loading-spinner"></div>';
             
             try {
-                const companyId = localStorage.getItem('currentCompanyId');
-                const params = new URLSearchParams({ search, department: departmentFilter, status: statusFilter });
-                const response = await fetch(`/api/companies/${companyId}/employees?${params}`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
-                });
+                const params = { search };
+                if (departmentFilter) params.department = departmentFilter;
+                if (statusFilter) params.status = statusFilter;
                 
-                if (response.ok) {
-                    employees = await response.json();
-                    renderEmployees();
-                    updateEmployeeStats();
-                } else {
-                    throw new Error('Failed to load employees');
-                }
+                employees = await getEmployees(search);
+                renderEmployees();
+                updateEmployeeStats();
             } catch (error) {
                 console.error('Failed to load employees:', error);
                 container.innerHTML = '<p class="text-muted">Failed to load employees</p>';
@@ -1113,8 +1094,9 @@
             const reason = document.getElementById('suspendReason').value;
             
             try {
+                // Note: This endpoint may need to be added to the API service layer
                 const companyId = localStorage.getItem('currentCompanyId');
-                const response = await fetch(`/api/companies/${companyId}/employees/${userId}/suspend`, {
+                const response = await fetch(`${API_BASE_URL}/companies/${companyId}/employees/${userId}/suspend`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1139,8 +1121,9 @@
 
         async function handleUnsuspendEmployee(userId) {
             try {
+                // Note: This endpoint may need to be added to the API service layer
                 const companyId = localStorage.getItem('currentCompanyId');
-                const response = await fetch(`/api/companies/${companyId}/employees/${userId}/unsuspend`, {
+                const response = await fetch(`${API_BASE_URL}/companies/${companyId}/employees/${userId}/unsuspend`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -1162,8 +1145,9 @@
 
         async function handleExportEmployees() {
             try {
+                // Note: This endpoint may need to be added to the API service layer
                 const companyId = localStorage.getItem('currentCompanyId');
-                const response = await fetch(`/api/companies/${companyId}/export`, {
+                const response = await fetch(`${API_BASE_URL}/companies/${companyId}/export`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
                     }
@@ -1231,19 +1215,8 @@
             container.innerHTML = '<div class="loading-spinner"></div>';
             
             try {
-                const companyId = localStorage.getItem('currentCompanyId');
-                const response = await fetch(`/api/companies/${companyId}/departments`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
-                });
-                
-                if (response.ok) {
-                    departments = await response.json();
-                    renderDepartments();
-                } else {
-                    throw new Error('Failed to load departments');
-                }
+                departments = await getDepartments();
+                renderDepartments();
             } catch (error) {
                 console.error('Failed to load departments:', error);
                 container.innerHTML = '<p class="text-muted">Failed to load departments</p>';
@@ -1345,21 +1318,12 @@
 
         async function loadDepartmentHeadOptions() {
             try {
-                const companyId = localStorage.getItem('currentCompanyId');
-                const response = await fetch(`/api/companies/${companyId}/employees`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const employees = await response.json();
-                    const select = document.getElementById('departmentHead');
-                    select.innerHTML = '<option value="">Select Employee</option>' +
-                        employees.map(emp => `
-                            <option value="${emp._id}">${escapeHtml(emp.name)}</option>
-                        `).join('');
-                }
+                const employees = await getEmployees();
+                const select = document.getElementById('departmentHead');
+                select.innerHTML = '<option value="">Select Employee</option>' +
+                    employees.map(emp => `
+                        <option value="${emp._id}">${escapeHtml(emp.name)}</option>
+                    `).join('');
             } catch (error) {
                 console.error('Failed to load employees for department head:', error);
             }
@@ -1379,32 +1343,17 @@
             };
             
             try {
-                const companyId = localStorage.getItem('currentCompanyId');
-                const url = departmentId 
-                    ? `/api/departments/${departmentId}`
-                    : `/api/companies/${companyId}/departments`;
-                const method = departmentId ? 'PUT' : 'POST';
-                
-                const response = await fetch(url, {
-                    method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (response.ok) {
-                    showToast(`Department ${departmentId ? 'updated' : 'created'} successfully`, 'success');
-                    closeDepartmentModal();
-                    await loadDepartments();
+                if (departmentId) {
+                    await updateDepartment(departmentId, data);
                 } else {
-                    const error = await response.json();
-                    showToast(error.message || 'Failed to save department', 'error');
+                    await addDepartment(data.name);
                 }
+                showToast(`Department ${departmentId ? 'updated' : 'created'} successfully`, 'success');
+                closeDepartmentModal();
+                await loadDepartments();
             } catch (error) {
                 console.error('Failed to save department:', error);
-                showToast('Failed to save department', 'error');
+                showToast(error.message || 'Failed to save department', 'error');
             }
         }
 
@@ -1488,16 +1437,12 @@
 
         async function handleRemoveEmployee(userId) {
             try {
-                const result = await removeEmployee(userId);
-                if (result.success) {
-                    showToast('Employee removed', 'success');
-                    await loadEmployees();
-                } else {
-                    showToast(result.message || 'Failed to remove employee', 'error');
-                }
+                await removeEmployee(userId);
+                showToast('Employee removed successfully', 'success');
+                await loadEmployees();
             } catch (error) {
                 console.error('Failed to remove employee:', error);
-                showToast('Failed to remove employee', 'error');
+                showToast(error.message || 'Failed to remove employee', 'error');
             }
         }
 
@@ -1632,47 +1577,24 @@
 
         async function toggleDepartmentVisibility(deptId, isHidden) {
             try {
-                const response = await fetch(`/api/departments/${deptId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    },
-                    body: JSON.stringify({ isHidden: !isHidden })
-                });
-                
-                if (response.ok) {
-                    showToast(`Department ${isHidden ? 'shown' : 'hidden'} successfully`, 'success');
-                    await loadDepartments();
-                } else {
-                    const error = await response.json();
-                    showToast(error.message || 'Failed to update department', 'error');
-                }
+                const data = { isHidden: !isHidden };
+                await updateDepartment(deptId, data);
+                showToast(`Department ${isHidden ? 'shown' : 'hidden'} successfully`, 'success');
+                await loadDepartments();
             } catch (error) {
                 console.error('Failed to toggle department visibility:', error);
-                showToast('Failed to update department', 'error');
+                showToast(error.message || 'Failed to update department', 'error');
             }
         }
 
         async function handleDeleteDepartment(deptId) {
             try {
-                const response = await fetch(`/api/departments/${deptId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
-                });
-                
-                if (response.ok) {
-                    showToast('Department deleted successfully', 'success');
-                    await loadDepartments();
-                } else {
-                    const error = await response.json();
-                    showToast(error.message || 'Failed to delete department', 'error');
-                }
+                await deleteDepartment(deptId);
+                showToast('Department deleted successfully', 'success');
+                await loadDepartments();
             } catch (error) {
                 console.error('Failed to delete department:', error);
-                showToast('Failed to delete department', 'error');
+                showToast(error.message || 'Failed to delete department', 'error');
             }
         }
 
