@@ -58,6 +58,20 @@ export async function registerEmployee(inviteCode, name, email, password) {
  */
 export async function login(email, password, rememberMe = false) {
     try {
+        // First clear any existing tokens to prevent caching issues
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('currentCompanyId');
+        localStorage.removeItem('currentAccount');
+        localStorage.removeItem('companyAccessToken');
+        localStorage.removeItem('companyRefreshToken');
+        localStorage.removeItem('companyUser');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
+        
+        console.log('Existing tokens cleared before login');
+        
         const response = await authAPI.login({
             email: sanitizeInput(email),
             password,
@@ -67,12 +81,16 @@ export async function login(email, password, rememberMe = false) {
         if (response.success && response.accessToken) {
             // Store tokens
             localStorage.setItem('accessToken', response.accessToken);
+            console.log('New access token stored');
+            
             if (response.refreshToken) {
                 localStorage.setItem('refreshToken', response.refreshToken);
+                console.log('New refresh token stored');
             }
             if (response.user) {
                 localStorage.setItem('user', JSON.stringify(response.user));
                 currentUser = response.user;
+                console.log('User data stored:', response.user.email);
             }
             
             return { 
@@ -98,11 +116,22 @@ export async function logout() {
     } catch (error) {
         console.error('Logout error:', error);
     } finally {
-        // Clear local storage
+        // Clear localStorage tokens
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
+        localStorage.removeItem('currentCompanyId');
+        localStorage.removeItem('currentAccount');
+        localStorage.removeItem('companyAccessToken');
+        localStorage.removeItem('companyRefreshToken');
+        localStorage.removeItem('companyUser');
+        
+        // Clear sessionStorage tokens
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
+        
         currentUser = null;
+        console.log('All tokens cleared on logout');
         
         // Redirect to home
         window.location.href = '/';
@@ -207,10 +236,15 @@ export async function resetPassword(token, password) {
  */
 export async function switchProfile(profileId) {
     try {
+        // Clear cached tokens before switching
+        console.log('Clearing tokens before profile switch');
+        localStorage.removeItem('currentCompanyId');
+        
         const response = await profileAPI.switchProfile(profileId);
         if (response.success && response.user) {
             currentUser = response.user;
             localStorage.setItem('user', JSON.stringify(response.user));
+            console.log('Profile switched successfully, user updated:', response.user.email);
             return { success: true, user: response.user };
         }
         return { success: false, message: response.message };
@@ -224,26 +258,50 @@ export async function switchProfile(profileId) {
  * Switch to company account
  */
 export function switchToCompany() {
+    // Clear cached data before switching
+    console.log('Clearing cached data before switching to company account');
+    localStorage.removeItem('currentCompanyId');
+    localStorage.removeItem('currentAccount');
+    
     const companyToken = localStorage.getItem('companyAccessToken');
     const companyUser = localStorage.getItem('companyUser');
     const companyId = localStorage.getItem('currentCompanyId');
     
-    if (!companyToken || !companyUser || !companyId) {
+    console.log('Company token found:', !!companyToken);
+    console.log('Company user found:', !!companyUser);
+    
+    if (!companyToken || !companyUser) {
         return { success: false, message: 'No company account found' };
     }
     
+    // Swap tokens
+    localStorage.setItem('accessToken', companyToken);
+    localStorage.setItem('user', companyUser);
     localStorage.setItem('currentAccount', 'company');
-    currentUser = JSON.parse(companyUser);
+    if (companyId) {
+        localStorage.setItem('currentCompanyId', companyId);
+    }
     
-    return { success: true, user: currentUser, companyId };
+    currentUser = JSON.parse(companyUser);
+    console.log('Switched to company account:', currentUser.email);
+    
+    return { success: true, user: currentUser };
 }
 
 /**
  * Switch to public account
  */
 export function switchToPublic() {
+    // Clear cached company data before switching
+    console.log('Clearing cached data before switching to public account');
+    localStorage.removeItem('currentCompanyId');
+    localStorage.removeItem('currentAccount');
+    
     const publicToken = localStorage.getItem('accessToken');
     const publicUser = localStorage.getItem('user');
+    
+    console.log('Public token found:', !!publicToken);
+    console.log('Public user found:', !!publicUser);
     
     if (!publicToken || !publicUser) {
         return { success: false, message: 'No public account found' };
@@ -251,6 +309,7 @@ export function switchToPublic() {
     
     localStorage.setItem('currentAccount', 'public');
     currentUser = JSON.parse(publicUser);
+    console.log('Switched to public account:', currentUser.email);
     
     return { success: true, user: currentUser };
 }
