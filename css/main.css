@@ -414,8 +414,8 @@ h3 {
 
 /* ==================== Footer ==================== */
 .footer {
-    background: var(--gray-900);
-    color: var(--gray-400);
+    background: var(--bg-primary);
+    color: var(--text-primary);
     padding: var(--spacing-2xl) var(--spacing-lg) var(--spacing-md);
 }
 

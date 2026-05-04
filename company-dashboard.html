@@ -747,6 +747,10 @@
                 flaggedCount: !!flaggedCountEl
             });
             
+            // Handle nested stats structure (stats.stats) or direct stats
+            const actualStats = stats.stats || stats;
+            console.log('Actual stats object:', actualStats);
+            
             // Handle different possible response structures
             // The stats object might have direct count properties or nested data
             let employeeCount = 0;
@@ -755,33 +759,33 @@
             let flaggedCount = 0;
             
             // Try to get employee count
-            if (typeof stats.employeeCount === 'number') {
-                employeeCount = stats.employeeCount;
-            } else if (stats.employees) {
-                employeeCount = Array.isArray(stats.employees) ? stats.employees.length : stats.employees;
-            } else if (stats.total) {
-                employeeCount = stats.total;
+            if (typeof actualStats.employeeCount === 'number') {
+                employeeCount = actualStats.employeeCount;
+            } else if (actualStats.employees) {
+                employeeCount = Array.isArray(actualStats.employees) ? actualStats.employees.length : actualStats.employees;
+            } else if (actualStats.total) {
+                employeeCount = actualStats.total;
             }
             
             // Try to get department count
-            if (typeof stats.departmentCount === 'number') {
-                departmentCount = stats.departmentCount;
-            } else if (stats.departments) {
-                departmentCount = Array.isArray(stats.departments) ? stats.departments.length : stats.departments;
+            if (typeof actualStats.departmentCount === 'number') {
+                departmentCount = actualStats.departmentCount;
+            } else if (actualStats.departments) {
+                departmentCount = Array.isArray(actualStats.departments) ? actualStats.departments.length : actualStats.departments;
             }
             
             // Try to get post count
-            if (typeof stats.postCount === 'number') {
-                postCount = stats.postCount;
-            } else if (stats.posts) {
-                postCount = Array.isArray(stats.posts) ? stats.posts.length : stats.posts;
+            if (typeof actualStats.postCount === 'number') {
+                postCount = actualStats.postCount;
+            } else if (actualStats.posts) {
+                postCount = Array.isArray(actualStats.posts) ? actualStats.posts.length : actualStats.posts;
             }
             
             // Try to get flagged count
-            if (typeof stats.flaggedCount === 'number') {
-                flaggedCount = stats.flaggedCount;
-            } else if (stats.flagged) {
-                flaggedCount = Array.isArray(stats.flagged) ? stats.flagged.length : stats.flagged;
+            if (typeof actualStats.flaggedCount === 'number') {
+                flaggedCount = actualStats.flaggedCount;
+            } else if (actualStats.flagged) {
+                flaggedCount = Array.isArray(actualStats.flagged) ? actualStats.flagged.length : actualStats.flagged;
             }
             
             console.log('Mapped counts:', {
@@ -862,14 +866,26 @@
                     const profileItem = e.target.closest('.profile-switch-item');
                     console.log('Profile item found:', !!profileItem, profileItem);
                     if (profileItem) {
-                        const profileId = profileItem.dataset.profileId;
-                        console.log('Profile ID:', profileId);
-                        if (!profileId || profileItem.classList.contains('active')) {
-                            console.log('Skipping - no profile ID or already active');
+                        const type = profileItem.dataset.type;
+                        console.log('Account type:', type);
+                        if (!type || profileItem.classList.contains('active')) {
+                            console.log('Skipping - no type or already active');
                             return;
                         }
-                        console.log('Calling handleProfileSwitch with:', profileId);
-                        await handleProfileSwitch(profileId);
+                        console.log('Calling account switch for type:', type);
+                        if (type === 'public') {
+                            const result = switchToPublic();
+                            if (result.success) {
+                                showToast('Switched to public account', 'success');
+                                window.location.href = '/platform.html';
+                            } else {
+                                showToast(result.message, 'error');
+                            }
+                        } else if (type === 'company') {
+                            // Switch to company account - reload the page to trigger company dashboard
+                            showToast('Switching to company account...', 'success');
+                            window.location.reload();
+                        }
                     }
                 });
             }
@@ -1741,48 +1757,38 @@
             console.log('Profile switcher element found:', !!profileSwitcher);
             
             try {
-                // Get user data from localStorage
-                const userStr = localStorage.getItem('user');
-                console.log('User data from localStorage:', !!userStr);
+                // Use getAvailableAccounts to get all accounts including public
+                const accounts = getAvailableAccounts();
+                console.log('Available accounts:', accounts);
                 
-                if (!userStr) {
-                    console.log('No user data found in localStorage');
+                if (!accounts || accounts.length === 0) {
+                    console.log('No accounts found');
+                    profileSwitcher.innerHTML = '<p class="text-muted">No profiles available</p>';
                     return;
                 }
                 
-                const userData = JSON.parse(userStr);
-                console.log('User data parsed:', userData);
-                console.log('User profiles:', userData.profiles);
-                
-                const activeProfileId = userData.activeProfileId || userData.profiles?.[0]?._id;
-                console.log('Active profile ID:', activeProfileId);
-                
                 let switcherHTML = '';
                 
-                // Render user profiles
-                if (userData?.profiles && userData.profiles.length > 0) {
-                    switcherHTML += userData.profiles.map(profile => {
-                        const isActive = profile._id === activeProfileId;
-                        const isEmployee = profile.type === 'employee';
-                        const companyName = isEmployee ? (profile.companyName || profile.companyId?.name || 'Company') : '';
-                        
-                        console.log(`Rendering profile: ${profile.username}, type: ${profile.type}, active: ${isActive}`);
-                        
-                        return `
-                            <div class="profile-switch-item ${isActive ? 'active' : ''}" data-profile-id="${profile._id}">
-                                <div class="profile-switch-icon">${isEmployee ? '🏢' : '🌍'}</div>
-                                <div class="profile-switch-info">
-                                    <div class="profile-switch-name">${escapeHtml(profile.username)}</div>
-                                    <div class="profile-switch-type">${isEmployee ? `Employee at ${companyName}` : 'Public Account'}</div>
-                                </div>
-                                ${isActive ? '<span class="profile-switch-badge">Active</span>' : ''}
+                // Render all available accounts
+                switcherHTML += accounts.map(acc => {
+                    const isActive = acc.isActive;
+                    const isCompany = acc.type === 'company';
+                    const name = isCompany ? 'Company Account' : 'Public Account';
+                    const icon = isCompany ? '🏢' : '👤';
+                    
+                    console.log(`Rendering account: ${name}, type: ${acc.type}, active: ${isActive}`);
+                    
+                    return `
+                        <div class="profile-switch-item ${isActive ? 'active' : ''}" data-type="${acc.type}" data-account-id="${acc.accountId || ''}">
+                            <div class="profile-switch-icon">${icon}</div>
+                            <div class="profile-switch-info">
+                                <div class="profile-switch-name">${name}</div>
+                                <div class="profile-switch-type">${isCompany ? 'Company Dashboard' : 'Public Timeline'}</div>
                             </div>
-                        `;
-                    }).join('');
-                } else {
-                    console.log('No profiles found in user data');
-                    switcherHTML = '<p class="text-muted">No profiles available</p>';
-                }
+                            ${isActive ? '<span class="profile-switch-badge">Active</span>' : ''}
+                        </div>
+                    `;
+                }).join('');
                 
                 console.log('Switcher HTML generated:', switcherHTML.length, 'characters');
                 profileSwitcher.innerHTML = switcherHTML;
