@@ -159,7 +159,7 @@
                             <h4>Post Moderation</h4>
                             <form id="moderationSettingsForm" class="settings-form">
                                 <div class="form-group">
-                                    <label>Post Moderation</label>
+                                    <label style="color: #000000 !important;">Post Moderation</label>
                                     <div class="radio-group">
                                         <label class="radio-label" style="color: #000000 !important;">
                                             <input type="radio" name="postModeration" value="auto_approve">
@@ -179,9 +179,9 @@
                                     </label>
                                 </div>
                                 
-                                <h4>Comment Moderation</h4>
+                                <h4 style="color: #000000 !important;">Comment Moderation</h4>
                                 <div class="form-group">
-                                    <label>Comment Moderation</label>
+                                    <label style="color: #000000 !important;">Comment Moderation</label>
                                     <div class="radio-group">
                                         <label class="radio-label" style="color: #000000 !important;">
                                             <input type="radio" name="commentModeration" value="auto_approve">
@@ -194,9 +194,9 @@
                                     </div>
                                 </div>
                                 
-                                <h4>Flagged Content</h4>
+                                <h4 style="color: #000000 !important;">Flagged Content</h4>
                                 <div class="form-group">
-                                    <label>Flagged Content Review</label>
+                                    <label style="color: #000000 !important;">Flagged Content Review</label>
                                     <div class="radio-group">
                                         <label class="radio-label" style="color: #000000 !important;">
                                             <input type="radio" name="flaggedContentReview" value="manual">
@@ -210,29 +210,29 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="blockedKeywords">Blocked Keywords</label>
+                                    <label for="blockedKeywords" style="color: #000000 !important;">Blocked Keywords</label>
                                     <div class="tags-input-container">
                                         <input type="text" id="blockedKeywords" placeholder="Type keyword and press Enter">
                                         <div class="tags-list" id="blockedKeywordsList"></div>
                                     </div>
-                                    <small class="form-help">Add keywords that should be automatically flagged</small>
+                                    <small class="form-help" style="color: #000000 !important;">Add keywords that should be automatically flagged</small>
                                 </div>
                                 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="autoSuspendAfterFlags">Auto-suspend after X flags</label>
+                                        <label for="autoSuspendAfterFlags" style="color: #000000 !important;">Auto-suspend after X flags</label>
                                         <input type="number" id="autoSuspendAfterFlags" name="autoSuspendAfterFlags" min="1" max="100" value="5">
-                                        <small class="form-help">Number of flags before automatic suspension</small>
+                                        <small class="form-help" style="color: #000000 !important;">Number of flags before automatic suspension</small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="maxCommentsPerDay">Max comments per day</label>
+                                        <label for="maxCommentsPerDay" style="color: #000000 !important;">Max comments per day</label>
                                         <input type="number" id="maxCommentsPerDay" name="maxCommentsPerDay" min="0" placeholder="0 = unlimited">
-                                        <small class="form-help">Set 0 for unlimited</small>
+                                        <small class="form-help" style="color: #000000 !important;">Set 0 for unlimited</small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="maxPostsPerDay">Max posts per day</label>
+                                        <label for="maxPostsPerDay" style="color: #000000 !important;">Max posts per day</label>
                                         <input type="number" id="maxPostsPerDay" name="maxPostsPerDay" min="0" placeholder="0 = unlimited">
-                                        <small class="form-help">Set 0 for unlimited</small>
+                                        <small class="form-help" style="color: #000000 !important;">Set 0 for unlimited</small>
                                     </div>
                                 </div>
                                 
@@ -257,11 +257,11 @@
                             <form id="generalSettingsForm" class="settings-form">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="companyName">Company Name *</label>
+                                        <label for="companyName" style="color: #000000 !important;">Company Name *</label>
                                         <input type="text" id="companyName" name="name" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="companyIndustry">Industry *</label>
+                                        <label for="companyIndustry" style="color: #000000 !important;">Industry *</label>
                                         <select id="companyIndustry" name="industry" required>
                                             <option value="">Select Industry</option>
                                             <option value="Technology">Technology</option>
@@ -279,66 +279,66 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="companyDescription">Description</label>
+                                    <label for="companyDescription" style="color: #000000 !important;">Description</label>
                                     <textarea id="companyDescription" name="description" rows="3" placeholder="Brief description of your company..."></textarea>
                                 </div>
                                 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="companyLogo">Company Logo</label>
+                                        <label for="companyLogo" style="color: #000000 !important;">Company Logo</label>
                                         <div class="file-upload-group">
                                             <input type="file" id="companyLogo" accept="image/*" class="file-input">
-                                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('companyLogo').click()">Choose File</button>
-                                            <span class="file-name" id="logoFileName">No file chosen</span>
+                                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('companyLogo').click()" style="color: #000000 !important;">Choose File</button>
+                                            <span class="file-name" id="logoFileName" style="color: #000000 !important;">No file chosen</span>
                                         </div>
                                         <input type="hidden" id="logoUrl" name="logo">
                                     </div>
                                     <div class="form-group">
-                                        <label for="companyBanner">Banner Image</label>
+                                        <label for="companyBanner" style="color: #000000 !important;">Banner Image</label>
                                         <div class="file-upload-group">
                                             <input type="file" id="companyBanner" accept="image/*" class="file-input">
-                                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('companyBanner').click()">Choose File</button>
-                                            <span class="file-name" id="bannerFileName">No file chosen</span>
+                                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('companyBanner').click()" style="color: #000000 !important;">Choose File</button>
+                                            <span class="file-name" id="bannerFileName" style="color: #000000 !important;">No file chosen</span>
                                         </div>
                                         <input type="hidden" id="bannerUrl" name="banner">
                                     </div>
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="companyWebsite">Website</label>
+                                    <label for="companyWebsite" style="color: #000000 !important;">Website</label>
                                     <input type="url" id="companyWebsite" name="website" placeholder="https://example.com">
                                 </div>
                                 
                                 <h4>Contact Information</h4>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="contactEmail">Contact Email *</label>
+                                        <label for="contactEmail" style="color: #000000 !important;">Contact Email *</label>
                                         <input type="email" id="contactEmail" name="contactEmail" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="contactPhone">Contact Phone</label>
+                                        <label for="contactPhone" style="color: #000000 !important;">Contact Phone</label>
                                         <input type="tel" id="contactPhone" name="contactPhone" placeholder="+254...">
                                     </div>
                                 </div>
                                 
-                                <h4>Address Information</h4>
+                                <h4 style="color: #000000 !important;">Address Information</h4>
                                 <div class="form-row">
                                     <div class="form-group full-width">
-                                        <label for="streetAddress">Street Address</label>
+                                        <label for="streetAddress" style="color: #000000 !important;">Street Address</label>
                                         <input type="text" id="streetAddress" name="streetAddress" placeholder="123 Main Street">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="city">City</label>
+                                        <label for="city" style="color: #000000 !important;">City</label>
                                         <input type="text" id="city" name="city" placeholder="Nairobi">
                                     </div>
                                     <div class="form-group">
-                                        <label for="postalCode">Postal Code</label>
+                                        <label for="postalCode" style="color: #000000 !important;">Postal Code</label>
                                         <input type="text" id="postalCode" name="postalCode" placeholder="00100">
                                     </div>
                                     <div class="form-group">
-                                        <label for="country">Country</label>
+                                        <label for="country" style="color: #000000 !important;">Country</label>
                                         <input type="text" id="country" name="country" placeholder="Kenya">
                                     </div>
                                 </div>
@@ -371,15 +371,15 @@
             <form id="departmentForm" class="modal-body">
                 <input type="hidden" id="departmentId">
                 <div class="form-group">
-                    <label for="departmentName">Department Name *</label>
+                    <label for="departmentName" style="color: #000000 !important;">Department Name *</label>
                     <input type="text" id="departmentName" required>
                 </div>
                 <div class="form-group">
-                    <label for="departmentDescription">Description</label>
+                    <label for="departmentDescription" style="color: #000000 !important;">Description</label>
                     <textarea id="departmentDescription" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="departmentIcon">Icon</label>
+                    <label for="departmentIcon" style="color: #000000 !important;">Icon</label>
                     <div class="icon-selector">
                         <button type="button" class="icon-btn" data-icon="🏢">🏢</button>
                         <button type="button" class="icon-btn" data-icon="💻">💻</button>
@@ -393,7 +393,7 @@
                     <input type="hidden" id="departmentIcon" value="🏢">
                 </div>
                 <div class="form-group">
-                    <label for="departmentHead">Head of Department</label>
+                    <label for="departmentHead" style="color: #000000 !important;">Head of Department</label>
                     <select id="departmentHead">
                         <option value="">Select Employee</option>
                     </select>
@@ -427,7 +427,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="suspendDuration">Suspension Duration</label>
+                    <label for="suspendDuration" style="color: #000000 !important;">Suspension Duration</label>
                     <select id="suspendDuration">
                         <option value="1">1 day</option>
                         <option value="3">3 days</option>
@@ -439,7 +439,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="suspendReason">Reason for Suspension *</label>
+                    <label for="suspendReason" style="color: #000000 !important;">Reason for Suspension *</label>
                     <textarea id="suspendReason" rows="3" required placeholder="Please provide a reason for this suspension..."></textarea>
                 </div>
                 

@@ -59,7 +59,7 @@
 }
 
 .section-description {
-    color: var(--text-secondary);
+    color: #000000 !important;
     font-size: 0.875rem;
     margin-top: 0.25rem;
 }
@@ -92,7 +92,7 @@
 .settings-card h4 {
     font-size: 1.125rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #000000 !important;
     margin: 0 0 1.5rem 0;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border-color);
@@ -125,7 +125,7 @@
 .form-group label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-primary);
+    color: #000000 !important;
 }
 
 .form-group input,
@@ -154,7 +154,7 @@
 
 .form-help {
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: #000000 !important;
     margin-top: 0.25rem;
 }
 
