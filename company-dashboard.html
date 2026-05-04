@@ -595,6 +595,10 @@
                 console.log('All profiles:', JSON.stringify(currentUser.profiles, null, 2));
                 console.log('currentCompanyId in localStorage:', localStorage.getItem('currentCompanyId'));
                 
+                // Clear any cached company ID to prevent showing wrong data
+                localStorage.removeItem('currentCompanyId');
+                console.log('Cleared cached currentCompanyId');
+                
                 // Find the ACTIVE profile (the one the user just switched to)
                 const activeProfile = currentUser.profiles?.find(p => p._id === currentUser.activeProfileId);
                 console.log('Active profile found:', activeProfile);
@@ -611,29 +615,8 @@
                     }
                 }
                 
-                // Fallback: find ANY employee profile
-                const anyEmployeeProfile = currentUser.profiles?.find(p => p.type === 'employee');
-                if (anyEmployeeProfile) {
-                    const companyId = anyEmployeeProfile.companyId?._id || anyEmployeeProfile.companyId;
-                    console.log('Fallback: Found employee profile, company ID:', companyId);
-                    if (companyId) {
-                        localStorage.setItem('currentCompanyId', companyId);
-                        console.log('Auth check passed (fallback) - Company ID:', companyId);
-                        updateUserMenu();
-                        return;
-                    }
-                }
-                
-                // Last resort: check if currentCompanyId exists in localStorage
-                const existingCompanyId = localStorage.getItem('currentCompanyId');
-                if (existingCompanyId) {
-                    console.log('Last resort: Using existing currentCompanyId:', existingCompanyId);
-                    updateUserMenu();
-                    return;
-                }
-                
-                // If we get here, we truly have no company info
-                console.log('No company profile found - cannot access dashboard');
+                // NO FALLBACK - If no active employee profile, user cannot access dashboard
+                console.log('No active employee profile found - cannot access dashboard');
                 showToast('No company profile found. Please switch to your company account first.', 'error');
                 setTimeout(() => window.location.href = '/platform.html', 3000);
             } catch (error) {
