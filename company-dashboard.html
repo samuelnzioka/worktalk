@@ -33,6 +33,7 @@
                     <!-- Company info will be populated -->
                 </div>
                 <div class="dashboard-nav">
+                    <button class="nav-btn" data-section="overview" data-tab="overview">Overview</button>
                     <button class="nav-btn" data-section="settings" data-tab="settings">General Settings</button>
                     <button class="nav-btn" data-section="moderation" data-tab="moderation">Moderation</button>
                     <button class="nav-btn" data-section="departments" data-tab="departments">Departments</button>
@@ -50,7 +51,7 @@
             </div>
 
             <div class="dashboard-main">
-                <div id="overviewSection" class="dashboard-section active">
+                <div id="overviewSection" class="dashboard-section">
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-value" id="employeeCount">0</div>
@@ -494,7 +495,11 @@
                 const tabParam = urlParams.get('tab');
                 const initialTab = tabParam || 'settings';
                 
-                loadSection(initialTab);
+                console.log('Initial tab:', initialTab);
+                
+                // Load initial section
+                await loadSection(initialTab);
+                
                 console.log('Dashboard initialization complete');
             } catch (error) {
                 console.error('Dashboard initialization error:', error);
@@ -688,13 +693,16 @@
             console.log('Setting up event listeners...');
             
             // Navigation with URL updates
-            document.querySelectorAll('.dashboard-nav .nav-btn').forEach(btn => {
-                console.log('Found nav button:', btn.dataset.section);
+            const navButtons = document.querySelectorAll('.dashboard-nav .nav-btn');
+            console.log('Found navigation buttons:', navButtons.length);
+            
+            navButtons.forEach(btn => {
+                console.log('Setting up nav button:', btn.dataset.section, btn.dataset.tab);
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     const section = btn.dataset.section;
                     const tab = btn.dataset.tab;
-                    console.log('Nav button clicked:', section);
+                    console.log('Nav button clicked:', section, tab);
                     
                     // Update URL
                     const url = new URL(window.location);
@@ -738,27 +746,43 @@
             document.getElementById('employeeSearch')?.addEventListener('input', debounce(loadEmployees, 300));
             document.getElementById('departmentFilter')?.addEventListener('change', loadEmployees);
             document.getElementById('statusFilter')?.addEventListener('change', loadEmployees);
+            
+            console.log('Event listeners setup complete');
         }
 
         async function loadSection(section) {
             console.log('Loading section:', section);
             activeSection = section;
             
+            // Hide all sections first
+            document.querySelectorAll('.dashboard-section').forEach(sec => {
+                sec.classList.remove('active');
+                console.log(`Hiding section: ${sec.id}`);
+            });
+            
             // Update active nav
             document.querySelectorAll('.dashboard-nav .nav-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.section === section);
             });
             
-            // Show/hide sections
-            document.querySelectorAll('.dashboard-section').forEach(sec => {
-                const shouldBeActive = sec.id === `${section}Section`;
-                sec.classList.toggle('active', shouldBeActive);
-                console.log(`Section ${sec.id}: ${shouldBeActive ? 'showing' : 'hiding'}`);
-            });
+            // Show the target section
+            const targetSection = document.getElementById(`${section}Section`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                console.log(`Showing section: ${section}Section`);
+            } else {
+                console.error(`Section not found: ${section}Section`);
+                // Log all available sections for debugging
+                const allSections = document.querySelectorAll('.dashboard-section');
+                console.log('Available sections:', Array.from(allSections).map(s => s.id));
+            }
             
             // Load section data
             try {
                 switch(section) {
+                    case 'overview':
+                        await loadRecentActivity();
+                        break;
                     case 'settings':
                         await loadGeneralSettings();
                         break;
@@ -777,6 +801,7 @@
                 }
             } catch (error) {
                 console.error('Error loading section data:', error);
+                showToast('Failed to load section data', 'error');
             }
         }
 
