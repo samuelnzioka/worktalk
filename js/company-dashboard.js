@@ -49,8 +49,8 @@ export async function getEmployees(search = '') {
     try {
         const companyId = localStorage.getItem('currentCompanyId');
         if (!companyId) throw new Error('No company ID found');
-        const employees = await companiesAPI.getEmployees(companyId, { search });
-        return employees;
+        const response = await companiesAPI.getEmployees(companyId, { search });
+        return response.employees || response || [];
     } catch (error) {
         console.error('Failed to get employees:', error);
         throw error;
@@ -79,8 +79,8 @@ export async function getInvites() {
     try {
         const companyId = localStorage.getItem('currentCompanyId');
         if (!companyId) throw new Error('No company ID found');
-        const invites = await invitesAPI.list(companyId);
-        return invites;
+        const response = await invitesAPI.list(companyId);
+        return response.invites || response || [];
     } catch (error) {
         console.error('Failed to get invites:', error);
         throw error;
@@ -124,8 +124,8 @@ export async function getDepartments() {
     try {
         const companyId = localStorage.getItem('currentCompanyId');
         if (!companyId) throw new Error('No company ID found');
-        const departments = await departmentsAPI.list(companyId);
-        return departments;
+        const response = await departmentsAPI.list(companyId);
+        return response.departments || response || [];
     } catch (error) {
         console.error('Failed to get departments:', error);
         throw error;

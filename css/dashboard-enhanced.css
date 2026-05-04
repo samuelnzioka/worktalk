@@ -175,13 +175,21 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
-    color: var(--text-primary);
+    color: #000000 !important;
+}
+
+.radio-label span {
+    color: #000000 !important;
 }
 
 .radio-label:hover {
     border-color: var(--border-hover);
     background: var(--bg-secondary);
-    color: var(--text-primary);
+    color: #000000 !important;
+}
+
+.radio-label:hover span {
+    color: #000000 !important;
 }
 
 .radio-label input[type="radio"] {
@@ -197,13 +205,21 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
-    color: var(--text-primary);
+    color: #000000 !important;
+}
+
+.checkbox-label span {
+    color: #000000 !important;
 }
 
 .checkbox-label:hover {
     border-color: var(--border-hover);
     background: var(--bg-secondary);
-    color: var(--text-primary);
+    color: #000000 !important;
+}
+
+.checkbox-label:hover span {
+    color: #000000 !important;
 }
 
 .checkbox-label input[type="checkbox"] {
