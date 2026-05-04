@@ -518,6 +518,9 @@
                 switch(section) {
                     case 'overview':
                         await loadRecentActivity();
+                        // Also update stats when loading overview
+                        const overviewStats = await getCompanyStats();
+                        updateStats(overviewStats);
                         break;
                     case 'settings':
                         await loadGeneralSettings();
@@ -745,10 +748,41 @@
             });
             
             // Handle different possible response structures
-            const employeeCount = stats.employeeCount || stats.employees || stats.employeeCount || 0;
-            const departmentCount = stats.departmentCount || stats.departments || stats.departmentCount || 0;
-            const postCount = stats.postCount || stats.posts || stats.postCount || 0;
-            const flaggedCount = stats.flaggedCount || stats.flagged || stats.flaggedCount || 0;
+            // The stats object might have direct count properties or nested data
+            let employeeCount = 0;
+            let departmentCount = 0;
+            let postCount = 0;
+            let flaggedCount = 0;
+            
+            // Try to get employee count
+            if (typeof stats.employeeCount === 'number') {
+                employeeCount = stats.employeeCount;
+            } else if (stats.employees) {
+                employeeCount = Array.isArray(stats.employees) ? stats.employees.length : stats.employees;
+            } else if (stats.total) {
+                employeeCount = stats.total;
+            }
+            
+            // Try to get department count
+            if (typeof stats.departmentCount === 'number') {
+                departmentCount = stats.departmentCount;
+            } else if (stats.departments) {
+                departmentCount = Array.isArray(stats.departments) ? stats.departments.length : stats.departments;
+            }
+            
+            // Try to get post count
+            if (typeof stats.postCount === 'number') {
+                postCount = stats.postCount;
+            } else if (stats.posts) {
+                postCount = Array.isArray(stats.posts) ? stats.posts.length : stats.posts;
+            }
+            
+            // Try to get flagged count
+            if (typeof stats.flaggedCount === 'number') {
+                flaggedCount = stats.flaggedCount;
+            } else if (stats.flagged) {
+                flaggedCount = Array.isArray(stats.flagged) ? stats.flagged.length : stats.flagged;
+            }
             
             console.log('Mapped counts:', {
                 employeeCount,
@@ -821,12 +855,20 @@
             
             // Profile switcher - use event delegation for dynamically added elements
             const profileSwitcher = document.getElementById('profileSwitcher');
+            console.log('Profile switcher element found:', !!profileSwitcher);
             if (profileSwitcher) {
                 profileSwitcher.addEventListener('click', async (e) => {
+                    console.log('Profile switcher clicked');
                     const profileItem = e.target.closest('.profile-switch-item');
+                    console.log('Profile item found:', !!profileItem, profileItem);
                     if (profileItem) {
                         const profileId = profileItem.dataset.profileId;
-                        if (!profileId || profileItem.classList.contains('active')) return;
+                        console.log('Profile ID:', profileId);
+                        if (!profileId || profileItem.classList.contains('active')) {
+                            console.log('Skipping - no profile ID or already active');
+                            return;
+                        }
+                        console.log('Calling handleProfileSwitch with:', profileId);
                         await handleProfileSwitch(profileId);
                     }
                 });
@@ -1752,8 +1794,16 @@
         }
 
         async function handleProfileSwitch(profileId) {
+            console.log('=== handleProfileSwitch called with profileId:', profileId);
             try {
                 let token = localStorage.getItem('accessToken');
+                console.log('Token found:', !!token);
+                if (!token) {
+                    console.error('No access token found');
+                    showToast('No authentication token found', 'error');
+                    return;
+                }
+                
                 let response = await fetch('https://worktalk-backend2.onrender.com/api/profiles/switch', {
                     method: 'POST',
                     headers: {
@@ -1762,6 +1812,7 @@
                     },
                     body: JSON.stringify({ profileId })
                 });
+                console.log('Switch API response status:', response.status);
                 
                 // Handle token expiration
                 if (response.status === 401) {
