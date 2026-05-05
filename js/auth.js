@@ -236,15 +236,71 @@ export async function resetPassword(token, password) {
  */
 export async function switchProfile(profileId) {
     try {
-        // Clear cached tokens before switching
-        console.log('Clearing tokens before profile switch');
+        // Clear cached data before switching
+        console.log('Clearing cached data before profile switch');
         localStorage.removeItem('currentCompanyId');
+        localStorage.removeItem('currentAccount');
         
         const response = await profileAPI.switchProfile(profileId);
-        if (response.success && response.user) {
-            currentUser = response.user;
-            localStorage.setItem('user', JSON.stringify(response.user));
-            console.log('Profile switched successfully, user updated:', response.user.email);
+        console.log('Switch profile API response:', response);
+        
+        if (response.success) {
+            // CRITICAL FIX: Save the new tokens from the switch response
+            // Without this, the frontend keeps sending the old token
+            if (response.accessToken) {
+                localStorage.setItem('accessToken', response.accessToken);
+                console.log('New access token saved after profile switch');
+            }
+            if (response.refreshToken) {
+                localStorage.setItem('refreshToken', response.refreshToken);
+                console.log('New refresh token saved after profile switch');
+            }
+            
+            // Update user data
+            if (response.user) {
+                currentUser = response.user;
+                localStorage.setItem('user', JSON.stringify(response.user));
+                console.log('User data updated after profile switch:', response.user.email);
+            }
+            
+            // Handle redirect based on switched profile type
+            if (response.switchedProfile) {
+                const switchedProfile = response.switchedProfile;
+                console.log('Switched profile type:', switchedProfile.type);
+                
+                if (switchedProfile.type === 'employee') {
+                    // Set company ID for employee profiles
+                    if (switchedProfile.companyId) {
+                        const companyId = switchedProfile.companyId._id || switchedProfile.companyId;
+                        localStorage.setItem('currentCompanyId', companyId);
+                        console.log('Company ID set:', companyId);
+                    }
+                    
+                    if (switchedProfile.isCompanyAdmin) {
+                        return { 
+                            success: true, 
+                            user: response.user, 
+                            switchedProfile,
+                            redirectTo: '/company-dashboard.html'
+                        };
+                    } else {
+                        return { 
+                            success: true, 
+                            user: response.user, 
+                            switchedProfile,
+                            redirectTo: '/platform.html'
+                        };
+                    }
+                } else if (switchedProfile.type === 'public') {
+                    return { 
+                        success: true, 
+                        user: response.user, 
+                        switchedProfile,
+                        redirectTo: '/platform.html'
+                    };
+                }
+            }
+            
             return { success: true, user: response.user };
         }
         return { success: false, message: response.message };
@@ -320,24 +376,36 @@ export function switchToPublic() {
 export function getAvailableAccounts() {
     const accounts = [];
     
-    const publicUser = localStorage.getItem('user');
-    if (publicUser) {
-        accounts.push({
-            type: 'public',
-            user: JSON.parse(publicUser),
-            isActive: localStorage.getItem('currentAccount') === 'public'
-        });
-    }
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return accounts;
     
-    const companyUser = localStorage.getItem('companyUser');
-    const companyId = localStorage.getItem('currentCompanyId');
-    if (companyUser && companyId) {
-        accounts.push({
-            type: 'company',
-            user: JSON.parse(companyUser),
-            companyId,
-            isActive: localStorage.getItem('currentAccount') === 'company'
-        });
+    try {
+        const userData = JSON.parse(userStr);
+        const activeProfileId = userData.activeProfileId;
+        
+        // Add all user profiles as available accounts
+        if (userData.profiles && userData.profiles.length > 0) {
+            userData.profiles.forEach(profile => {
+                const isEmployee = profile.type === 'employee';
+                const isActive = profile._id === activeProfileId;
+                const companyName = isEmployee 
+                    ? (profile.companyName || profile.companyId?.name || 'Company') 
+                    : '';
+                const isCompanyAdmin = isEmployee && profile.isCompanyAdmin;
+                
+                accounts.push({
+                    type: isEmployee ? 'company' : 'public',
+                    profileId: profile._id,
+                    username: profile.username,
+                    companyName,
+                    isCompanyAdmin,
+                    isActive,
+                    profile
+                });
+            });
+        }
+    } catch (error) {
+        console.error('Error getting available accounts:', error);
     }
     
     return accounts;

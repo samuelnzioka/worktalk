@@ -468,7 +468,7 @@
     </div>
 
     <script type="module">
-        import { isAuthenticated, getCurrentUser, switchToPublic, getAvailableAccounts } from '/js/auth.js';
+        import { isAuthenticated, getCurrentUser, switchToPublic, switchProfile, getAvailableAccounts } from '/js/auth.js';
         import { 
             getCompanyStats, getEmployees, getInvites, getDepartments, getFlaggedContent,
             generateInvite, revokeInvite, removeEmployee, addDepartment, updateDepartment,
@@ -634,13 +634,20 @@
                 
                 let accountSwitcherHTML = '';
                 if (accounts.length > 1) {
-                    accountSwitcherHTML = accounts.map(acc => `
-                        <button class="dropdown-item account-switch ${acc.isActive ? 'active' : ''}" data-type="${acc.type}">
-                            <span class="account-icon">${acc.type === 'company' ? '🏢' : '👤'}</span>
-                            <span class="account-name">${acc.type === 'company' ? 'Company Account' : 'Public Account'}</span>
-                            ${acc.isActive ? '<span class="active-badge">✓</span>' : ''}
-                        </button>
-                    `).join('');
+                    accountSwitcherHTML = accounts.map(acc => {
+                        const isCompany = acc.type === 'company';
+                        const label = isCompany 
+                            ? (acc.isCompanyAdmin ? `Admin at ${acc.companyName}` : `Employee at ${acc.companyName}`)
+                            : (acc.username || 'Public Profile');
+                        const icon = isCompany ? '🏢' : '👤';
+                        return `
+                            <button class="dropdown-item account-switch ${acc.isActive ? 'active' : ''}" data-profile-id="${acc.profileId}">
+                                <span class="account-icon">${icon}</span>
+                                <span class="account-name">${escapeHtml(label)}</span>
+                                ${acc.isActive ? '<span class="active-badge">✓</span>' : ''}
+                            </button>
+                        `;
+                    }).join('');
                 }
                 
                 userMenu.innerHTML = `
@@ -676,16 +683,26 @@
             }
         }
         
-        function handleAccountSwitch(e) {
-            const type = e.currentTarget.dataset.type;
-            if (type === 'public') {
-                const result = switchToPublic();
-                if (result.success) {
-                    showToast('Switched to public account', 'success');
-                    window.location.href = '/platform.html';
+        async function handleAccountSwitch(e) {
+            const profileId = e.currentTarget.dataset.profileId;
+            console.log('Account switch clicked, profileId:', profileId);
+            if (!profileId) {
+                showToast('No profile ID found', 'error');
+                return;
+            }
+            
+            const result = await switchProfile(profileId);
+            console.log('Switch profile result:', result);
+            
+            if (result.success) {
+                showToast('Profile switched successfully', 'success');
+                if (result.redirectTo) {
+                    setTimeout(() => window.location.href = result.redirectTo, 500);
                 } else {
-                    showToast(result.message, 'error');
+                    setTimeout(() => window.location.reload(), 500);
                 }
+            } else {
+                showToast(result.message || 'Failed to switch profile', 'error');
             }
         }
 
@@ -849,25 +866,26 @@
                     const profileItem = e.target.closest('.profile-switch-item');
                     console.log('Profile item found:', !!profileItem, profileItem);
                     if (profileItem) {
-                        const type = profileItem.dataset.type;
-                        console.log('Account type:', type);
-                        if (!type || profileItem.classList.contains('active')) {
-                            console.log('Skipping - no type or already active');
+                        const profileId = profileItem.dataset.profileId;
+                        console.log('Profile ID:', profileId);
+                        if (!profileId || profileItem.classList.contains('active')) {
+                            console.log('Skipping - no profile ID or already active');
                             return;
                         }
-                        console.log('Calling account switch for type:', type);
-                        if (type === 'public') {
-                            const result = switchToPublic();
-                            if (result.success) {
-                                showToast('Switched to public account', 'success');
-                                window.location.href = '/platform.html';
+                        console.log('Calling switchProfile with ID:', profileId);
+                        
+                        const result = await switchProfile(profileId);
+                        console.log('Switch profile result:', result);
+                        
+                        if (result.success) {
+                            showToast('Profile switched successfully', 'success');
+                            if (result.redirectTo) {
+                                setTimeout(() => window.location.href = result.redirectTo, 500);
                             } else {
-                                showToast(result.message, 'error');
+                                setTimeout(() => window.location.reload(), 500);
                             }
-                        } else if (type === 'company') {
-                            // Switch to company account - reload the page to trigger company dashboard
-                            showToast('Switching to company account...', 'success');
-                            window.location.reload();
+                        } else {
+                            showToast(result.message || 'Failed to switch profile', 'error');
                         }
                     }
                 });
@@ -1752,21 +1770,24 @@
                 
                 let switcherHTML = '';
                 
-                // Render all available accounts
+                // Render all available accounts using profileId, companyName, isCompanyAdmin
                 switcherHTML += accounts.map(acc => {
                     const isActive = acc.isActive;
                     const isCompany = acc.type === 'company';
-                    const name = isCompany ? 'Company Account' : 'Public Account';
+                    const label = isCompany 
+                        ? (acc.isCompanyAdmin ? `Admin at ${acc.companyName}` : `Employee at ${acc.companyName}`)
+                        : (acc.username || 'Public Profile');
                     const icon = isCompany ? '🏢' : '👤';
+                    const subtitle = isCompany ? 'Company Dashboard' : 'Public Timeline';
                     
-                    console.log(`Rendering account: ${name}, type: ${acc.type}, active: ${isActive}`);
+                    console.log(`Rendering account: ${label}, type: ${acc.type}, active: ${isActive}`);
                     
                     return `
-                        <div class="profile-switch-item ${isActive ? 'active' : ''}" data-type="${acc.type}" data-account-id="${acc.accountId || ''}">
+                        <div class="profile-switch-item ${isActive ? 'active' : ''}" data-profile-id="${acc.profileId}">
                             <div class="profile-switch-icon">${icon}</div>
                             <div class="profile-switch-info">
-                                <div class="profile-switch-name">${name}</div>
-                                <div class="profile-switch-type">${isCompany ? 'Company Dashboard' : 'Public Timeline'}</div>
+                                <div class="profile-switch-name">${escapeHtml(label)}</div>
+                                <div class="profile-switch-type">${subtitle}</div>
                             </div>
                             ${isActive ? '<span class="profile-switch-badge">Active</span>' : ''}
                         </div>

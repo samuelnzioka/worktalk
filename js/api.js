@@ -7,14 +7,9 @@ const API_BASE_URL = 'https://worktalk-backend2.onrender.com/api';
 
 // Helper function for API calls
 export async function apiCall(endpoint, options = {}) {
-    // Get tokens based on current account type
-    const currentAccount = localStorage.getItem('currentAccount') || 'public';
-    const token = currentAccount === 'company' 
-        ? localStorage.getItem('companyAccessToken') 
-        : localStorage.getItem('accessToken');
-    const refreshToken = currentAccount === 'company'
-        ? localStorage.getItem('companyRefreshToken')
-        : localStorage.getItem('refreshToken');
+    // ALWAYS read the latest token fresh from localStorage — never cache it
+    const token = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
     
     const headers = {
         'Content-Type': 'application/json',
@@ -47,11 +42,8 @@ export async function apiCall(endpoint, options = {}) {
         if (response.status === 401 && refreshToken && endpoint !== '/auth/refresh-token') {
             const refreshed = await refreshAccessToken();
             if (refreshed) {
-                // Retry with new token (re-fetch based on current account)
-                const currentAccount = localStorage.getItem('currentAccount') || 'public';
-                const newToken = currentAccount === 'company'
-                    ? localStorage.getItem('companyAccessToken')
-                    : localStorage.getItem('accessToken');
+                // Re-read the fresh token after refresh
+                const newToken = localStorage.getItem('accessToken');
                 headers['Authorization'] = `Bearer ${newToken}`;
                 config.headers = headers;
                 response = await fetch(`${API_BASE_URL}${endpoint}`, config);
@@ -86,10 +78,7 @@ export async function apiCall(endpoint, options = {}) {
 
 // Refresh access token
 async function refreshAccessToken() {
-    const currentAccount = localStorage.getItem('currentAccount') || 'public';
-    const refreshToken = currentAccount === 'company'
-        ? localStorage.getItem('companyRefreshToken')
-        : localStorage.getItem('refreshToken');
+    const refreshToken = localStorage.getItem('refreshToken');
     
     if (!refreshToken) return false;
     
@@ -104,31 +93,20 @@ async function refreshAccessToken() {
         const data = await response.json();
         
         if (response.ok && data.accessToken) {
-            if (currentAccount === 'company') {
-                localStorage.setItem('companyAccessToken', data.accessToken);
-                if (data.refreshToken) {
-                    localStorage.setItem('companyRefreshToken', data.refreshToken);
-                }
-            } else {
-                localStorage.setItem('accessToken', data.accessToken);
-                if (data.refreshToken) {
-                    localStorage.setItem('refreshToken', data.refreshToken);
-                }
+            localStorage.setItem('accessToken', data.accessToken);
+            if (data.refreshToken) {
+                localStorage.setItem('refreshToken', data.refreshToken);
             }
+            console.log('Token refreshed successfully');
             return true;
         }
     } catch (error) {
         console.error('Token refresh failed:', error);
     }
     
-    // Refresh failed, clear tokens for current account
-    if (currentAccount === 'company') {
-        localStorage.removeItem('companyAccessToken');
-        localStorage.removeItem('companyRefreshToken');
-    } else {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-    }
+    // Refresh failed, clear tokens
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     return false;
 }
 
