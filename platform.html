@@ -1569,9 +1569,9 @@
                 });
                 
                 if (response.ok) {
-                    const post = await response.json();
+                    const data = await response.json();
                     // Add to local posts array
-                    publicPosts.unshift(post);
+                    publicPosts.unshift(data.post);
                     renderPublicTimeline();
                     return true;
                 }
@@ -1880,25 +1880,41 @@
                 return;
             }
 
-            container.innerHTML = publicPosts.map(post => `
-                <div class="post-card">
-                    <div class="post-header">
-                        <div class="avatar-placeholder ${post.isAnonymous ? 'anonymous' : 'employee'}">${post.isAnonymous ? '🔒' : '👤'}</div>
-                        <div class="user-info">
-                            <div class="user-name">${post.isAnonymous ? 'Anonymous' : post.username}</div>
-                            <div class="user-badge">
-                                <span class="badge">Public User</span>
-                                <span>• ${formatTime(post.createdAt)}</span>
+            container.innerHTML = publicPosts.map(post => {
+                // Check if this is the current user's post
+                const isCurrentUserPost = currentUserData && post.user === currentUserData._id;
+                let avatarHtml = '';
+                
+                if (post.isAnonymous) {
+                    avatarHtml = '<div class="avatar-placeholder anonymous">🔒</div>';
+                } else if (isCurrentUserPost && (currentUserData.avatar || currentUserData.profiles?.[0]?.avatar)) {
+                    const userAvatar = currentUserData.avatar || currentUserData.profiles?.[0]?.avatar;
+                    avatarHtml = `<div class="avatar-placeholder employee" style="background-image: url(${userAvatar}); background-size: cover; background-position: center;"></div>`;
+                } else {
+                    const initial = post.username ? post.username.charAt(0).toUpperCase() : '?';
+                    avatarHtml = `<div class="avatar-placeholder employee">${initial}</div>`;
+                }
+                
+                return `
+                    <div class="post-card">
+                        <div class="post-header">
+                            ${avatarHtml}
+                            <div class="user-info">
+                                <div class="user-name">${post.isAnonymous ? 'Anonymous' : post.username}</div>
+                                <div class="user-badge">
+                                    <span class="badge">Public User</span>
+                                    <span>• ${formatTime(post.createdAt)}</span>
+                                </div>
                             </div>
                         </div>
+                        <div class="post-content">${post.content}</div>
+                        <div class="post-stats">
+                            <span class="stat-view">👍 ${post.likeCount || 0}</span>
+                            <span class="stat-view">💬 ${post.commentCount || 0}</span>
+                        </div>
                     </div>
-                    <div class="post-content">${post.content}</div>
-                    <div class="post-stats">
-                        <span class="stat-view">👍 ${post.likeCount || 0}</span>
-                        <span class="stat-view">💬 ${post.commentCount || 0}</span>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // ==================== HELPER FUNCTIONS ====================

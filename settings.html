@@ -2735,26 +2735,39 @@
             ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
             ctx.clip();
 
-            // Draw image with current transform
+            // Draw image with current transform - WhatsApp style
             const cropImage = document.getElementById('cropImage');
             
-            // Calculate the draw position based on the visual transform
-            // The visual transform is translate(offsetX, offsetY) scale(scale)
-            // We need to replicate this on the canvas
-            const imgWidth = cropImage.naturalWidth * cropState.scale;
-            const imgHeight = cropImage.naturalHeight * cropState.scale;
+            // The image element is already transformed visually with translate and scale
+            // We need to capture exactly what's visible in the crop area
+            // The crop area is the visible circular region (200x200)
             
-            // The offset is relative to the center of the crop area (100, 100)
-            // So we draw at: center + offset - half of image size
-            const drawX = (size / 2) + cropState.offsetX - (imgWidth / 2);
-            const drawY = (size / 2) + cropState.offsetY - (imgHeight / 2);
+            // Calculate the source rectangle from the original image
+            // based on the current transform state
+            const scaledWidth = cropImage.naturalWidth * cropState.scale;
+            const scaledHeight = cropImage.naturalHeight * cropState.scale;
             
+            // The crop area center is at (100, 100) in the crop modal
+            // The image center after transform is at (100 + offsetX, 100 + offsetY)
+            // We need to draw the portion of the image that's visible in the crop circle
+            
+            // Source rectangle coordinates (from original image)
+            const sourceX = (cropImage.naturalWidth / 2) - (size / (2 * cropState.scale)) - (cropState.offsetX / cropState.scale);
+            const sourceY = (cropImage.naturalHeight / 2) - (size / (2 * cropState.scale)) - (cropState.offsetY / cropState.scale);
+            const sourceWidth = size / cropState.scale;
+            const sourceHeight = size / cropState.scale;
+            
+            // Draw the cropped portion to fill the canvas
             ctx.drawImage(
                 cropImage,
-                drawX,
-                drawY,
-                imgWidth,
-                imgHeight
+                sourceX,
+                sourceY,
+                sourceWidth,
+                sourceHeight,
+                0,
+                0,
+                size,
+                size
             );
 
             return canvas.toDataURL('image/png');
